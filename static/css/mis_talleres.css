@@ -1,0 +1,378 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #8f0d0d;
+    --negro: #111;
+    --gris: #666;
+    --blanco: #fff;
+    --fondo: #f4f4f2;
+}
+
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: var(--fondo);
+    color: #222;
+}
+
+
+/* =========================
+   NAV
+========================= */
+
+.navbar {
+    height: 80px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 6%;
+
+    background-color: var(--negro);
+    color: var(--blanco);
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.logo {
+    width: 38px;
+    height: 50px;
+
+    object-fit: contain;
+}
+
+.nav-acciones {
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+.nav-acciones a {
+    color: var(--blanco);
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+.nav-acciones a:hover {
+    opacity: 0.7;
+}
+
+.btn-cerrar {
+    padding: 10px 16px;
+
+    border: 1px solid var(--blanco);
+    border-radius: 5px;
+}
+
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.pagina-talleres {
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 60px 30px;
+}
+
+.encabezado {
+    margin-bottom: 40px;
+}
+
+.subtitulo {
+    margin: 0 0 8px;
+
+    color: var(--rojo);
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 3px;
+}
+
+.encabezado h1 {
+    margin: 0 0 10px;
+
+    font-size: 42px;
+}
+
+.descripcion {
+    margin: 0;
+
+    color: var(--gris);
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   LISTA
+========================= */
+
+.lista-talleres {
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+}
+
+
+/* =========================
+   TARJETA
+========================= */
+
+.tarjeta-taller {
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+
+    overflow: hidden;
+}
+
+.contenido-taller {
+    padding: 30px;
+}
+
+.cabecera-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+}
+
+.etiqueta {
+    margin: 0 0 7px;
+
+    color: #999;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+.cabecera-tarjeta h2 {
+    margin: 0;
+
+    font-size: 28px;
+}
+
+
+/* =========================
+   ESTADO
+========================= */
+
+.estado {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    text-transform: capitalize;
+}
+
+.estado-activa {
+    background-color: #eeeeee;
+    color: var(--rojo);
+}
+
+.estado-inactiva {
+    background-color: #eeeeee;
+    color: var(--gris);
+}
+
+
+/* =========================
+   DATOS
+========================= */
+
+.datos-taller {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 22px 40px;
+
+    padding: 25px 0;
+
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.dato {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.dato span {
+    color: #888;
+
+    font-size: 12px;
+}
+
+.dato strong {
+    color: var(--negro);
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* =========================
+   ACCIONES
+========================= */
+
+.acciones-taller {
+    margin-top: 25px;
+}
+
+.btn-principal {
+    display: inline-block;
+
+    padding: 11px 18px;
+
+    background-color: var(--rojo);
+    color: var(--blanco);
+
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.btn-principal:hover {
+    background-color: #700a0a;
+}
+
+
+/* =========================
+   SIN TALLERES
+========================= */
+
+.sin-talleres {
+    padding: 40px;
+
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.sin-talleres h2 {
+    margin: 0 0 12px;
+
+    font-size: 27px;
+}
+
+.sin-talleres > p:not(.subtitulo) {
+    margin: 0 0 25px;
+
+    color: var(--gris);
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   VOLVER
+========================= */
+
+.volver {
+    margin-top: 35px;
+}
+
+.volver a {
+    color: var(--rojo);
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+.volver a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+    .datos-taller {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecera-tarjeta {
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .marca span {
+        display: none;
+    }
+
+    .nav-acciones {
+        gap: 12px;
+    }
+
+    .pagina-talleres {
+        padding: 40px 20px;
+    }
+
+    .encabezado h1 {
+        font-size: 32px;
+    }
+
+    .contenido-taller {
+        padding: 24px;
+    }
+
+    .cabecera-tarjeta h2 {
+        font-size: 24px;
+    }
+
+}

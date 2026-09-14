@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis talleres | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/mis_talleres.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>
+                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
+                </span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('panel_alumno') }}">
+                    Mi perfil
+                </a>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="btn-cerrar"
+                >
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+    CONTENIDO
+    ========================== -->
+
+    <main class="pagina-talleres">
+
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                MIS INSCRIPCIONES
+            </p>
+
+            <h1>
+                Mis talleres
+            </h1>
+
+            <p class="descripcion">
+                Revisa tus talleres activos, el plan contratado
+                y las clases disponibles.
+            </p>
+
+        </section>
+
+
+        {% if inscripciones %}
+
+            <section class="lista-talleres">
+
+                {% for inscripcion in inscripciones %}
+
+                    <article class="tarjeta-taller">
+
+                        <div class="contenido-taller">
+
+                            <div class="cabecera-tarjeta">
+
+                                <div>
+
+                                    <p class="etiqueta">
+                                        TALLER
+                                    </p>
+
+                                    <h2>
+                                        {{ inscripcion.taller }}
+                                    </h2>
+
+                                </div>
+
+                                <span class="estado estado-{{ inscripcion.estado|lower }}">
+                                    {{ inscripcion.estado }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="datos-taller">
+
+                                <div class="dato">
+
+                                    <span>
+                                        Plan
+                                    </span>
+
+                                    <strong>
+                                        {{ inscripcion.plan }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dato">
+
+                                    <span>
+                                        Clases contratadas
+                                    </span>
+
+                                    <strong>
+                                        {{ inscripcion.clases_contratadas }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dato dato-ancho">
+
+                                    <span>
+                                        Horario
+                                    </span>
+
+                                    <strong>
+                                        {{ inscripcion.horario }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dato dato-ancho">
+
+                                    <span>
+                                        Vigencia
+                                    </span>
+
+                                    <strong>
+                                        {{ inscripcion.fecha_inicio }}
+                                        -
+                                        {{ inscripcion.fecha_vencimiento }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="acciones-taller">
+
+                                <a
+                                    href="{{ url_for(
+                                        'clases_disponibles_alumno',
+                                        id_inscripcion=inscripcion.id_inscripcion
+                                    ) }}"
+                                    class="btn-principal"
+                                >
+                                    Ver clases disponibles →
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+
+        {% else %}
+
+            <section class="sin-talleres">
+
+                <p class="subtitulo">
+                    MIS INSCRIPCIONES
+                </p>
+
+                <h2>
+                    Aún no tienes talleres activos
+                </h2>
+
+                <p>
+                    Puedes revisar los talleres disponibles
+                    y elegir el plan que más te acomode.
+                </p>
+
+                <a
+                    href="{{ url_for('talleres_disponibles') }}"
+                    class="btn-principal"
+                >
+                    Ver talleres disponibles
+                </a>
+
+            </section>
+
+        {% endif %}
+
+
+        <div class="volver">
+
+            <a href="{{ url_for('panel_alumno') }}">
+                ← Volver al panel
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

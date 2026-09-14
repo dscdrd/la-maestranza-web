@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ titulo }} | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/mensaje.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="pagina-mensaje">
+
+        <section class="tarjeta-mensaje {{ tipo }}">
+
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo Maestranza"
+                class="logo"
+            >
+
+            <div class="icono-mensaje">
+
+                {% if tipo == "exito" %}
+                    ✓
+                {% elif tipo == "aviso" %}
+                    !
+                {% else %}
+                    ✗
+                {% endif %}
+
+            </div>
+
+            <p class="subtitulo">
+                LA MAESTRANZA
+            </p>
+
+            <h1>
+                {{ titulo }}
+            </h1>
+
+            <p class="mensaje">
+                {{ mensaje }}
+            </p>
+
+            {% if texto_boton and destino %}
+
+                <a
+                    href="{{ destino }}"
+                    class="btn-mensaje"
+                >
+                    {{ texto_boton }}
+                </a>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,391 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #ff343b;
+    --crema: #efeedc;
+}
+
+
+/* BODY */
+
+body {
+    margin: 0;
+    min-height: 100svh;
+
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+
+    font-family: Arial, sans-serif;
+    color: var(--crema);
+
+    background-color: #101010;
+
+    overflow-x: hidden;
+}
+
+
+/* IMAGEN DE FONDO */
+
+.fondo-portada {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    filter: brightness(0.65);
+
+    z-index: -1;
+}
+
+
+
+
+
+
+a {
+    color: inherit;
+}
+
+
+/* NAVEGACIÓN */
+
+.cabecera {
+    padding: 20px 3%;
+
+    background: linear-gradient(
+        #0009,
+        transparent
+    );
+
+    flex-shrink: 0;
+}
+
+
+.navegacion {
+    max-width: 1600px;
+    margin: auto;
+}
+
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px 20px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.menu a {
+    display: inline-block;
+
+    padding: 10px 0;
+
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+
+    letter-spacing: 0.4px;
+
+    text-transform: uppercase;
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+
+.menu a:hover {
+    color: var(--rojo);
+}
+
+
+/* PORTADA */
+
+.portada {
+
+    /* Ocupa todo el espacio que queda debajo del menú */
+    flex: 1;
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.6fr)
+        minmax(220px, 1fr)
+        90px;
+
+    align-items: end;
+
+    gap: 24px;
+
+    max-width: 1600px;
+
+    margin: 0 auto;
+
+
+
+    padding: 20px 3% 8px;
+}
+
+
+.mensaje {
+    min-width: 0;
+}
+
+
+.logo-principal {
+    display: block;
+
+    width: 300px;
+    max-width: 85%;
+
+    height: auto;
+
+    margin-bottom: 24px;
+}
+
+
+/* TÍTULO */
+
+h1 {
+    margin: 0;
+
+    font-family: Impact, "Arial Narrow", sans-serif;
+
+    font-size: clamp(
+        44px,
+        5.5vw,
+        80px
+    );
+
+    font-weight: 900;
+
+    line-height: 1.06;
+
+    letter-spacing: -0.5px;
+
+    text-transform: uppercase;
+
+    color: var(--rojo);
+}
+
+
+h1 span {
+    display: block;
+}
+
+
+h1 .crema {
+    color: var(--crema);
+}
+
+
+/* INSCRIPCIÓN */
+
+.llamada {
+    padding-bottom: 14px;
+}
+
+
+.btn-inscripcion {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+
+    padding: 10px 24px;
+
+    border: 1px solid #ff7058;
+
+    border-radius: 30px;
+
+    background: linear-gradient(
+        135deg,
+        #ff654d,
+        #b31b12
+    );
+
+    color: #fff8e8;
+
+    font-family: Impact, "Arial Narrow", sans-serif;
+
+    font-size: 25px;
+
+    font-weight: normal;
+
+    letter-spacing: 0.5px;
+
+    text-transform: uppercase;
+    text-decoration: none;
+
+    box-shadow: 0 6px 18px #0005;
+}
+
+
+.btn-inscripcion:hover {
+    background: #c8261d;
+}
+
+
+/* SELLO */
+
+.sello {
+    width: 65px;
+    height: 100px;
+
+    object-fit: contain;
+
+    justify-self: end;
+}
+
+
+
+/* TABLETS */
+
+@media (max-width: 1100px) {
+
+    .menu {
+        justify-content: center;
+
+        gap: 6px 24px;
+    }
+
+
+    .menu a {
+        font-size: 18px;
+    }
+
+
+    .portada {
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
+        padding: 20px 3% 10px;
+    }
+
+
+    .mensaje {
+        grid-column: 1 / -1;
+    }
+
+
+    .sello {
+        width: 55px;
+        height: 85px;
+    }
+}
+
+
+/* CELULARES */
+
+@media (max-width: 600px) {
+
+    .fondo-portada {
+        object-position: 62% center;
+    }
+
+
+    .cabecera {
+        padding: 14px 20px;
+    }
+
+
+    .menu {
+        gap: 4px 18px;
+    }
+
+
+    .menu a {
+        font-size: 16px;
+    }
+
+
+    .portada {
+        padding: 20px 20px 10px;
+
+        gap: 22px;
+    }
+
+
+    h1 {
+        font-size: clamp(
+            38px,
+            9vw,
+            54px
+        );
+    }
+
+
+    .logo-principal {
+        width: 240px;
+    }
+
+
+    .btn-inscripcion {
+        font-size: 22px;
+
+        padding: 10px 20px;
+    }
+}
+
+
+/* FOTO DE PERFIL EN NAVEGACIÓN */
+
+.acceso-usuario {
+    display: flex;
+    align-items: center;
+}
+
+
+.link-perfil {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.foto-perfil-nav {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid var(--crema);
+}
+
+.perfil-sin-sesion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.separador {
+    margin: 0 12px;
+
+    color: #fff8e8;
+}

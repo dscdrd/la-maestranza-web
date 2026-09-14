@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnos de la clase | La Maestranza</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos_clase.css') }}">
+</head>
+<body>
+    <header class="barra">
+        <span>LA MAESTRANZA</span>
+        <a href="{{ url_for('panel_profesor') }}">Mi panel</a>
+    </header>
+    <main class="contenedor">
+        <a class="volver" href="{{ url_for('mis_clases') }}">← Volver a mis talleres</a>
+        <header class="encabezado">
+            <p class="etiqueta">PANEL DE PROFESOR · DETALLE DE CLASE</p>
+            <h1>{{ clase.taller }}</h1>
+            <p class="descripcion">Consulta los datos de esta sesión y sus reservas.</p>
+        </header>
+        <section class="resumen" aria-label="Datos de la clase">
+            <article class="tarjeta dato"><h2>Fecha</h2><p>{{ clase.fecha }}</p></article>
+            <article class="tarjeta dato"><h2>Horario</h2><p>{{ clase.hora_inicio }} – {{ clase.hora_fin }}</p></article>
+            <article class="tarjeta dato"><h2>Cupo máximo</h2><p>{{ clase.cupo_maximo }} <span>personas</span></p></article>
+        </section>
+        <section class="tarjeta reservas">
+            <div class="titulo-lista">
+                <div><h2>Alumnos de la clase</h2><p class="descripcion">Estado de las reservas de esta sesión.</p></div>
+                <span class="contador">{{ alumnos | length }} registro(s)</span>
+            </div>
+            {% if alumnos %}
+            <div class="tabla-scroll" tabindex="0" role="region" aria-label="Lista de reservas, desplazable horizontalmente">
+                <table>
+                    <caption class="solo-lectores">Reservas de alumnos para esta clase</caption>
+                    <thead><tr>
+                        <th scope="col">Alumno</th><th scope="col">RUT</th><th scope="col">Estado de reserva</th><th scope="col">Fecha de reserva</th><th scope="col">Fecha de cancelación</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for alumno in alumnos %}
+                        <tr>
+                            <td class="nombre">{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                            <td>{{ alumno.rut }}</td>
+                            <td><span class="estado {% if alumno.estado == 'reservada' %}activa{% elif alumno.estado == 'cancelada' %}cancelada{% endif %}">{{ alumno.estado }}</span></td>
+                            <td>{{ alumno.fecha_reserva or '—' }}</td>
+                            <td>{{ alumno.fecha_cancelacion or '—' }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="vacio">
+                <span class="icono-vacio" aria-hidden="true">◇</span>
+                <h3>Aún no hay reservas</h3>
+                <p>Cuando un alumno reserve esta clase, aparecerá aquí.</p>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis talleres | Profesor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel_profesor.css') }}">
+</head>
+<body>
+<main class="panel">
+    <a class="boton" href="{{ url_for('panel_profesor') }}">← Volver a mi panel</a>
+    <section class="bienvenida">
+        <p class="subtitulo">PANEL DE PROFESOR</p>
+        <h1>Mis talleres</h1>
+        <p>Selecciona un taller para ver sus clases y alumnos reservados.</p>
+    </section>
+    <div class="lista-talleres">
+    {% for taller in talleres %}
+        <details class="tarjeta">
+            <summary>{{ taller.nombre }}</summary>
+            <p class="nota">Horario habitual: {{ taller.horario or 'Sin registrar' }}</p>
+            <p class="nota">Clases ordenadas desde la fecha más reciente. Incluye el historial.</p>
+            {% for clase in taller.clases %}
+            <article class="fila-clase">
+                <div>
+                    <h3>{{ clase.fecha }}</h3>
+                    <p>{{ clase.hora_inicio }} – {{ clase.hora_fin }}</p>
+                    <p>{{ clase.reservados }} / {{ clase.cupo_maximo }} reservas · {{ clase.estado }}</p>
+                </div>
+                {% if clase.estado != 'cancelada' %}
+                <a class="boton" href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}">Ver alumnos</a>
+                {% endif %}
+            </article>
+            {% else %}
+            <p>Este taller todavía no tiene clases cargadas.</p>
+            {% endfor %}
+        </details>
+    {% else %}
+        <p class="tarjeta">Todavía no tienes talleres asignados.</p>
+    {% endfor %}
+    </div>
+</main>
+</body>
+</html>

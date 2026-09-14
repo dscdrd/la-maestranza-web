@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Maestranza · Escuela del Movimiento</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+
+<body>
+
+    <!-- IMAGEN DE FONDO -->
+    <img
+        src="{{ url_for('static', filename='img/fondo-inicio.jpg') }}"
+        class="fondo-portada"
+        alt="Imagen de fondo de la portada"
+    >
+
+    <header class="cabecera">
+
+        <nav class="navegacion" aria-label="Navegación principal">
+
+            <ul class="menu">
+
+                <li>
+                    <a href="{{ url_for('talleres') }}">
+                        Talleres
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('comunidad') }}">
+                        Comunidad
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('terapias') }}">
+                        Servicios terapéuticos
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('equipo') }}">
+                        Nosotros
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('contacto') }}">
+                        Contacto
+                    </a>
+                </li>
+
+                
+                <li class="acceso-usuario">
+
+    {% if session.get("id_usuario") %}
+
+        <a href="{{ url_for('mi_panel') }}" class="link-perfil">
+
+            {% if foto_perfil %} 
+
+                <!--  APARECE FOTO SUBIDA POR EL ALUMNO -->
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='img/perfiles/' + foto_perfil
+                    ) }}"
+                    alt="Foto de perfil"
+                    class="foto-perfil-nav"
+                >
+
+            {% else %}
+
+                <!-- LOGO PREDETERMINADO -->
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='img/logo-maestranza.png'
+                    ) }}"
+                    alt="Avatar Maestranza"
+                    class="foto-perfil-nav"
+                >
+
+            {% endif %}
+
+            <span>Mi perfil</span>
+
+        </a>
+
+    {% else %}
+
+        <a href="{{ url_for('mi_panel') }}">
+            Mi PERFIL   </a>
+
+        <span class="separador" aria-hidden="true">
+            |
+        </span>
+
+        <a href="{{ url_for('seleccionar_perfil') }}">
+            Iniciar sesión
+        </a>
+
+    {% endif %}
+
+</li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <main class="portada">
+
+        <section class="mensaje"
+                aria-labelledby="titulo-inicio">
+
+            <img
+                src="{{ url_for('static', filename='img/logo-principal.png') }}"
+                alt="Maestranza, Escuela del Movimiento"
+                class="logo-principal"
+            >
+
+            <h1 id="titulo-inicio">
+
+                <span>Deporte</span>
+
+                <span>Circo y</span>
+
+                <span class="crema">
+                    Artes escénicas
+                </span>
+
+            </h1>
+
+        </section>
+
+
+        <div class="llamada">
+
+            <a
+                href="{{ url_for('registro_alumno') }}"
+                class="btn-inscripcion"
+            >
+                Inscríbete aquí
+            </a>
+
+        </div>
+
+
+        <img
+            src="{{ url_for('static', filename='img/logo-maestranza.png') }}"
+            class="sello"
+            alt=""
+        >
+
+    </main>
+
+</body>
+
+</html>
+
+
+<!--
+☣━━━━━━━━━━━━━━━━━━━━☣
+    D S C D R D
+☣━━━━━━━━━━━━━━━━━━━━☣
+-->

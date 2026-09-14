@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Planes del taller | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/planes_taller.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+        NAV
+    ========================== -->
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>
+                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
+                </span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('panel_alumno') }}">
+                    Mi perfil
+                </a>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="btn-cerrar"
+                >
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+        CONTENIDO
+    ========================== -->
+
+    <main class="pagina-planes">
+
+        <!-- INFORMACIÓN DEL TALLER -->
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                TALLER
+            </p>
+
+            <h1>
+                {{ taller.nombre }}
+            </h1>
+
+            <p class="descripcion">
+                {{ taller.descripcion }}
+            </p>
+
+            <p class="horario">
+                <strong>Horario:</strong>
+                {{ taller.horario }}
+            </p>
+
+        </section>
+
+
+        <!-- =========================
+            PLANES
+        ========================== -->
+
+        <section class="seccion-planes">
+
+            <div class="titulo-seccion">
+
+                <p class="subtitulo">
+                    INSCRIPCIÓN
+                </p>
+
+                <h2>
+                    Planes disponibles
+                </h2>
+
+            </div>
+
+
+            {% if planes %}
+
+                <div class="lista-planes">
+
+                    {% for plan in planes %}
+
+                        <article class="tarjeta-plan">
+
+                            <div class="contenido-plan">
+
+                                <h3>
+                                    {{ plan.nombre }}
+                                </h3>
+
+                                <div class="datos-plan">
+
+                                    <p>
+                                        <span>Clases</span>
+                                        <strong>
+                                            {{ plan.cantidad_clases }}
+                                        </strong>
+                                    </p>
+
+                                    <p>
+                                        <span>Precio</span>
+                                        <strong class="precio">
+                                            ${{ "{:,.0f}".format(plan.precio) }}
+                                        </strong>
+                                    </p>
+
+                                </div>
+
+                                <a
+                                    href="{{ url_for(
+                                        'confirmar_inscripcion',
+                                        id_taller=taller.id_taller,
+                                        id_plan=plan.id_plan
+                                    ) }}"
+                                    class="btn-plan"
+                                >
+                                    Elegir este plan
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="sin-planes">
+
+                    <p>
+                        Este taller no tiene planes disponibles.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- VOLVER -->
+        <div class="volver">
+
+            <a href="{{ url_for('talleres_disponibles') }}">
+                ← Volver a talleres
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

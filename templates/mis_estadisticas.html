@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mis estadísticas | La Maestranza</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/panel_alumno.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/mis_estadisticas.css') }}">
+
+    <script
+        src="{{ url_for('static', filename='js/mis_estadisticas.js') }}"
+        defer>
+    </script>
+</head>
+
+<body>
+
+    <main class="panel"
+        id="estadisticas-alumno"
+        data-api-url="{{ url_for('api_alumno_estadisticas') }}">
+
+        <a class="volver" href="{{ url_for('panel_alumno') }}">
+            ← Volver a mi panel
+        </a>
+
+        <section class="bienvenida">
+            <p class="subtitulo">PANEL DE ALUMNO</p>
+
+            <h1>Mis estadísticas</h1>
+
+            <p>Tus planes vigentes y el historial de tus reservas.</p>
+        </section>
+
+        <p id="estado" role="status" aria-live="polite">
+            Cargando tus estadísticas…
+        </p>
+
+        <button id="reintentar" type="button" hidden>
+            Volver a intentar
+        </button>
+
+        <div id="contenido" hidden>
+
+            <section class="metricas" aria-label="Resumen personal">
+
+                <article class="tarjeta metrica">
+                    <h2>Talleres vigentes</h2>
+                    <strong id="talleres_vigentes"></strong>
+                    <p>Talleres con un plan activo y vigente hoy.</p>
+                </article>
+
+                <article class="tarjeta metrica">
+                    <h2>Clases contratadas</h2>
+                    <strong id="clases_contratadas_vigentes"></strong>
+                    <p>
+                        Total contratado en planes vigentes;
+                        no es el saldo restante.
+                    </p>
+                </article>
+
+                <article class="tarjeta metrica">
+                    <h2>Próximas reservas</h2>
+                    <strong id="reservas_proximas"></strong>
+                    <p>
+                        Reservas activas en clases programadas
+                        que aún no comienzan.
+                    </p>
+                </article>
+
+                <article class="tarjeta metrica">
+                    <h2>Reservas realizadas</h2>
+                    <strong id="total_reservas"></strong>
+                    <p>
+                        Todo tu historial, incluidas las reservas canceladas.
+                    </p>
+                </article>
+
+                <article class="tarjeta metrica">
+                    <h2>Reservas canceladas</h2>
+                    <strong id="reservas_canceladas"></strong>
+                    <p>Total histórico de tus reservas canceladas.</p>
+                </article>
+
+            </section>
+
+            <section class="tarjeta">
+
+                <h2>Mis talleres más reservados</h2>
+
+                <p class="nota">
+                    Tu historial de reservas activas, excluyendo clases
+                    canceladas. No representa asistencia.
+                </p>
+
+                <ol id="ranking" class="lista"></ol>
+
+                <p id="sin-reservas" hidden>
+                    Todavía no tienes reservas para mostrar.
+                </p>
+
+            </section>
+
+            <section class="metricas" aria-label="Asistencia">
+
+                <article class="tarjeta metrica">
+                    <h2>Asistencia</h2>
+                    <p>Pendiente de registro</p>
+                </article>
+
+                <article class="tarjeta metrica">
+                    <h2>Inasistencia</h2>
+                    <p>Pendiente de registro</p>
+                </article>
+
+            </section>
+
+            <p class="nota">
+                Los porcentajes estarán disponibles cuando se implemente
+                el registro de asistencia del profesor.
+            </p>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

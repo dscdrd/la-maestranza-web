@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel Profesor | Maestranza</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/panel_profesor.css') }}">
+</head>
+
+<body>
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>MAESTRANZA - ESCUELA DEL MOVIMIENTO</span>
+
+            </div>
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="#mi-perfil">Mi perfil</a>
+
+                <a href="{{ url_for('cerrar_sesion') }}"
+                class="btn-cerrar">
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <main class="panel">
+
+        <section class="bienvenida">
+
+            <p class="subtitulo">
+                PANEL DE PROFESOR
+            </p>
+
+            <h1>
+                Hola, {{ profesor.nombre }}
+            </h1>
+
+            <p>
+                Bienvenido al espacio de administración de Maestranza.
+            </p>
+
+        </section>
+
+
+        <section class="datos-profesor tarjeta" id="mi-perfil">
+
+            <div class="titulo-tarjeta">
+
+                <div class="perfil-resumen">
+                    {% if profesor.foto_perfil %}
+
+    <img
+        src="{{ url_for(
+            'static',
+            filename='img/perfiles/' + profesor.foto_perfil
+        ) }}"
+        alt="Foto de perfil"
+        class="avatar-perfil"
+    >
+
+{% else %}
+
+    <img
+        src="{{ url_for(
+            'static',
+            filename='img/logo-maestranza.png'
+        ) }}"
+        alt="Avatar predeterminado de La Maestranza"
+        class="avatar-perfil"
+    >
+
+{% endif %}
+
+
+                    <h2>Mi perfil</h2>
+
+                    <form
+    action="{{ url_for('subir_foto_profesor') }}"
+    method="POST"
+    enctype="multipart/form-data"
+    class="form-foto-perfil"
+>
+
+    <label for="foto-profesor" class="btn-seleccionar-foto">
+        Seleccionar imagen
+    </label>
+
+    <input
+        type="file"
+        id="foto-profesor"
+        name="foto"
+        accept=".jpg,.jpeg,.png,.webp"
+        class="input-foto"
+        required
+    >
+
+    <button
+        type="submit"
+        class="btn-guardar-foto"
+    >
+        Guardar foto
+    </button>
+
+</form>
+                </div>
+
+                <span class="estado">
+                    Profesor
+                </span>
+
+            </div>
+
+
+            <div class="datos-grid">
+
+                <div class="dato">
+
+                    <span>Nombre</span>
+
+                    <strong>
+                        {{ profesor.nombre }} {{ profesor.apellido }}
+                    </strong>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <span>RUT</span>
+
+                    <strong>
+                        {{ profesor.rut or 'Sin registrar' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <span>Teléfono</span>
+
+                    <strong>
+                        {{ profesor.telefono or 'Sin registrar' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="dato">
+
+                    <span>Especialidad</span>
+
+                    <strong>
+                        {{ profesor.especialidad or 'Sin registrar' }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="opciones" aria-label="Opciones del profesor">
+
+            <article class="tarjeta opcion">
+                <div class="icono" aria-hidden="true">◇</div>
+                <h3>Mis talleres</h3>
+                <p>Consulta tus talleres asignados, sus clases y alumnos reservados.</p>
+                <a href="{{ url_for('mis_clases') }}">Ver mis talleres →</a>
+            </article>
+
+
+            <article class="tarjeta opcion">
+                <div class="icono" aria-hidden="true">▥</div>
+                <h3>Mis estadísticas</h3>
+                <p>Revisa un resumen de tus talleres, alumnos, reservas y ocupación.</p>
+                <a href="{{ url_for('mis_estadisticas_profesor') }}">
+    Ver mis estadísticas →</a>
+            </article>
+
+
+            <article class="tarjeta opcion">
+                <div class="icono" aria-hidden="true">✔</div>
+                <h3>Tomar asistencia</h3>
+                <p>Revisa tus clases y registra la asistencia de los alumnos.</p>
+                <a href="{{ url_for('mis_clases_profesor') }}"> Ver mis clases → </a>
+</article>
+        </section>
+        <section class="tarjeta clases-hoy">
+            <h2>Clases de hoy</h2>
+            <p class="nota">Incluye las sesiones de hoy, aunque ya hayan comenzado. Las canceladas se indican en la lista.</p>
+            {% for clase in clases_hoy %}
+            <article class="fila-clase">
+                <div>
+                    <h3>{{ clase.taller }}</h3>
+                    <p>{{ clase.hora_inicio }} – {{ clase.hora_fin }}</p>
+                    <p>{{ clase.reservados }} / {{ clase.cupo_maximo }} reservas · {{ clase.estado }}</p>
+                </div>
+                {% if clase.estado != 'cancelada' %}
+                <a class="boton" href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}">Ver alumnos</a>
+                {% endif %}
+            </article>
+            {% else %}
+            <p>No tienes clases asignadas para hoy.</p>
+            {% endfor %}
+            <p class="nota">El registro de asistencia se incorporará en el siguiente paso.</p>
+        </section>
+
+    </main>
+
+</body>
+
+</html>

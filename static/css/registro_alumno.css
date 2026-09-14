@@ -1,0 +1,381 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.registro {
+    min-height: 100vh;
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* COLUMNA IZQUIERDA */
+.registro-izquierda {
+    width: 58%;
+    background-color: #8f0d0d;
+    color: white;
+    padding: 35px 55px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+
+    clip-path: polygon(
+        0 0,
+        92% 0,
+        100% 100%,
+        0 100%
+    );
+}
+
+/* TEXTO SUPERIOR */
+.texto-superior {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* TITULO PRINCIPAL */
+.registro-izquierda h1 {
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-size: 50px;
+    font-weight: 900;
+    line-height: 0.9;
+    margin: 10px 0 15px 0;
+    text-transform: uppercase;
+}
+
+/* FLECHAS */
+.flechas {
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+/* TITULO FORMULARIO */
+.registro-izquierda h2 {
+    font-size: 18px;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+}
+
+/* CONTENEDOR FORMULARIO */
+.contenido-formulario {
+    width: 100%;
+}
+
+/* FORMULARIO */
+.form-registro {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    width: 100%;
+    max-width: 650px;
+}
+
+/* INPUTS */
+.form-registro input {
+    width: 100%;
+    padding: 13px 18px;
+
+    border: 2px solid transparent;
+    border-radius: 25px;
+
+    box-sizing: border-box;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+/* EFECTO AL SELECCIONAR INPUT */
+.form-registro input:focus {
+    border-color: #ffb3b3;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+/* PLACEHOLDER */
+.form-registro input::placeholder {
+    color: #777;
+    font-weight: 500;
+}
+
+/* FECHA NACIMIENTO */
+.form-registro label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 12px;
+}
+
+/* CAMPOS QUE OCUPAN TODO EL ANCHO */
+.form-registro input[type="email"],
+.form-registro input[type="password"] {
+    grid-column: span 2;
+}
+
+/* BOTON */
+.btn-registro {
+    grid-column: span 2;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 30px;
+
+    background-color: white;
+    color: #8f0d0d;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.btn-registro:hover {
+    background-color: #e6e6e6;
+}
+
+/* COLUMNA DERECHA */
+.registro-derecha {
+    width: 47%;
+    margin-left: -5%;
+}
+
+/* IMAGEN */
+.registro-derecha img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+
+    .registro {
+        display: block;
+    }
+
+    .registro-izquierda {
+        width: 100%;
+        clip-path: none;
+        padding: 30px;
+    }
+
+    .registro-derecha {
+        display: none;
+    }
+
+    .form-registro {
+        grid-template-columns: 1fr;
+    }
+
+    .form-registro input[type="email"],
+    .form-registro input[type="password"],
+    .btn-registro {
+        grid-column: span 1;
+    }
+}
+
+.campo-fecha {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.condiciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    font-size: 14px;
+}
+
+.condiciones input {
+    width: auto;
+}
+
+.condiciones a {
+    color: white;
+    font-weight: bold;
+}
+
+.condiciones a:hover {
+    text-decoration: underline;
+}
+
+
+/* ========================= */
+/* MODAL DEL REGLAMENTO      */
+/* ========================= */
+
+.modal-reglamento {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(0, 0, 0, 0.75);
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.contenido-reglamento {
+    position: relative;
+
+    background-color: white;
+    color: #222;
+
+    width: 90%;
+    max-width: 650px;
+
+    max-height: 80vh;
+    overflow-y: auto;
+
+    padding: 30px;
+
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.contenido-reglamento h2 {
+    margin-top: 0;
+    text-align: center;
+
+    color: #8f0d0d;
+}
+
+.contenido-reglamento h3 {
+    margin-top: 20px;
+
+    color: #8f0d0d;
+}
+
+.contenido-reglamento p {
+    line-height: 1.5;
+}
+
+.cerrar-reglamento {
+    position: absolute;
+
+    top: 10px;
+    right: 15px;
+
+    border: none;
+    background: none;
+
+    font-size: 30px;
+    cursor: pointer;
+
+    color: #8f0d0d;
+}
+
+.btn-reglamento {
+    margin-top: 10px;
+
+    padding: 10px 18px;
+
+    border: 2px solid white;
+    border-radius: 6px;
+
+    background-color: transparent;
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.btn-reglamento:hover {
+    background-color: white;
+    color: #8f0d0d;
+}
+
+.btn-entendido {
+    display: block;
+
+    margin: 25px auto 0;
+
+    padding: 12px 25px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #8f0d0d;
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.btn-entendido:hover {
+    background-color: #650909;
+}
+
+.condiciones {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.aceptar-condiciones {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.aceptar-condiciones input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+
+.registro-izquierda {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Logo decorativo del costado izquierdo */
+.logo-lateral {
+    position: absolute;
+
+    width: 340px;
+    height: auto;
+
+    left: -170px;   /* Oculta aproximadamente la mitad */
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    opacity: 0.4;
+
+    z-index: 0;
+
+    pointer-events: none;
+
+
+}
+

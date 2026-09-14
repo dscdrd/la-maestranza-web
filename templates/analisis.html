@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Análisis - La Maestranza</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/analisis.css') }}">
+
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+
+    <header class="encabezado">
+
+        <h1>LA MAESTRANZA | ANÁLISIS</h1>
+
+        <a href="{{ url_for('inicio') }}">
+            Volver al inicio
+        </a>
+
+    </header>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+
+    <main class="contenedor">
+
+        <!-- TÍTULO -->
+
+        <section class="titulo-seccion">
+
+            <h2>Panel de Análisis</h2>
+
+            <p>
+                Resumen general de la actividad registrada
+                en La Maestranza.
+            </p>
+
+        </section>
+
+
+        <!-- TARJETAS -->
+
+        <section class="tarjetas">
+
+            <article class="tarjeta">
+
+                <h3>ALUMNOS REGISTRADOS</h3>
+
+                <p class="numero">
+                    {{ total_alumnos }}
+                </p>
+
+            </article>
+
+
+            <article class="tarjeta">
+
+                <h3>TALLERES</h3>
+
+                <p class="numero">
+                    {{ total_talleres }}
+                </p>
+
+            </article>
+
+
+            <article class="tarjeta">
+
+                <h3>RESERVAS ACTIVAS</h3>
+
+                <p class="numero">
+                    {{ reservas_activas }}
+                </p>
+
+            </article>
+
+
+            <article class="tarjeta">
+
+                <h3>RESERVAS CANCELADAS</h3>
+
+                <p class="numero">
+                    {{ reservas_canceladas }}
+                </p>
+
+            </article>
+
+            <article class="tarjeta">
+
+    <h3>PORCENTAJE DE CANCELACIÓN</h3>
+
+    <p class="numero">
+        {{ tasa_cancelacion }}%
+    </p>
+
+</article>
+
+
+<article class="tarjeta">
+
+    <h3>TALLER CON MÁS DEMANDA</h3>
+
+    <p class="nombre-taller-destacado">
+        {{ taller_mas_demandado }}
+    </p>
+
+    <p class="detalle-taller">
+        {{ reservas_taller_mas_demandado }}
+        reservas activas
+    </p>
+
+</article>
+
+        </section>
+
+
+        <!-- GRÁFICO -->
+
+        <section class="panel panel-grafico">
+
+            <h2>Demanda por taller</h2>
+
+            <p class="descripcion-grafico">
+                Cantidad de reservas activas registradas por taller.
+            </p>
+
+            <div class="grafico-contenedor">
+
+                <canvas id="graficoDemanda"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- GRÁFICO DE OCUPACIÓN -->
+
+<section class="panel panel-grafico">
+
+    <h2>Ocupación por taller</h2>
+
+    <p class="descripcion-grafico">
+        Porcentaje de ocupación según las reservas activas
+        y los cupos disponibles.
+    </p>
+
+    <div class="grafico-contenedor">
+
+        <canvas id="graficoOcupacion"></canvas>
+
+    </div>
+
+</section>
+
+
+        <!-- TABLA -->
+
+        <section class="panel">
+
+            <h2>Detalle de demanda por taller</h2>
+
+            <div class="tabla-contenedor">
+
+                {% if talleres %}
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Taller</th>
+                            <th>Reservas activas</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for taller in talleres %}
+
+                        <tr>
+
+                            <td>
+                                {{ taller.taller }}
+                            </td>
+
+                            <td>
+                                {{ taller.reservas }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+                {% else %}
+
+                <p>
+                    No existen datos para analizar.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JAVASCRIPT DEL DASHBOARD -->
+
+    <script src="{{ url_for('static', filename='js/analisis.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.45)
+        ),
+        url("../img/fondo-index.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+.seleccion-taller {
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 30px 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 180px;
+    height: auto;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 26px;
+    margin: 0 0 30px;
+}
+
+.selector {
+    width: 100%;
+    max-width: 360px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    color: #a50505;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+select:disabled {
+    cursor: wait;
+}
+
+select:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 4px;
+}
+
+#mensaje {
+    min-height: 40px;
+    margin: 0 0 15px;
+    line-height: 1.5;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.detalle-taller {
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    margin-bottom: 25px;
+    padding: 20px;
+
+    background-color: rgba(0, 0, 0, 0.65);
+    border-radius: 10px;
+    text-align: left;
+    line-height: 1.6;
+}
+
+.detalle-taller h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+
+.detalle-taller p {
+    margin: 10px 0;
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel Alumno | La Maestranza</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/panel_alumno.css') }}">
+    
+</head>
+
+<body>
+
+    <!-- BARRA SUPERIOR -->
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>MAESTRANZA - ESCUELA DEL MOVIMIENTO</span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="#mis-datos">Mi perfil</a>
+
+                <a href="{{ url_for('cerrar_sesion') }}"
+                class="btn-cerrar">
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- CONTENIDO -->
+    <main class="panel">
+
+        <section class="bienvenida">
+
+            <p class="subtitulo">
+                PANEL DE ALUMNO
+            </p>
+
+            <h1>
+                Hola, {{ alumno.nombre }}
+            </h1>
+
+            <p>
+                Bienvenido a tu espacio en Maestranza Escuela del Movimiento.
+            </p>
+
+        </section>
+
+
+        <section class="contenido-panel">
+
+            <!-- DATOS PERSONALES -->
+            <article class="tarjeta datos-personales" id="mis-datos">
+
+                <div class="titulo-tarjeta">
+
+                    <div class="perfil-resumen">
+                        {% if alumno.foto_perfil %}
+
+    <img
+        src="{{ url_for('static', filename='img/perfiles/' + alumno.foto_perfil) }}"
+        alt="Foto de perfil"
+        class="avatar-perfil"
+    >
+
+{% else %}
+
+    <img
+        src="{{ url_for('static', filename='img/logo-maestranza.png') }}"
+        alt="Avatar predeterminado de La Maestranza"
+        class="avatar-perfil"
+    >
+
+{% endif %}
+                    
+                        <h2>Mi perfil</h2>
+
+                        <form
+    action="{{ url_for('subir_foto_perfil') }}"
+    method="POST"
+    enctype="multipart/form-data"
+    class="form-foto-perfil"
+>
+
+    <label for="foto" class="btn-seleccionar-foto">
+        Seleccionar imagen
+    </label>
+
+    <input
+        type="file"
+        id="foto"
+        name="foto"
+        accept=".jpg,.jpeg,.png,.webp"
+        class="input-foto"
+        required
+    >
+
+    <button type="submit" class="btn-guardar-foto">
+        Guardar foto
+    </button>
+
+</form>
+                    </div>
+
+                    
+
+                    <span class="estado">
+                        Alumno
+                    </span>
+
+                </div>
+
+
+                <div class="datos-grid">
+
+                    <div class="dato">
+
+                        <span>Nombre</span>
+
+                        <strong>
+                            {{ alumno.nombre }} {{ alumno.apellido }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>RUT</span>
+
+                        <strong>
+                            {{ alumno.rut }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>Fecha de nacimiento</span>
+
+                        <strong>
+                            {{ alumno.fecha_nacimiento }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>Teléfono</span>
+
+                        <strong>
+                            {{ alumno.telefono }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>Contacto de emergencia</span>
+
+                        <strong>
+                            {{ alumno.contacto_emergencia }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>Teléfono de emergencia</span>
+
+                        <strong>
+                            {{ alumno.telefono_emergencia }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <p class="nota-perfil">La edición de datos y la foto de perfil estarán disponibles próximamente.</p>
+
+            </article>
+
+
+            <!-- ACCESOS DEL ALUMNO -->
+            <section class="opciones" aria-label="Opciones del alumno">
+                <article class="tarjeta opcion">
+                    <div class="icono" aria-hidden="true">◇</div>
+                    <h3>Mis talleres</h3>
+                    <p>Consulta tus inscripciones, planes, vigencias y próximas clases.</p>
+                    <a href="{{ url_for('mis_talleres') }}">Ver mis talleres →</a>
+                </article>
+
+                <article class="tarjeta opcion">
+                    <div class="icono" aria-hidden="true">+</div>
+                    <h3>Talleres disponibles</h3>
+                    <p>Explora los talleres y elige un plan para inscribirte.</p>
+                    <a href="{{ url_for('talleres_disponibles') }}">Explorar talleres →</a>
+                </article>
+
+                <article class="tarjeta opcion">
+                    <div class="icono" aria-hidden="true">▥</div>
+                    <h3>Mis estadísticas</h3>
+                    <p>Aquí podrás consultar tus reservas y tu asistencia personal.</p>
+                    <a href="{{ url_for('mis_estadisticas') }}">Ver mis estadísticas →</a>
+                </article>
+            </section>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

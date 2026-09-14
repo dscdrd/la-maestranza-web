@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contacto | La Maestranza</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/contacto.css') }}">
+</head>
+
+<body>
+
+    <header class="barra">
+        <a class="marca" href="{{ url_for('inicio') }}">
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="">
+            <span>LA MAESTRANZA</span>
+        </a>
+    </header>
+
+    <main class="contacto">
+
+        <a class="volver" href="{{ url_for('inicio') }}">
+            ← Volver al inicio
+        </a>
+
+        <section class="encabezado">
+            <p class="subtitulo">ESCUELA DEL MOVIMIENTO</p>
+            <h1>Ven a conocernos</h1>
+            <p>
+                Encuentra nuestra escuela y escríbenos para consultar
+                por talleres, horarios e inscripciones.
+            </p>
+        </section>
+
+        <div class="contacto-grid">
+
+            <section class="tarjeta informacion">
+
+                <h2>Estamos en Lampa</h2>
+
+                <address>
+                    Ruta G-16 km 15, parcela 3.<br>
+                    Lampa, Región Metropolitana, Chile.
+                </address>
+
+                <a class="boton boton-principal"
+                href="https://www.google.com/maps/dir/?api=1&amp;destination=-33.2939914%2C-70.8663292"
+                target="_blank"
+                rel="noopener noreferrer">
+                    Cómo llegar
+                    <span class="solo-lectores">
+                        (abre una nueva pestaña)
+                    </span>
+                </a>
+
+                <hr>
+
+                <h2>Conversemos</h2>
+                <p>Consultas sobre nuestros talleres e inscripciones.</p>
+
+                <a class="boton"
+                href="https://wa.me/56942179354"
+                target="_blank"
+                rel="noopener noreferrer">
+                    Escribir por WhatsApp
+                    <span class="solo-lectores">
+                        (abre una nueva pestaña)
+                    </span>
+                </a>
+
+                <p class="telefono">+56 9 4217 9354</p>
+
+                <hr>
+
+                <h2>Síguenos</h2>
+                <p>Conoce las novedades y actividades de la escuela.</p>
+
+                <a class="instagram"
+                href="https://www.instagram.com/maestranza.escuela/"
+                target="_blank"
+                rel="noopener noreferrer">
+                    @maestranza.escuela ↗
+                    <span class="solo-lectores">
+                        (abre una nueva pestaña)
+                    </span>
+                </a>
+
+            </section>
+
+            <section class="tarjeta ubicacion">
+
+                <div class="titulo-mapa">
+                    <h2>Nuestra ubicación</h2>
+                    <p>Maestranza, escuela del movimiento.</p>
+                </div>
+
+                <iframe
+                    title="Ubicación de La Maestranza en Lampa"
+                    src="https://maps.google.com/maps?q=-33.2939914,-70.8663292&amp;z=16&amp;output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen>
+                </iframe>
+
+                <p class="pie-mapa">
+                    Si el mapa no carga, utiliza el botón «Cómo llegar».
+                </p>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

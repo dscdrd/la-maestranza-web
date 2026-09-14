@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seleccionar_perfil.css') }}">
+</head>
+
+<body>
+
+    <main class="seleccion-perfil">
+
+        <img src="{{ url_for('static', filename='img/logo.png') }}"
+        alt="Logo de la Maestranza Escuela del Movimiento" class="logo-perfil">
+
+        <h1>INICIAR SESIÓN</h1>
+
+        <p>Selecciona tu perfil de usuario</p>
+
+        <div class="botones-perfil">
+
+        <a href="{{ url_for('login_alumno') }}" class="btn-perfil">
+    ALUMNO
+</a>
+
+        <a href="{{ url_for('login_profesor') }}" class="btn-perfil">PROFESOR</a>
+
+        </div>
+
+        <a href="{{ url_for('inicio') }}" class="volver-inicio">Volver al inicio</a>
+
+    </main>
+
+</body>
+
+</html>

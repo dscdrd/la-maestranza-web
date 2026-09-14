@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Clases disponibles | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/clases_disponibles_alumno.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+         NAV
+    ========================== -->
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>
+                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
+                </span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('panel_alumno') }}">
+                    Mi perfil
+                </a>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="btn-cerrar"
+                >
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+         CONTENIDO
+    ========================== -->
+
+    <main class="pagina-clases">
+
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                RESERVA DE CLASES
+            </p>
+
+            <h1>
+                {{ inscripcion.taller }}
+            </h1>
+
+            <p class="descripcion">
+                Revisa tus clases disponibles y reserva el horario
+                que deseas asistir.
+            </p>
+
+        </section>
+
+
+        <!-- =========================
+             RESUMEN DEL PLAN
+        ========================== -->
+
+        <section class="resumen-plan">
+
+            <div class="dato-resumen">
+
+                <span>
+                    Clases contratadas
+                </span>
+
+                <strong>
+                    {{ inscripcion.clases_contratadas }}
+                </strong>
+
+            </div>
+
+
+            <div class="dato-resumen">
+
+                <span>
+                    Clases utilizadas del plan
+                </span>
+
+                <strong>
+                    {{ clases_usadas }}
+                </strong>
+
+            </div>
+
+
+            <div class="dato-resumen destacado">
+
+                <span>
+                    Clases disponibles
+                </span>
+
+                <strong>
+                    {{ clases_disponibles }}
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             CLASES
+        ========================== -->
+
+        <section class="seccion-clases">
+
+            <div class="titulo-seccion">
+
+                <p class="subtitulo">
+                    HORARIOS
+                </p>
+
+                <h2>
+                    Próximas clases
+                </h2>
+
+            </div>
+
+
+            {% if clases %}
+
+                <div class="lista-clases">
+
+                    {% for clase in clases %}
+
+                        <article class="tarjeta-clase">
+
+                            <div class="informacion-clase">
+
+                                <div class="fecha-clase">
+
+                                    <span>
+                                        Fecha
+                                    </span>
+
+                                    <strong>
+                                        {{ clase.fecha }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dato-clase">
+
+                                    <span>
+                                        Horario
+                                    </span>
+
+                                    <strong>
+                                        {{ clase.hora_inicio }}
+                                        -
+                                        {{ clase.hora_fin }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dato-clase">
+
+                                    <span>
+                                        Cupos
+                                    </span>
+
+                                    <strong>
+                                        {{ clase.reservados }}
+                                        /
+                                        {{ clase.cupo_maximo }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =========================
+                                 ESTADO / ACCIONES
+                            ========================== -->
+
+                            <div class="accion-clase">
+
+                                {% if clase.mi_reserva %}
+
+                                    <span class="estado reservada">
+                                        Reservada
+                                    </span>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'cancelar_reserva',
+                                            id_reserva=clase.mi_reserva
+                                        ) }}"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn-cancelar"
+                                        >
+                                            Cancelar reserva
+                                        </button>
+
+                                    </form>
+
+
+                                {% elif clases_disponibles <= 0 %}
+
+                                    <span class="estado sin-clases">
+                                        Sin clases disponibles
+                                    </span>
+
+
+                                {% elif clase.reservados >= clase.cupo_maximo %}
+
+                                    <span class="estado completa">
+                                        Clase completa
+                                    </span>
+
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'reservar_clase',
+                                            id_inscripcion=inscripcion.id_inscripcion,
+                                            id_clase=clase.id_clase
+                                        ) }}"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn-reservar"
+                                        >
+                                            Reservar clase
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="sin-clases">
+
+                    <h3>
+                        No hay próximas clases
+                    </h3>
+
+                    <p>
+                        Actualmente no hay clases disponibles para
+                        reservar en este taller.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <div class="volver">
+
+            <a href="{{ url_for('mis_talleres') }}">
+                ← Volver a mis talleres
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

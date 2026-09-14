@@ -1,0 +1,313 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #8f0d0d;
+    --negro: #111;
+    --gris: #666;
+    --blanco: #fff;
+    --fondo: #f4f4f2;  
+}
+
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--fondo);
+    color: #222;
+}
+
+
+/* =========================
+   NAV
+========================= */
+
+.navbar {
+    height: 80px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 6%;
+
+    background-color: var(--negro);
+    color: var(--blanco);
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.logo {
+    width: 38px;
+    height: 50px;
+
+    object-fit: contain;
+}
+
+.nav-acciones {
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+.nav-acciones a {
+    color: var(--blanco);
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+.nav-acciones a:hover {
+    opacity: 0.7;
+}
+
+.btn-cerrar {
+    padding: 10px 16px;
+
+    border: 1px solid var(--blanco);
+    border-radius: 5px;
+}
+
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.pagina-confirmacion {
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 60px 30px;
+}
+
+.encabezado {
+    margin-bottom: 35px;
+}
+
+.subtitulo {
+    margin-bottom: 8px;
+
+    color: var(--rojo);
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 3px;
+}
+
+.encabezado h1 {
+    margin: 0 0 10px;
+
+    font-size: 42px;
+}
+
+.descripcion {
+    margin: 0;
+
+    color: var(--gris);
+}
+
+
+/* =========================
+   TARJETA
+========================= */
+
+.tarjeta-confirmacion {
+    padding: 35px;
+
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.etiqueta {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #888;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.bloque-taller h2,
+.bloque-plan h3 {
+    margin: 0 0 12px;
+}
+
+.bloque-taller h2 {
+    font-size: 28px;
+}
+
+.bloque-plan h3 {
+    font-size: 24px;
+}
+
+.bloque-taller p {
+    margin: 0;
+
+    color: var(--gris);
+}
+
+
+/* =========================
+   SEPARADOR
+========================= */
+
+.separador {
+    height: 1px;
+
+    margin: 30px 0;
+
+    background-color: #eee;
+}
+
+
+/* =========================
+   DATOS DEL PLAN
+========================= */
+
+.datos-plan {
+    display: flex;
+
+    gap: 50px;
+
+    margin-top: 20px;
+}
+
+.dato {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.dato span {
+    color: #888;
+
+    font-size: 13px;
+}
+
+.dato strong {
+    font-size: 20px;
+}
+
+.precio {
+    color: var(--rojo);
+}
+
+
+/* =========================
+CONFIRMACIÓN
+========================= */
+
+.confirmacion p {
+    margin: 0 0 20px;
+
+    font-size: 16px;
+}
+
+.btn-confirmar {
+    padding: 12px 20px;
+
+    border: none;
+    border-radius: 7px;
+
+    background-color: var(--rojo);
+    color: var(--blanco);
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.btn-confirmar:hover {
+    background-color: #700a0a;
+}
+
+
+/* =========================
+VOLVER
+========================= */
+
+.volver {
+    margin-top: 30px;
+}
+
+.volver a {
+    color: var(--rojo);
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+.volver a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media (max-width: 650px) {
+
+    .datos-plan {
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .marca span {
+        display: none;
+    }
+
+    .nav-acciones {
+        gap: 12px;
+    }
+
+    .pagina-confirmacion {
+        padding: 40px 20px;
+    }
+
+    .encabezado h1 {
+        font-size: 32px;
+    }
+
+    .tarjeta-confirmacion {
+        padding: 25px;
+    }
+
+}

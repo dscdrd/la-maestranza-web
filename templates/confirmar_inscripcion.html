@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Confirmar inscripción | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/confirmar_inscripcion.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+         NAV
+    ========================== -->
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>
+                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
+                </span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('panel_alumno') }}">
+                    Mi perfil
+                </a>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="btn-cerrar"
+                >
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+         CONTENIDO
+    ========================== -->
+
+    <main class="pagina-confirmacion">
+
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                INSCRIPCIÓN
+            </p>
+
+            <h1>
+                Confirmar inscripción
+            </h1>
+
+            <p class="descripcion">
+                Revisa los datos antes de confirmar tu inscripción.
+            </p>
+
+        </section>
+
+
+        <!-- =========================
+            RESUMEN
+        ========================== -->
+
+        <section class="tarjeta-confirmacion">
+
+            <div class="bloque-taller">
+
+                <span class="etiqueta">
+                    Taller
+                </span>
+
+                <h2>
+                    {{ datos.taller }}
+                </h2>
+
+                <p>
+                    <strong>Horario:</strong>
+                    {{ datos.horario }}
+                </p>
+
+            </div>
+
+
+            <div class="separador"></div>
+
+
+            <div class="bloque-plan">
+
+                <span class="etiqueta">
+                    Plan seleccionado
+                </span>
+
+                <h3>
+                    {{ datos.plan }}
+                </h3>
+
+                <div class="datos-plan">
+
+                    <div class="dato">
+
+                        <span>
+                            Clases
+                        </span>
+
+                        <strong>
+                            {{ datos.cantidad_clases }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span>
+                            Precio
+                        </span>
+
+                        <strong class="precio">
+                            ${{ "{:,.0f}".format(datos.precio) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="separador"></div>
+
+
+            <div class="confirmacion">
+
+                <p>
+                    ¿Deseas inscribirte en este taller con este plan?
+                </p>
+
+                <form
+                    action="{{ url_for(
+                        'inscribir_taller',
+                        id_taller=datos.id_taller,
+                        id_plan=datos.id_plan
+                    ) }}"
+                    method="POST"
+                >
+
+                    <button
+                        type="submit"
+                        class="btn-confirmar"
+                    >
+                        Confirmar inscripción
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <div class="volver">
+
+            <a href="{{ url_for(
+                'planes_taller',
+                id_taller=datos.id_taller
+            ) }}">
+                ← Volver a los planes
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

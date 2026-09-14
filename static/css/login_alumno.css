@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    
+    color: white;
+    text-align: center;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.25),
+            rgba(0, 0, 0, 0.25)
+        ),
+        url("../img/fondo-index.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+h2 {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+.login_alumno {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+
+.form-login {
+    display: flex;
+    flex-direction: column;
+
+    width: 300px;
+    gap: 15px;
+}
+
+.form-login input {
+    padding: 12px;
+
+    border: none;
+    border-radius: 5px;
+
+    font-size: 16px;
+}
+
+.btn-ingresar {
+    padding: 12px;
+
+    border: none;
+    border-radius: 5px;
+
+    background-color: white;
+    color: #a50505;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-ingresar:hover {
+    background-color: #dddddd;
+}
+
+.logo-alumno {
+    width: 180px;
+    height: auto;
+
+    margin-bottom: 25px;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+a:hover {
+    color: rgb(96, 94, 104);
+    text-decoration: underline;  /* Agrega un subrayado al pasar el mouse */
+}
+
+.volver-perfil,
+.volver-perfil:visited {
+    display: inline-block;
+    width: auto;
+    min-height: 0;
+    margin-top: 12px;
+    padding: 0;
+
+    background: transparent;
+    border: none;
+    border-radius: 0;
+
+    color: #fff;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.volver-perfil:hover {
+    background: transparent;
+    color: #ccc;
+}

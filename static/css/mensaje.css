@@ -1,0 +1,144 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #8f0d0d;
+    --negro: #111;
+    --gris: #666;
+    --blanco: #fff;
+    --fondo: #f4f4f2;
+}
+
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: var(--fondo);
+    color: var(--negro);
+}
+
+.pagina-mensaje {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+}
+
+.tarjeta-mensaje {
+    width: 100%;
+    max-width: 460px;
+
+    padding: 40px;
+
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+}
+
+.logo {
+    width: 55px;
+    height: 65px;
+
+    margin-bottom: 20px;
+
+    object-fit: contain;
+}
+
+.icono-mensaje {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.exito .icono-mensaje {
+    background-color: var(--rojo);
+    color: var(--blanco);
+}
+
+.aviso .icono-mensaje {
+    background-color: #ececec;
+    color: var(--negro);
+}
+
+.error .icono-mensaje {
+    background-color: var(--negro);
+    color: var(--blanco);
+}
+
+.subtitulo {
+    margin: 0 0 8px;
+
+    color: var(--rojo);
+
+    font-size: 11px;
+    font-weight: bold;
+
+    letter-spacing: 3px;
+}
+
+.tarjeta-mensaje h1 {
+    margin: 0 0 12px;
+
+    font-size: 27px;
+}
+
+.mensaje {
+    margin: 0 auto 25px;
+
+    color: var(--gris);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.btn-mensaje {
+    display: inline-block;
+
+    padding: 11px 18px;
+
+    background-color: var(--rojo);
+    color: var(--blanco);
+
+    border-radius: 6px;
+
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.btn-mensaje:hover {
+    background-color: #700a0a;
+}
+
+@media (max-width: 500px) {
+
+    .tarjeta-mensaje {
+        padding: 32px 24px;
+    }
+
+    .tarjeta-mensaje h1 {
+        font-size: 24px;
+    }
+
+}

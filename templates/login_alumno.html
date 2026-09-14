@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión Alumno</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_alumno.css') }}">
+</head>
+<body>
+    <main class="login_alumno">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo de la Maestranza Escuela del Movimiento" class="logo-alumno">
+
+        <h1>INICIAR SESIÓN</h1>
+        <form class="form-login" method="POST"> 
+
+            <h2>PERFIL ALUMNO</h2>
+
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+
+            <input type="password" name="contrasena" placeholder="Contraseña" required>
+
+            <button type="submit" class="btn-ingresar">Iniciar Sesión</button>
+
+
+        </form> 
+
+        <a href="{{ url_for('seleccionar_perfil') }}" class="volver-perfil">Cambiar perfil</a>
+
+        <p>¿No tienes una cuenta? <a href="{{ url_for('registro_alumno') }}" target="_blank">Regístrate aquí</a></p>
+    </main>
+
+    
+        
+</body>
+</html>

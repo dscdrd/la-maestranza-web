@@ -1,0 +1,154 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    
+    color: white;
+    text-align: center;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.25),
+            rgba(0, 0, 0, 0.25)
+        ),
+        url("../img/fondo-inicio.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+
+nav {
+    display: flex;
+    background-color: transparent;
+    
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px; /* Separación de los bordes */
+}
+
+nav ul {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: rgb(96, 94, 104);
+    text-decoration: underline;  /* Agrega un subrayado al pasar el mouse */
+}
+
+.btn-login {
+    border: 1px solid white; /* Borde blanco */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+.btn-login:hover {
+    background-color: white;
+    color: #a50505;
+    text-decoration: none;
+    /* cursor: pointer; /* Cambia el cursor al pasar el mouse (Manito)*/
+}
+
+.inicio {
+    min-height: calc(100vh - 70px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inicio-texto h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.inicio-texto h2 {
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.inicio-texto p {
+    font-size: 18px;
+}
+
+.btn-principal {
+    display: inline-block; /* Permite que el enlace se comporte como un botón */
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: white;
+    color: #a50505;
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    border-radius: 5px;
+} 
+
+.btn-principal:hover { 
+    background-color: #dddddd;
+}  /* Cambia el color de fondo al pasar el mouse */
+
+.contenedor-talleres {
+    display: flex; /* Utiliza flexbox para organizar los talleres en una fila */
+    justify-content: center;
+    gap: 30px;
+}   
+        
+.botones-inicio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.marca {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-nav {
+    width: 40px;
+    height: auto;
+}
+
+.marca h2 {
+    margin: 0;
+}
+
+.acciones-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-panel {
+    color: white;
+    text-decoration: none;
+
+    padding: 10px 18px;
+
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.btn-panel:hover {
+    background-color: white;
+    color: #8f0d0d;
+}
+
+.logo-principal {
+    width: 600px;
+    max-width: 90%;
+    height: auto;
+
+    display: block;
+    margin: 0 auto 20px auto;
+}

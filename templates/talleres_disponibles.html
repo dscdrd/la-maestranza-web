@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Talleres disponibles | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/talleres_disponibles.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- BARRA SUPERIOR -->
+    <header>
+
+        <nav class="navbar">
+
+            <div class="marca">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Logo Maestranza"
+                    class="logo"
+                >
+
+                <span>
+                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
+                </span>
+
+            </div>
+
+            <div class="nav-acciones">
+
+                <a href="{{ url_for('inicio') }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('panel_alumno') }}">
+                    Mi perfil
+                </a>
+
+                <a
+                    href="{{ url_for('cerrar_sesion') }}"
+                    class="btn-cerrar"
+                >
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <main class="pagina-talleres">
+
+        <!-- ENCABEZADO -->
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                TALLERES
+            </p>
+
+            <h1>
+                Talleres disponibles
+            </h1>
+
+            <p class="descripcion">
+                Revisa los talleres de La Maestranza y selecciona uno
+                para conocer sus planes.
+            </p>
+
+        </section>
+
+
+        <!-- LISTADO DE TALLERES -->
+        {% if talleres %}
+
+            <section class="lista-talleres">
+
+                {% for taller in talleres %}
+
+                    <article class="tarjeta-taller">
+
+                        <!-- IMAGEN -->
+                        <div class="imagen-taller">
+
+                            {% if taller.imagen %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='img/talleres/' + taller.imagen
+                                    ) }}"
+                                    alt="{{ taller.nombre }}"
+                                >
+
+                            {% else %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='img/talleres/taller-default.png'
+                                    ) }}"
+                                    alt="{{ taller.nombre }}"
+                                >
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- INFORMACIÓN -->
+                        <div class="contenido-taller">
+
+                            <h2>
+                                {{ taller.nombre }}
+                            </h2>
+
+                            <p class="descripcion-taller">
+                                {{ taller.descripcion }}
+                            </p>
+
+                            <div class="datos-taller">
+
+                                <p>
+                                    <strong>Horario:</strong>
+                                    {{ taller.horario }}
+                                </p>
+
+                                <p>
+                                    <strong>Cupo máximo:</strong>
+                                    {{ taller.cupo_maximo }}
+                                </p>
+
+                            </div>
+
+                            <a
+                                href="{{ url_for(
+                                    'planes_taller',
+                                    id_taller=taller.id_taller
+                                ) }}"
+                                class="btn-taller"
+                            >
+                                Ver planes e inscribirme →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <div class="sin-talleres">
+
+                <p>
+                    No hay talleres disponibles actualmente.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+        <div class="volver-panel">
+
+            <a href="{{ url_for('panel_alumno') }}">
+                ← Volver al panel
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

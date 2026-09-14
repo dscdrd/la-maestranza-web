@@ -1,0 +1,330 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #8f0d0d;
+    --rojo-claro: #a80d12;
+    --negro: #111;
+    --gris: #666;
+    --blanco: #fff;
+    --fondo: #f4f4f2;
+}
+
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: var(--fondo);
+
+    color: #222;
+}
+
+
+/* =========================
+   NAV
+========================= */
+
+.navbar {
+    height: 80px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 6%;
+
+    background-color: var(--negro);
+    color: var(--blanco);
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+.logo {
+    width: 38px;
+    height: 50px;
+
+    object-fit: contain;
+}
+
+.nav-acciones {
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+.nav-acciones a {
+    color: var(--blanco);
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+.nav-acciones a:hover {
+    opacity: 0.7;
+}
+
+.btn-cerrar {
+    padding: 10px 16px;
+
+    border: 1px solid var(--blanco);
+    border-radius: 5px;
+}
+
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.pagina-talleres {
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding: 60px 30px;
+}
+
+.encabezado {
+    margin-bottom: 40px;
+}
+
+.subtitulo {
+    margin-bottom: 8px;
+
+    color: var(--rojo);
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 3px;
+}
+
+.encabezado h1 {
+    margin: 0;
+
+    font-size: 42px;
+}
+
+.descripcion {
+    margin-top: 10px;
+
+    color: var(--gris);
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   LISTA DE TALLERES
+========================= */
+
+.lista-talleres {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 25px;
+}
+
+.tarjeta-taller {
+    display: grid;
+
+    grid-template-columns: 240px 1fr;
+
+    min-height: 230px;
+
+    overflow: hidden;
+
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================
+   IMAGEN
+========================= */
+
+.imagen-taller {
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+.imagen-taller img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+}
+
+
+/* =========================
+   INFORMACIÓN
+========================= */
+
+.contenido-taller {
+    padding: 30px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+.contenido-taller h2 {
+    margin: 0 0 12px;
+
+    font-size: 26px;
+}
+
+.descripcion-taller {
+    margin: 0 0 18px;
+
+    color: #555;
+
+    line-height: 1.5;
+}
+
+.datos-taller {
+    display: flex;
+
+    gap: 30px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 20px;
+}
+
+.datos-taller p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   BOTÓN
+========================= */
+
+.btn-taller {
+    display: inline-block;
+
+    width: fit-content;
+
+    padding: 11px 18px;
+
+    background-color: var(--rojo);
+
+    color: var(--blanco);
+
+    text-decoration: none;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.btn-taller:hover {
+    background-color: #700a0a;
+}
+
+
+/* =========================
+   VOLVER
+========================= */
+
+.volver-panel {
+    margin-top: 35px;
+}
+
+.volver-panel a {
+    color: var(--rojo);
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+.volver-panel a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   SIN TALLERES
+========================= */
+
+.sin-talleres {
+    padding: 30px;
+
+    background-color: var(--blanco);
+
+    border-radius: 12px;
+
+    color: var(--gris);
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    .tarjeta-taller {
+        grid-template-columns: 1fr;
+    }
+
+    .imagen-taller {
+        height: 220px;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .marca span {
+        display: none;
+    }
+
+    .nav-acciones {
+        gap: 12px;
+    }
+
+    .encabezado h1 {
+        font-size: 32px;
+    }
+
+    .pagina-talleres {
+        padding: 40px 20px;
+    }
+
+}

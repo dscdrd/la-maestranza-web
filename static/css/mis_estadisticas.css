@@ -1,0 +1,112 @@
+/* Cuadrícula de estadísticas */
+.metricas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 24px 0;
+}
+
+/* Tarjetas */
+.metrica {
+    min-width: 0;
+}
+
+.metrica h2 {
+    font-size: 18px;
+}
+
+.metrica strong {
+    display: block;
+    margin: 12px 0;
+    font-size: 32px;
+    color: #8f0d0d;
+}
+
+.metrica p,
+.nota {
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Ranking personal */
+.lista {
+    padding-left: 24px;
+}
+
+.lista li {
+    margin: 14px 0;
+    overflow-wrap: anywhere;
+}
+
+/* Navegación */
+.volver {
+    display: inline-block;
+    margin-bottom: 24px;
+    color: #8f0d0d;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.volver:hover {
+    text-decoration: underline;
+}
+
+/* Estados de carga y error */
+#estado {
+    margin-top: 20px;
+    line-height: 1.5;
+}
+
+#reintentar {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: 1px solid #8f0d0d;
+    border-radius: 8px;
+    background: white;
+    color: #8f0d0d;
+    font: inherit;
+    cursor: pointer;
+}
+
+#reintentar:hover {
+    background: #8f0d0d;
+    color: white;
+}
+
+.volver:focus-visible,
+#reintentar:focus-visible {
+    outline: 3px solid #8f0d0d;
+    outline-offset: 4px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Pantallas pequeñas */
+@media (max-width: 550px) {
+    .metricas {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+a.volver {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 18px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+    border: 1px solid #8f0d0d;
+    border-radius: 10px;
+    background: #fff;
+    color: #8f0d0d;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.volver:hover {
+    background: #8f0d0d;
+    color: #fff;
+}

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Editar Alumno | Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/editar_alumno.css') }}">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <nav class="navbar">
+
+        <div class="marca">
+
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo Maestranza"
+                class="logo">
+
+            <span>MAESTRANZA</span>
+
+        </div>
+
+
+        <div class="nav-acciones">
+
+            <a href="{{ url_for('gestion_alumnos') }}">
+                Gestión alumnos
+            </a>
+
+            <a href="{{ url_for('panel_profesor') }}">
+                Panel profesor
+            </a>
+
+            <a
+                href="{{ url_for('cerrar_sesion') }}"
+                class="btn-cerrar">
+
+                Cerrar sesión
+
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+
+<main class="contenedor">
+
+
+    <section class="encabezado">
+
+        <p class="subtitulo">
+            ADMINISTRACIÓN
+        </p>
+
+        <h1>Editar alumno</h1>
+
+        <p>
+            Modifica los datos registrados del alumno.
+        </p>
+
+    </section>
+
+
+
+    <section class="tarjeta">
+
+
+        <form method="POST">
+
+
+            <div class="form-grid">
+
+
+                <div class="campo">
+
+                    <label>
+                        Nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        value="{{ alumno.nombre }}"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Apellido
+                    </label>
+
+                    <input
+                        type="text"
+                        name="apellido"
+                        value="{{ alumno.apellido }}"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        RUT
+                    </label>
+
+                    <input
+                        type="text"
+                        name="rut"
+                        value="{{ alumno.rut }}"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Fecha de nacimiento
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_nacimiento"
+                        value="{{ alumno.fecha_nacimiento }}"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        value="{{ alumno.telefono or '' }}">
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Contacto de emergencia
+                    </label>
+
+                    <input
+                        type="text"
+                        name="contacto_emergencia"
+                        value="{{ alumno.contacto_emergencia or '' }}">
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Teléfono emergencia
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono_emergencia"
+                        value="{{ alumno.telefono_emergencia or '' }}">
+
+                </div>
+
+
+            </div>
+
+
+            <div class="acciones-formulario">
+
+                <a
+                    href="{{ url_for('gestion_alumnos') }}"
+                    class="btn-cancelar">
+
+                    Cancelar
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="btn-guardar">
+
+                    Guardar cambios
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+    </section>
+
+
+</main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mis clases</title>
+</head>
+
+<body>
+
+    <h1>Mis clases</h1>
+
+    {% if clases %}
+
+        {% for clase in clases %}
+
+            <h2>{{ clase.taller }}</h2>
+
+            <p>Fecha: {{ clase.fecha }}</p>
+
+            <p>
+                Horario:
+                {{ clase.hora_inicio }}
+                -
+                {{ clase.hora_fin }}
+            </p>
+
+            <p>
+                Cupos:
+                {{ clase.reservados }}
+                /
+                {{ clase.cupo_maximo }}
+            </p>
+
+            <a href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}">
+                Ver alumnos →
+            </a>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No tienes clases programadas.</p>
+
+    {% endif %}
+
+    <a href="{{ url_for('panel_profesor') }}">
+        Volver al panel
+    </a>
+
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Comunidad · Maestranza</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/comunidad.css') }}">
+</head>
+
+<body>
+
+    <header class="cabecera">
+
+    <div class="barra-superior">
+
+        <div class="marca">
+
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo Maestranza"
+                class="logo-cabecera"
+            >
+
+            <span>
+                MAESTRANZA · ESCUELA DEL MOVIMIENTO
+            </span>
+
+        </div>
+
+
+        <nav class="navegacion">
+
+            <a href="{{ url_for('inicio') }}">
+                Inicio
+            </a>
+
+            <a href="{{ url_for('talleres') }}">
+                Talleres
+            </a>
+
+            <a href="{{ url_for('terapias') }}">
+                Servicios terapéuticos
+            </a>
+
+        </nav>
+
+    </div>
+
+
+    </header>
+
+
+    <main class="comunidad">
+
+        <section class="encabezado-comunidad">
+
+            <h1>Comunidad</h1>
+
+            <p>
+                Conoce las actividades, competencias y encuentros
+                que forman parte de La Maestranza.
+            </p>
+
+        </section>
+
+
+        <section class="categorias">
+
+
+            <!-- ACTIVIDADES EDUCATIVAS -->
+
+            <article class="tarjeta">
+
+                <img
+                    src="{{ url_for('static',
+                    filename='img/comunidad/actividades-educativas.jpg') }}"
+                    alt="Actividades educativas"
+                >
+
+                <div class="contenido-tarjeta">
+
+                    <h2>Actividades educativas</h2>
+
+                    <p>
+                        Talleres, jornadas y actividades de aprendizaje.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <!-- ÁGUILAS SATIVAS Y PETIT -->
+
+            <article class="tarjeta">
+
+                <img
+                    src="{{ url_for('static',
+                    filename='img/comunidad/aguilas.jpg') }}"
+                    alt="Águilas Sativas y Petit"
+                >
+
+                <div class="contenido-tarjeta">
+
+                    <h2>Águilas Sativas y Petit</h2>
+
+                    <p>
+                        Actividades y encuentros de nuestra comunidad.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <!-- CROSSFIT -->
+
+            <article class="tarjeta">
+
+                <img
+                    src="{{ url_for('static',
+                    filename='img/comunidad/crossfit.jpg') }}"
+                    alt="Competencias Crossfit"
+                >
+
+                <div class="contenido-tarjeta">
+
+                    <h2>Competencias Crossfit</h2>
+
+                    <p>
+                        Competencias, entrenamiento y desafíos deportivos.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <!-- DÍA DE LA TRANZA -->
+
+            <article class="tarjeta">
+
+                <img
+                    src="{{ url_for('static',
+                    filename='img/comunidad/dia-tranza.jpg') }}"
+                    alt="Día de la Tranza"
+                >
+
+                <div class="contenido-tarjeta">
+
+                    <h2>Día de la Tranza</h2>
+
+                    <p>
+                        Una jornada especial para compartir y encontrarnos.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <!-- FIESTAS Y EVENTOS -->
+
+            <article class="tarjeta">
+
+                <img
+                    src="{{ url_for('static',
+                    filename='img/comunidad/fiestas-eventos.jpg') }}"
+                    alt="Fiestas y eventos"
+                >
+
+                <div class="contenido-tarjeta">
+
+                    <h2>Fiestas y eventos</h2>
+
+                    <p>
+                        Celebraciones y momentos de nuestra comunidad.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

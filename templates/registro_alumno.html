@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registro Alumno</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro_alumno.css') }}">
+</head>
+
+<body>
+
+    <main class="registro">
+
+        <section class="registro-izquierda">
+
+            <p class="texto-superior"></p>
+
+            <div class="titulo-comunidad"></div>
+
+            <!-- Logo decorativo lateral -->
+    <img
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        alt="Logo La Maestranza"
+        class="logo-lateral"
+    >
+
+<h1>
+    SÉ PARTE DE<br>
+    NUESTRA COMUNIDAD
+</h1>
+
+            <h2>INSCRÍBETE CON NOSOTROS</h2>
+
+            <div class="contenido-formulario">
+
+                <form class="form-registro" method="POST">
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        placeholder="Nombre:"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="apellido"
+                        placeholder="Apellido:"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="rut"
+                        placeholder="Ingresa tu RUT : 1111111-1"
+                        required
+                    >
+
+                    <div class="campo-fecha">
+
+                        <label for="fecha_nacimiento">
+                            Fecha de nacimiento:
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_nacimiento"
+                            id="fecha_nacimiento"
+                            required
+                        >
+
+                    </div>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        placeholder="Correo Electrónico:"
+                        required
+                    >
+
+                    <input
+                        type="tel"
+                        name="telefono"
+                        placeholder="Teléfono:"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="contacto_emergencia"
+                        placeholder="Nombre del contacto de emergencia:"
+                        required
+                    >
+
+                    <input
+                        type="tel"
+                        name="telefono_emergencia"
+                        placeholder="Teléfono de emergencia:"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        name="contrasena"
+                        placeholder="Contraseña:"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        name="confirmar_contrasena"
+                        placeholder="Confirmar contraseña:"
+                        required
+                    >
+
+
+                    <!-- ACEPTACIÓN DE REGLAMENTO -->
+
+                    <div class="condiciones">
+
+                        <label class="aceptar-condiciones">
+
+                            <input
+                                type="checkbox"
+                                name="acepta_condiciones"
+                                id="acepta_condiciones"
+                                required
+                            >
+
+                            Acepto el reglamento y las condiciones de La Maestranza
+
+                        </label>
+
+                        <button
+                            type="button"
+                            class="btn-reglamento"
+                            onclick="abrirReglamento()"
+                        >
+                            Ver reglamento
+                        </button>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn-registro"
+                    >
+                        Registrarse
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <section class="registro-derecha">
+
+            <img
+                src="{{ url_for('static', filename='img/inscripciones.jpg') }}"
+                alt="Maestranza Escuela del Movimiento"
+            >
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL DEL REGLAMENTO -->
+
+    <div id="modal-reglamento" class="modal-reglamento">
+
+        <div class="contenido-reglamento">
+
+            <button
+                type="button"
+                class="cerrar-reglamento"
+                onclick="cerrarReglamento()"
+            >
+                ×
+            </button>
+
+            <h2>Reglamento La Maestranza</h2>
+
+            <p>
+                Al registrarse como alumno de La Maestranza, el usuario
+                declara conocer y aceptar las normas de funcionamiento
+                de la escuela.
+            </p>
+
+            <h3>1. Respeto y convivencia</h3>
+
+            <p>
+                Todos los alumnos deberán mantener una actitud respetuosa
+                hacia profesores, alumnos y miembros de la comunidad.
+            </p>
+
+            <h3>2. Uso de las instalaciones</h3>
+
+            <p>
+                Los espacios, materiales y equipamiento deberán utilizarse
+                de manera responsable.
+            </p>
+
+            <h3>3. Horarios</h3>
+
+            <p>
+                Los alumnos deberán respetar los horarios establecidos
+                para las clases y talleres.
+            </p>
+
+            <h3>4. Pagos</h3>
+
+            <p>
+                Los pagos correspondientes a talleres o mensualidades
+                deberán realizarse dentro de los plazos establecidos.
+            </p>
+
+            <h3>5. Seguridad</h3>
+
+            <p>
+                El alumno deberá informar antecedentes médicos relevantes
+                para la realización de actividad física.
+            </p>
+
+            <button
+                type="button"
+                class="btn-entendido"
+                onclick="cerrarReglamento()"
+            >
+                Entendido
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function abrirReglamento() {
+            document.getElementById("modal-reglamento").style.display = "flex";
+        }
+
+        function cerrarReglamento() {
+            document.getElementById("modal-reglamento").style.display = "none";
+        }
+
+    </script>
+
+</body>
+
+</html>
