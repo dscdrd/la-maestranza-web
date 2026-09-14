@@ -8,7 +8,7 @@ import mysql.connector
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "maestranza_clave_secreta"
+app.secret_key = os.getenv("SECRET_KEY")
 
 
 # CONFIGURACIÓN PARA FOTOS DE PERFIL
