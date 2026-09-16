@@ -142,6 +142,15 @@ body {
     margin-bottom: 30px;
 }
 
+.enlace-tarjeta {
+    color: #a00000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.enlace-tarjeta:hover {
+    text-decoration: underline;
+}
 
 /* =========================
    PERFIL
@@ -177,6 +186,11 @@ body {
     border-radius: 50%;
 
     background-color: var(--blanco);
+}
+
+.avatar-predeterminado {
+    object-fit: contain;
+    padding: 5px;
 }
 
 .estado {
@@ -509,4 +523,73 @@ summary:focus-visible {
     );
 
     gap: 20px;
+}
+
+.acciones-clase {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-editar,
+.btn-alumnos {
+    display: inline-block;
+    padding: 11px 17px;
+
+    border-radius: 10px;
+
+    font-weight: bold;
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+.btn-editar {
+    background-color: #111;
+    border: 1px solid #111;
+    color: white;
+}
+
+.btn-editar:hover {
+    background-color: #333;
+}
+
+.btn-alumnos {
+    background-color: white;
+    border: 1px solid #a80d0d;
+    color: #a80d0d;
+}
+
+.btn-alumnos:hover {
+    background-color: #a80d0d;
+    color: white;
+}
+
+
+.form-cancelar {
+    margin: 0;
+}
+
+.btn-cancelar-clase {
+    padding: 11px 17px;
+
+    border: 1px solid #a80d0d;
+    border-radius: 10px;
+
+    background-color: #a80d0d;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    transition: 0.2s;
+}
+
+.btn-cancelar-clase:hover {
+    background-color: #850909;
+    border-color: #850909;
 }

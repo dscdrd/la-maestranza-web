@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestión de talleres | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/gestion_talleres.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <!-- VOLVER -->
+
+        <a
+            class="volver"
+            href="{{ url_for('panel_profesor') }}"
+        >
+            ← Volver al panel
+        </a>
+
+
+        <!-- ENCABEZADO -->
+
+        <header class="encabezado">
+
+            <div>
+
+                <p class="subtitulo">
+                    PANEL DE PROFESOR
+                </p>
+
+                <h1>
+                    Gestión de talleres
+                </h1>
+
+                <p class="descripcion">
+                    Crea, modifica y administra los talleres de La Maestranza.
+                </p>
+
+            </div>
+
+
+            <a
+                class="btn-crear"
+                href="{{ url_for('crear_taller') }}"
+            >
+                + Crear nuevo taller
+            </a>
+
+        </header>
+
+
+        <!-- LISTADO -->
+
+        {% if talleres %}
+
+            <section class="grid-talleres">
+
+                {% for taller in talleres %}
+
+                    <article
+                        class="tarjeta-taller
+                        {% if taller.estado == 'inactivo' %}
+                            taller-inactivo
+                        {% endif %}"
+                    >
+
+                        <div class="cabecera-tarjeta">
+
+                            <h2>
+                                {{ taller.nombre }}
+                            </h2>
+
+
+                            {% if taller.estado == 'activo' %}
+
+                                <span class="estado estado-activo">
+                                    Activo
+                                </span>
+
+                            {% else %}
+
+                                <span class="estado estado-inactivo">
+                                    Inactivo
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <p class="descripcion-taller">
+                            {{ taller.descripcion or 'Sin descripción' }}
+                        </p>
+
+
+                        <div class="datos">
+
+                            <p>
+                                <strong>Horario</strong>
+                                <span>
+                                    {{ taller.horario or 'Sin horario' }}
+                                </span>
+                            </p>
+
+
+                            <p>
+                                <strong>Cupo máximo</strong>
+                                <span>
+                                    {{ taller.cupo_maximo or 'Sin definir' }}
+                                </span>
+                            </p>
+
+                        </div>
+
+
+                        <div class="acciones">
+
+                            <a
+                                class="btn-editar"
+                                href="{{ url_for(
+                                    'editar_taller',
+                                    id_taller=taller.id_taller
+                                ) }}"
+                            >
+                                Editar
+                            </a>
+
+
+                            {% if taller.estado == 'activo' %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'desactivar_taller',
+                                        id_taller=taller.id_taller
+                                    ) }}"
+                                >
+
+                                    <button
+                                        class="btn-desactivar"
+                                        type="submit"
+                                        onclick="return confirm(
+                                            '¿Seguro que deseas desactivar este taller?'
+                                        );"
+                                    >
+                                        Desactivar
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <span class="texto-inactivo">
+                                    Taller desactivado
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+
+        {% else %}
+
+            <section class="sin-talleres">
+
+                <h2>
+                    No hay talleres registrados
+                </h2>
+
+                <p>
+                    Crea el primer taller para comenzar.
+                </p>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

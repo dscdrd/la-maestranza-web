@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Editar mi perfil | La Maestranza</title>
+
+    <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/editar_perfil_alumno.css') }}">
+</head>
+
+<body>
+
+    <main class="editar-perfil">
+
+        <section class="tarjeta-editar">
+
+            <div class="encabezado-editar">
+
+                <p class="subtitulo">
+                    LA MAESTRANZA
+                </p>
+
+                <h1>Editar mis datos</h1>
+
+                <p>
+                    Actualiza tu información personal.
+                </p>
+
+            </div>
+
+            <form method="POST" class="form-editar">
+
+                <div class="campo">
+                    <label for="nombre">Nombre</label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        value="{{ alumno.nombre }}"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="apellido">Apellido</label>
+
+                    <input
+                        type="text"
+                        id="apellido"
+                        name="apellido"
+                        value="{{ alumno.apellido }}"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">Teléfono</label>
+
+                    <input
+                        type="text"
+                        id="telefono"
+                        name="telefono"
+                        value="{{ alumno.telefono or '' }}"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="contacto_emergencia">
+                        Contacto de emergencia
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contacto_emergencia"
+                        name="contacto_emergencia"
+                        value="{{ alumno.contacto_emergencia or '' }}"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="telefono_emergencia">
+                        Teléfono de emergencia
+                    </label>
+
+                    <input
+                        type="text"
+                        id="telefono_emergencia"
+                        name="telefono_emergencia"
+                        value="{{ alumno.telefono_emergencia or '' }}"
+                    >
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button type="submit" class="btn-guardar">
+                        Guardar cambios
+                    </button>
+
+                    <a href="{{ url_for('panel_alumno') }}"
+                        class="btn-cancelar">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

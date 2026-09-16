@@ -8,6 +8,7 @@ import mysql.connector
 load_dotenv()
 
 app = Flask(__name__)
+
 app.secret_key = os.getenv("SECRET_KEY")
 
 
@@ -298,7 +299,9 @@ def login_alumno():
         sql = """
             SELECT *
             FROM usuarios
-            WHERE correo = %s AND rol = %s
+            WHERE correo = %s 
+            AND rol = %s
+            AND activo = 1
         """
 
         cursor.execute(sql, (correo, "alumno"))
@@ -370,6 +373,156 @@ def panel_alumno():
         alumno=alumno
     )
 
+
+
+@app.route("/editar_perfil_alumno", methods=["GET", "POST"])
+def editar_perfil_alumno():
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_alumno"))
+
+    # Verificar rol
+    if session.get("rol") != "alumno":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para acceder a esta sección.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    id_usuario = session["id_usuario"]
+
+    # UPDATE
+    if request.method == "POST":
+
+        nombre = request.form.get("nombre")
+        apellido = request.form.get("apellido")
+        telefono = request.form.get("telefono")
+        contacto_emergencia = request.form.get("contacto_emergencia")
+        telefono_emergencia = request.form.get("telefono_emergencia")
+
+        conexion = conectar_db()
+        cursor = conexion.cursor()
+
+        sql = """
+            UPDATE alumnos
+            SET nombre = %s,
+                apellido = %s,
+                telefono = %s,
+                contacto_emergencia = %s,
+                telefono_emergencia = %s
+            WHERE id_usuario = %s
+        """
+
+        cursor.execute(
+            sql,
+            (
+                nombre,
+                apellido,
+                telefono,
+                contacto_emergencia,
+                telefono_emergencia,
+                id_usuario
+            )
+        )
+
+        conexion.commit()
+
+        cursor.close()
+        conexion.close()
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Datos actualizados",
+            mensaje="Tus datos personales fueron modificados correctamente.",
+            texto_boton="Volver a mi perfil",
+            destino=url_for("panel_alumno")
+        )
+
+    # GET: cargar los datos actuales
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    sql = """
+        SELECT *
+        FROM alumnos
+        WHERE id_usuario = %s
+    """
+
+    cursor.execute(sql, (id_usuario,))
+    alumno = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    if not alumno:
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Datos no encontrados",
+            mensaje="No se encontraron los datos del alumno.",
+            texto_boton="Volver",
+            destino=url_for("panel_alumno")
+        )
+
+    return render_template(
+        "editar_perfil_alumno.html",
+        alumno=alumno
+    )
+
+
+@app.route("/desactivar_cuenta_alumno", methods=["POST"])
+def desactivar_cuenta_alumno():
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_alumno"))
+
+    # Verificar que sea alumno
+    if session.get("rol") != "alumno":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para realizar esta acción.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    id_usuario = session["id_usuario"]
+
+    conexion = conectar_db()
+    cursor = conexion.cursor()
+
+    sql = """
+        UPDATE usuarios
+        SET activo = 0
+        WHERE id_usuario = %s
+        AND rol = 'alumno'
+    """
+
+    cursor.execute(sql, (id_usuario,))
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()
+
+    # Cerrar la sesión después de desactivar la cuenta
+    session.clear()
+
+    return render_template(
+        "mensaje.html",
+        tipo="exito",
+        titulo="Cuenta desactivada",
+        mensaje="Tu cuenta ha sido desactivada correctamente.",
+        texto_boton="Volver al inicio",
+        destino=url_for("inicio")
+    )
+
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
 
@@ -419,7 +572,14 @@ def login_profesor():
 
             return redirect(url_for("panel_profesor"))
 
-        return "Correo o contraseña incorrectos"
+        return render_template(
+    "mensaje.html",
+    tipo="error",
+    titulo="Error al iniciar sesión",
+    mensaje="Correo o contraseña incorrectos.",
+    texto_boton="Volver al inicio de sesión",
+    destino=url_for("login_profesor")
+)
 
     return render_template("login_profesor.html")
 
@@ -546,6 +706,336 @@ def mis_clases():
         cursor.close()
         conexion.close()
 
+
+# CREAR CLASE CRUD 
+
+@app.route("/profesor/taller/<int:id_taller>/crear_clase", methods=["POST"])
+def crear_clase_profesor(id_taller):
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para realizar esta acción.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    fecha = request.form.get("fecha")
+    hora_inicio = request.form.get("hora_inicio")
+    hora_fin = request.form.get("hora_fin")
+    cupo_maximo = request.form.get("cupo_maximo")
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Obtener el profesor que inició sesión
+        cursor.execute("""
+            SELECT id_profesor
+            FROM profesores
+            WHERE id_usuario = %s
+        """, (session["id_usuario"],))
+
+        profesor = cursor.fetchone()
+
+        if not profesor:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Profesor no encontrado",
+                mensaje="No se encontró el perfil del profesor.",
+                texto_boton="Volver",
+                destino=url_for("mis_clases")
+            )
+
+        # Comprobar que el taller pertenece al profesor
+        cursor.execute("""
+            SELECT 1
+            FROM taller_profesor
+            WHERE id_profesor = %s
+            AND id_taller = %s
+        """, (
+            profesor["id_profesor"],
+            id_taller
+        ))
+
+        taller_asignado = cursor.fetchone()
+
+        if not taller_asignado:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Taller no autorizado",
+                mensaje="Este taller no está asignado a tu perfil.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_clases")
+            )
+
+        # Crear la clase
+        cursor.execute("""
+            INSERT INTO clases
+                (id_taller, fecha, hora_inicio, hora_fin, cupo_maximo, estado)
+            VALUES
+                (%s, %s, %s, %s, %s, 'programada')
+        """, (
+            id_taller,
+            fecha,
+            hora_inicio,
+            hora_fin,
+            cupo_maximo
+        ))
+
+        conexion.commit()
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Clase creada",
+            mensaje="La nueva clase fue creada correctamente.",
+            texto_boton="Volver a mis talleres",
+            destino=url_for("mis_clases")
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
+
+
+@app.route("/profesor/clase/<int:id_clase>/editar", methods=["GET", "POST"])
+def editar_clase(id_clase):
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    # Verificar rol
+    if session.get("rol") != "profesor":
+        return "Acceso no autorizado", 403
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Obtener el profesor conectado
+        cursor.execute("""
+            SELECT id_profesor
+            FROM profesores
+            WHERE id_usuario = %s
+        """, (session["id_usuario"],))
+
+        profesor = cursor.fetchone()
+
+        if not profesor:
+            return "Profesor no encontrado", 404
+
+        # Buscar la clase y comprobar que pertenece
+        # a uno de los talleres del profesor
+        cursor.execute("""
+            SELECT
+                c.id_clase,
+                c.id_taller,
+                c.fecha,
+                c.hora_inicio,
+                c.hora_fin,
+                c.cupo_maximo,
+                c.estado,
+                t.nombre AS taller
+            FROM clases c
+
+            INNER JOIN talleres t
+                ON c.id_taller = t.id_taller
+
+            INNER JOIN taller_profesor tp
+                ON tp.id_taller = t.id_taller
+
+            WHERE c.id_clase = %s
+            AND tp.id_profesor = %s
+        """, (
+            id_clase,
+            profesor["id_profesor"]
+        ))
+
+        clase = cursor.fetchone()
+
+        if not clase:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Clase no encontrada",
+                mensaje="No puedes editar esta clase.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_clases")
+            )
+
+        # -------------------------
+        # ACTUALIZAR LA CLASE
+        # -------------------------
+
+        if request.method == "POST":
+
+            fecha = request.form["fecha"]
+            hora_inicio = request.form["hora_inicio"]
+            hora_fin = request.form["hora_fin"]
+            cupo_maximo = request.form["cupo_maximo"]
+
+            cursor.execute("""
+                UPDATE clases
+                SET
+                    fecha = %s,
+                    hora_inicio = %s,
+                    hora_fin = %s,
+                    cupo_maximo = %s
+                WHERE id_clase = %s
+            """, (
+                fecha,
+                hora_inicio,
+                hora_fin,
+                cupo_maximo,
+                id_clase
+            ))
+
+            conexion.commit()
+
+            return render_template(
+                "mensaje.html",
+                tipo="exito",
+                titulo="Clase actualizada",
+                mensaje="Los datos de la clase fueron modificados correctamente.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_clases")
+            )
+
+        # Si es GET, mostrar formulario
+        return render_template(
+            "editar_clase.html",
+            clase=clase
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
+
+
+
+@app.route("/profesor/clase/<int:id_clase>/cancelar", methods=["POST"])
+def cancelar_clase(id_clase):
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    # Verificar rol
+    if session.get("rol") != "profesor":
+        return "Acceso no autorizado", 403
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Obtener profesor conectado
+        cursor.execute("""
+            SELECT id_profesor
+            FROM profesores
+            WHERE id_usuario = %s
+        """, (session["id_usuario"],))
+
+        profesor = cursor.fetchone()
+
+        if not profesor:
+            return "Profesor no encontrado", 404
+
+
+        # Verificar que la clase pertenece a un taller
+        # asignado al profesor
+        cursor.execute("""
+            SELECT
+                c.id_clase,
+                c.estado,
+                t.nombre AS taller
+            FROM clases c
+
+            INNER JOIN talleres t
+                ON c.id_taller = t.id_taller
+
+            INNER JOIN taller_profesor tp
+                ON tp.id_taller = t.id_taller
+
+            WHERE c.id_clase = %s
+            AND tp.id_profesor = %s
+        """, (
+            id_clase,
+            profesor["id_profesor"]
+        ))
+
+        clase = cursor.fetchone()
+
+        if not clase:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Clase no encontrada",
+                mensaje="No puedes cancelar esta clase.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_clases")
+            )
+
+
+        # Evitar cancelar nuevamente una clase cancelada
+        if clase["estado"] == "cancelada":
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Clase ya cancelada",
+                mensaje="Esta clase ya se encuentra cancelada.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_clases")
+            )
+
+
+        # Cancelación lógica de la clase
+        cursor.execute("""
+            UPDATE clases
+            SET estado = 'cancelada'
+            WHERE id_clase = %s
+        """, (id_clase,))
+
+
+        # Cancelar reservas activas asociadas a la clase
+        cursor.execute("""
+            UPDATE reservas_clase
+            SET
+                estado = 'cancelada',
+                fecha_cancelacion = NOW()
+            WHERE id_clase = %s
+            AND estado = 'reservada'
+        """, (id_clase,))
+
+
+        # Guardar los cambios
+        conexion.commit()
+
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Clase cancelada",
+            mensaje="La clase fue cancelada correctamente.",
+            texto_boton="Volver a mis talleres",
+            destino=url_for("mis_clases")
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
 
 
 @app.route("/mis_clases_profesor")
@@ -1309,7 +1799,291 @@ def mi_panel():
 
     return redirect(url_for("seleccionar_perfil"))
 
+#TALLERES
 
+@app.route("/gestion_talleres")
+def gestion_talleres():
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    # Verificar rol
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para gestionar talleres.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        cursor.execute("""
+            SELECT
+                id_taller,
+                nombre,
+                descripcion,
+                horario,
+                cupo_maximo,
+                imagen,
+                estado
+            FROM talleres
+            ORDER BY nombre
+        """)
+
+        talleres = cursor.fetchall()
+
+        return render_template(
+            "gestion_talleres.html",
+            talleres=talleres
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
+
+
+@app.route("/crear_taller", methods=["GET", "POST"])
+def crear_taller():
+
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para crear talleres.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    if request.method == "POST":
+
+        nombre = request.form.get("nombre")
+        descripcion = request.form.get("descripcion")
+        horario = request.form.get("horario")
+        cupo_maximo = request.form.get("cupo_maximo")
+        imagen = request.form.get("imagen")
+
+        conexion = conectar_db()
+        cursor = conexion.cursor()
+
+        try:
+
+            cursor.execute("""
+                INSERT INTO talleres (
+                    nombre,
+                    descripcion,
+                    horario,
+                    cupo_maximo,
+                    imagen,
+                    estado
+                )
+                VALUES (%s, %s, %s, %s, %s, 'activo')
+            """, (
+                nombre,
+                descripcion,
+                horario,
+                cupo_maximo,
+                imagen
+            ))
+
+            conexion.commit()
+
+            return render_template(
+                "mensaje.html",
+                tipo="exito",
+                titulo="Taller creado",
+                mensaje="El nuevo taller fue creado correctamente.",
+                texto_boton="Volver a gestión de talleres",
+                destino=url_for("gestion_talleres")
+            )
+
+        finally:
+            cursor.close()
+            conexion.close()
+
+    return render_template("crear_taller.html")
+
+
+@app.route("/editar_taller/<int:id_taller>", methods=["GET", "POST"])
+def editar_taller(id_taller):
+
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para editar talleres.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Buscar taller
+        cursor.execute("""
+            SELECT
+                id_taller,
+                nombre,
+                descripcion,
+                horario,
+                cupo_maximo,
+                imagen,
+                estado
+            FROM talleres
+            WHERE id_taller = %s
+        """, (id_taller,))
+
+        taller = cursor.fetchone()
+
+        if not taller:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Taller no encontrado",
+                mensaje="El taller solicitado no existe.",
+                texto_boton="Volver a gestión de talleres",
+                destino=url_for("gestion_talleres")
+            )
+
+        # Guardar cambios
+        if request.method == "POST":
+
+            nombre = request.form.get("nombre")
+            descripcion = request.form.get("descripcion")
+            horario = request.form.get("horario")
+            cupo_maximo = request.form.get("cupo_maximo")
+            imagen = request.form.get("imagen")
+
+            cursor.execute("""
+                UPDATE talleres
+                SET
+                    nombre = %s,
+                    descripcion = %s,
+                    horario = %s,
+                    cupo_maximo = %s,
+                    imagen = %s
+                WHERE id_taller = %s
+            """, (
+                nombre,
+                descripcion,
+                horario,
+                cupo_maximo,
+                imagen,
+                id_taller
+            ))
+
+            conexion.commit()
+
+            return render_template(
+                "mensaje.html",
+                tipo="exito",
+                titulo="Taller actualizado",
+                mensaje="Los datos del taller fueron actualizados correctamente.",
+                texto_boton="Volver a gestión de talleres",
+                destino=url_for("gestion_talleres")
+            )
+
+        return render_template(
+            "editar_taller.html",
+            taller=taller
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
+
+
+@app.route("/desactivar_taller/<int:id_taller>", methods=["POST"])
+def desactivar_taller(id_taller):
+
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para desactivar talleres.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Comprobar que el taller existe
+        cursor.execute("""
+            SELECT
+                id_taller,
+                nombre,
+                estado
+            FROM talleres
+            WHERE id_taller = %s
+        """, (id_taller,))
+
+        taller = cursor.fetchone()
+
+        if not taller:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Taller no encontrado",
+                mensaje="El taller solicitado no existe.",
+                texto_boton="Volver a gestión de talleres",
+                destino=url_for("gestion_talleres")
+            )
+
+        # Comprobar si ya está inactivo
+        if taller["estado"] == "inactivo":
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Taller inactivo",
+                mensaje="Este taller ya se encuentra desactivado.",
+                texto_boton="Volver a gestión de talleres",
+                destino=url_for("gestion_talleres")
+            )
+
+        # Desactivación lógica
+        cursor.execute("""
+            UPDATE talleres
+            SET estado = 'inactivo'
+            WHERE id_taller = %s
+        """, (id_taller,))
+
+        conexion.commit()
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Taller desactivado",
+            mensaje="El taller fue desactivado correctamente.",
+            texto_boton="Volver a gestión de talleres",
+            destino=url_for("gestion_talleres")
+        )
+
+    finally:
+        cursor.close()
+        conexion.close()
 
 @app.route("/talleres_disponibles")
 def talleres_disponibles():
@@ -1332,6 +2106,7 @@ def talleres_disponibles():
             cupo_maximo,
             imagen
         FROM talleres
+        WHERE estado = 'activo'
         ORDER BY nombre
     """)
 
@@ -1368,6 +2143,7 @@ def planes_taller(id_taller):
             cupo_maximo
         FROM talleres
         WHERE id_taller = %s
+        AND estado = 'activo'
     """, (id_taller,))
 
     taller = cursor.fetchone()
@@ -1375,7 +2151,14 @@ def planes_taller(id_taller):
     if not taller:
         cursor.close()
         conexion.close()
-        return "Taller no encontrado"
+        return render_template(
+        "mensaje.html",
+        tipo="error",
+        titulo="Taller no disponible",
+        mensaje="Este taller no existe o actualmente se encuentra desactivado.",
+        texto_boton="Volver a talleres",
+        destino=url_for("talleres_disponibles")
+        )
 
     cursor.execute("""
         SELECT
@@ -2105,12 +2888,12 @@ def cancelar_reserva(id_reserva):
                 r.fecha_cancelacion = NOW(),
                 r.consume_clase = CASE
                     WHEN TIMESTAMP(c.fecha, c.hora_inicio)
-                         >= DATE_ADD(NOW(), INTERVAL 2 HOUR)
+                        >= DATE_ADD(NOW(), INTERVAL 2 HOUR)
                     THEN 0
                     ELSE 1
                 END
             WHERE r.id_reserva = %s
-              AND r.estado = 'reservada'
+                AND r.estado = 'reservada'
         """, (id_reserva,))
 
         conexion.commit()

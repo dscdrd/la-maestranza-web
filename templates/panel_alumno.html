@@ -92,21 +92,22 @@
     <img
         src="{{ url_for('static', filename='img/logo-maestranza.png') }}"
         alt="Avatar predeterminado de La Maestranza"
-        class="avatar-perfil"
+        class="avatar-perfil avatar-predeterminado"
     >
 
 {% endif %}
                     
                         <h2>Mi perfil</h2>
 
-                        <form
+<!-- SUBIR FOTO -->
+<form
     action="{{ url_for('subir_foto_perfil') }}"
     method="POST"
     enctype="multipart/form-data"
     class="form-foto-perfil"
 >
 
-    <label for="foto" class="btn-seleccionar-foto">
+    <label for="foto" class="btn-perfil btn-negro">
         Seleccionar imagen
     </label>
 
@@ -119,8 +120,32 @@
         required
     >
 
-    <button type="submit" class="btn-guardar-foto">
+    <button type="submit" class="btn-perfil btn-rojo">
         Guardar foto
+    </button>
+
+</form>
+
+
+<!-- EDITAR DATOS -->
+<a
+    href="{{ url_for('editar_perfil_alumno') }}"
+    class="btn-perfil btn-negro"
+>
+    Editar mis datos
+</a>
+
+
+<!-- ELIMINAR / DESACTIVAR CUENTA -->
+<form
+    action="{{ url_for('desactivar_cuenta_alumno') }}"
+    method="POST"
+    class="form-desactivar"
+    onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta?');"
+>
+
+    <button type="submit" class="btn-perfil btn-rojo">
+        Eliminar mi cuenta
     </button>
 
 </form>
@@ -204,7 +229,9 @@
 
                 </div>
 
-                <p class="nota-perfil">La edición de datos y la foto de perfil estarán disponibles próximamente.</p>
+                
+
+                
 
             </article>
 

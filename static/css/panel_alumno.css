@@ -1,3 +1,7 @@
+/* =========================
+   CONFIGURACIÓN GENERAL
+========================= */
+
 * {
     box-sizing: border-box;
 }
@@ -163,7 +167,7 @@ body {
     display: flex;
     align-items: center;
 
-    gap: 16px;
+    gap: 12px;
 
     flex-wrap: wrap;
 }
@@ -179,6 +183,11 @@ body {
     border-radius: 50%;
 
     background-color: var(--blanco);
+}
+
+.avatar-predeterminado {
+    object-fit: contain;
+    padding: 5px;
 }
 
 .estado {
@@ -201,7 +210,9 @@ body {
     display: flex;
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
+
+    margin: 0;
 
     flex-wrap: wrap;
 }
@@ -210,40 +221,71 @@ body {
     display: none;
 }
 
-.btn-seleccionar-foto,
-.btn-guardar-foto {
+.form-desactivar {
+    margin: 0;
+}
+
+
+/* =========================
+   BOTONES DEL PERFIL
+========================= */
+
+/*
+   Esta clase controla el tamaño de los
+   cuatro botones del perfil:
+
+   - Seleccionar imagen
+   - Guardar foto
+   - Editar mis datos
+   - Eliminar mi cuenta
+*/
+
+.btn-perfil {
+    height: 38px;
+
+    padding: 0 16px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    padding: 10px 16px;
-
     border: none;
     border-radius: 7px;
 
-    color: var(--blanco);
-
+    font-family: Arial, sans-serif;
     font-size: 13px;
     font-weight: 600;
+
+    text-decoration: none;
+
+    white-space: nowrap;
 
     cursor: pointer;
 
     transition: 0.2s;
 }
 
-.btn-seleccionar-foto {
+
+/* BOTONES NEGROS */
+
+.btn-negro {
     background-color: var(--negro);
+    color: var(--blanco);
 }
 
-.btn-seleccionar-foto:hover {
+.btn-negro:hover {
     background-color: #333;
 }
 
-.btn-guardar-foto {
+
+/* BOTONES ROJOS */
+
+.btn-rojo {
     background-color: var(--rojo-claro);
+    color: var(--blanco);
 }
 
-.btn-guardar-foto:hover {
+.btn-rojo:hover {
     background-color: #860a0e;
 }
 
@@ -306,7 +348,7 @@ body {
 
 
 /* =========================
-   OPCIONES
+   OPCIONES DEL ALUMNO
 ========================= */
 
 .opciones {
@@ -355,9 +397,13 @@ body {
     text-decoration: none;
 }
 
+.opcion a:hover {
+    text-decoration: underline;
+}
+
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE - TABLET
 ========================= */
 
 @media (max-width: 800px) {
@@ -370,8 +416,16 @@ body {
         grid-template-columns: 1fr;
     }
 
+    .perfil-resumen {
+        gap: 10px;
+    }
+
 }
 
+
+/* =========================
+   RESPONSIVE - CELULAR
+========================= */
 
 @media (max-width: 550px) {
 
@@ -387,6 +441,10 @@ body {
         gap: 12px;
     }
 
+    .panel {
+        padding: 40px 20px;
+    }
+
     .datos-grid {
         grid-template-columns: 1fr;
     }
@@ -399,6 +457,18 @@ body {
         flex-wrap: wrap;
 
         gap: 16px;
+    }
+
+    .perfil-resumen {
+        width: 100%;
+    }
+
+    .form-foto-perfil {
+        width: 100%;
+    }
+
+    .btn-perfil {
+        min-width: 130px;
     }
 
 }

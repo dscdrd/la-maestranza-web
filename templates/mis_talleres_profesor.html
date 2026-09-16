@@ -1,44 +1,262 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Mis talleres | Profesor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel_profesor.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/panel_profesor.css') }}">
 </head>
+
 <body>
-<main class="panel">
-    <a class="boton" href="{{ url_for('panel_profesor') }}">← Volver a mi panel</a>
-    <section class="bienvenida">
-        <p class="subtitulo">PANEL DE PROFESOR</p>
-        <h1>Mis talleres</h1>
-        <p>Selecciona un taller para ver sus clases y alumnos reservados.</p>
-    </section>
-    <div class="lista-talleres">
-    {% for taller in talleres %}
-        <details class="tarjeta">
-            <summary>{{ taller.nombre }}</summary>
-            <p class="nota">Horario habitual: {{ taller.horario or 'Sin registrar' }}</p>
-            <p class="nota">Clases ordenadas desde la fecha más reciente. Incluye el historial.</p>
-            {% for clase in taller.clases %}
-            <article class="fila-clase">
-                <div>
-                    <h3>{{ clase.fecha }}</h3>
-                    <p>{{ clase.hora_inicio }} – {{ clase.hora_fin }}</p>
-                    <p>{{ clase.reservados }} / {{ clase.cupo_maximo }} reservas · {{ clase.estado }}</p>
-                </div>
-                {% if clase.estado != 'cancelada' %}
-                <a class="boton" href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}">Ver alumnos</a>
-                {% endif %}
-            </article>
+
+    <main class="panel">
+
+        <!-- VOLVER AL PANEL -->
+        <a class="boton"
+            href="{{ url_for('panel_profesor') }}">
+            ← Volver a mi panel
+        </a>
+
+
+        <!-- ENCABEZADO -->
+        <section class="bienvenida">
+
+            <p class="subtitulo">
+                PANEL DE PROFESOR
+            </p>
+
+            <h1>Mis talleres</h1>
+
+            <p>
+                Selecciona un taller para ver sus clases
+                y alumnos reservados.
+            </p>
+
+        </section>
+
+
+        <!-- LISTA DE TALLERES -->
+        <div class="lista-talleres">
+
+            {% for taller in talleres %}
+
+            <details class="tarjeta">
+
+                <summary>
+                    {{ taller.nombre }}
+                </summary>
+
+
+                <!-- INFORMACIÓN DEL TALLER -->
+
+                <p class="nota">
+                    Horario habitual:
+                    {{ taller.horario or 'Sin registrar' }}
+                </p>
+
+
+                <!-- ============================== -->
+                <!-- CREAR NUEVA CLASE -->
+                <!-- ============================== -->
+
+                <section class="crear-clase">
+
+                    <h3>Crear nueva clase</h3>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'crear_clase_profesor',
+                            id_taller=taller.id_taller
+                        ) }}"
+                        class="form-clase"
+                    >
+
+                        <!-- FECHA -->
+
+                        <div class="campo-formulario">
+
+                            <label>
+                                Fecha
+                            </label>
+
+                            <input
+                                type="date"
+                                name="fecha"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- HORA INICIO -->
+
+                        <div class="campo-formulario">
+
+                            <label>
+                                Hora inicio
+                            </label>
+
+                            <input
+                                type="time"
+                                name="hora_inicio"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- HORA FIN -->
+
+                        <div class="campo-formulario">
+
+                            <label>
+                                Hora fin
+                            </label>
+
+                            <input
+                                type="time"
+                                name="hora_fin"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CUPO MÁXIMO -->
+
+                        <div class="campo-formulario">
+
+                            <label>
+                                Cupo máximo
+                            </label>
+
+                            <input
+                                type="number"
+                                name="cupo_maximo"
+                                min="1"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- BOTÓN -->
+
+                        <button
+                            type="submit"
+                            class="boton"
+                        >
+                            Crear clase
+                        </button>
+
+                    </form>
+
+                </section>
+
+
+                <!-- ============================== -->
+                <!-- CLASES DEL TALLER -->
+                <!-- ============================== -->
+
+                <p class="nota">
+                    Clases ordenadas desde la fecha más reciente.
+                    Incluye el historial.
+                </p>
+
+
+                {% for clase in taller.clases %}
+
+                <article class="fila-clase">
+
+                    <div>
+
+                        <h3>
+                            <h3>{{ clase.fecha.strftime('%d-%m-%Y') }}</h3>
+                        </h3>
+
+                        <p>
+                            {{ clase.hora_inicio }}
+                            
+                            {{ clase.hora_fin }}
+                        </p>
+
+                        <p>
+                            {{ clase.reservados }}
+                            /
+                            {{ clase.cupo_maximo }}
+                            reservas
+                            ·
+                            {{ clase.estado }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- VER ALUMNOS -->
+
+                    {% if clase.estado != 'cancelada' %}
+
+                    <div class="acciones-clase">
+
+    <a href="{{ url_for('editar_clase', id_clase=clase.id_clase) }}"
+        class="btn-editar">
+        Editar clase
+    </a>
+
+    <a href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}"
+        class="btn-alumnos">
+        Ver alumnos
+    </a>
+
+    <form
+        method="POST"
+        action="{{ url_for('cancelar_clase', id_clase=clase.id_clase) }}"
+        class="form-cancelar"
+        onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta clase?');"
+    >
+
+        <button type="submit" class="btn-cancelar-clase">
+            Cancelar clase
+        </button>
+
+    </form>
+
+</div>
+
+                    {% endif %}
+
+                </article>
+
+
+                {% else %}
+
+                <p>
+                    Este taller todavía no tiene clases cargadas.
+                </p>
+
+                {% endfor %}
+
+
+            </details>
+
+
             {% else %}
-            <p>Este taller todavía no tiene clases cargadas.</p>
+
+            <p class="tarjeta">
+                Todavía no tienes talleres asignados.
+            </p>
+
             {% endfor %}
-        </details>
-    {% else %}
-        <p class="tarjeta">Todavía no tienes talleres asignados.</p>
-    {% endfor %}
-    </div>
-</main>
+
+        </div>
+
+    </main>
+
 </body>
+
 </html>

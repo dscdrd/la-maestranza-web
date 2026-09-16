@@ -91,7 +91,7 @@
             filename='img/logo-maestranza.png'
         ) }}"
         alt="Avatar predeterminado de La Maestranza"
-        class="avatar-perfil"
+        class="avatar-perfil avatar-predeterminado"
     >
 
 {% endif %}
@@ -203,6 +203,23 @@
                 <a href="{{ url_for('mis_estadisticas_profesor') }}">
     Ver mis estadísticas →</a>
             </article>
+
+
+            <article class="tarjeta">
+
+    <div class="icono">⚙</div>
+
+    <h2>Gestión de talleres</h2>
+
+    <p>
+        Crea, modifica y administra los talleres de La Maestranza.
+    </p>
+
+    <a class="enlace-tarjeta" href="{{ url_for('gestion_talleres') }}">
+        Gestionar talleres →
+    </a>
+
+</article>
 
 
             <article class="tarjeta opcion">

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crear taller | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/crear_taller.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <a
+            class="volver"
+            href="{{ url_for('gestion_talleres') }}"
+        >
+            ← Volver a gestión de talleres
+        </a>
+
+
+        <header class="encabezado">
+
+            <p class="subtitulo">
+                GESTIÓN DE TALLERES
+            </p>
+
+            <h1>
+                Crear nuevo taller
+            </h1>
+
+            <p class="descripcion">
+                Ingresa los datos necesarios para registrar un nuevo taller
+                en La Maestranza.
+            </p>
+
+        </header>
+
+
+        <section class="tarjeta-formulario">
+
+            <form method="POST">
+
+                <div class="campo">
+
+                    <label for="nombre">
+                        Nombre del taller
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ej: Acrobacia"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="descripcion">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="descripcion"
+                        name="descripcion"
+                        rows="5"
+                        placeholder="Describe brevemente el taller"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="fila">
+
+                    <div class="campo">
+
+                        <label for="horario">
+                            Horario
+                        </label>
+
+                        <input
+                            type="text"
+                            id="horario"
+                            name="horario"
+                            placeholder="Ej: L/M/V 19:00 - 20:00"
+                        >
+
+                    </div>
+
+
+                    <div class="campo campo-cupo">
+
+                        <label for="cupo_maximo">
+                            Cupo máximo
+                        </label>
+
+                        <input
+                            type="number"
+                            id="cupo_maximo"
+                            name="cupo_maximo"
+                            min="1"
+                            placeholder="Ej: 10"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="imagen">
+                        Nombre de imagen
+                    </label>
+
+                    <input
+                        type="text"
+                        id="imagen"
+                        name="imagen"
+                        placeholder="Ej: crossfit.jpg"
+                    >
+
+                    <small>
+                        Ingresa el nombre del archivo de imagen utilizado para el taller.
+                    </small>
+
+                </div>
+
+
+                <div class="acciones">
+
+                    <a
+                        class="btn-cancelar"
+                        href="{{ url_for('gestion_talleres') }}"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        class="btn-guardar"
+                        type="submit"
+                    >
+                        Crear taller
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

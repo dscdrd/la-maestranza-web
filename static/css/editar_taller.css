@@ -1,0 +1,254 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f2;
+    color: #181818;
+}
+
+
+/* CONTENEDOR */
+
+.contenedor {
+    width: 84%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 55px 0 80px;
+}
+
+
+/* VOLVER */
+
+.volver {
+    display: inline-block;
+    margin-bottom: 25px;
+
+    color: #8f0d0d;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.volver:hover {
+    text-decoration: underline;
+}
+
+
+/* ENCABEZADO */
+
+.encabezado {
+    margin-bottom: 30px;
+}
+
+.subtitulo {
+    margin: 0 0 8px;
+
+    color: #a50b0b;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 4px;
+}
+
+.encabezado h1 {
+    margin: 0 0 10px;
+
+    font-size: 38px;
+}
+
+.descripcion {
+    margin: 0;
+
+    color: #555;
+
+    line-height: 1.5;
+}
+
+
+/* TARJETA */
+
+.tarjeta-formulario {
+    padding: 35px;
+
+    background-color: white;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 18px rgba(0, 0, 0, 0.06);
+}
+
+
+/* CAMPOS */
+
+.campo {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 24px;
+}
+
+.campo label {
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.campo input,
+.campo textarea {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d6d6d6;
+    border-radius: 6px;
+
+    background-color: #fafafa;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    outline: none;
+}
+
+.campo textarea {
+    resize: vertical;
+}
+
+.campo input:focus,
+.campo textarea:focus {
+    border-color: #a50b0b;
+    background-color: white;
+}
+
+.campo small {
+    margin-top: 7px;
+
+    color: #777;
+    font-size: 12px;
+}
+
+
+/* HORARIO + CUPO */
+
+.fila {
+    display: grid;
+
+    grid-template-columns: 2fr 1fr;
+
+    gap: 20px;
+}
+
+
+/* BOTONES */
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 10px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-cancelar {
+    border: 1px solid #ccc;
+
+    background-color: white;
+    color: #333;
+
+    text-decoration: none;
+}
+
+.btn-cancelar:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-guardar {
+    border: none;
+
+    background-color: #a50b0b;
+    color: white;
+
+    cursor: pointer;
+}
+
+.btn-guardar:hover {
+    background-color: #7f0808;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    .contenedor {
+        width: 90%;
+        padding-top: 35px;
+    }
+
+    .encabezado h1 {
+        font-size: 31px;
+    }
+
+    .tarjeta-formulario {
+        padding: 25px;
+    }
+
+    .fila {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .acciones {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancelar,
+    .btn-guardar {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ESTADO DEL TALLER */
+
+.estado-actual {
+    margin-top: 2px;
+}
+
+.estado {
+    display: inline-block;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.estado.activo {
+    background-color: #e8f5e9;
+    color: #246b2a;
+}
+
+.estado.inactivo {
+    background-color: #eeeeee;
+    color: #666;
+}

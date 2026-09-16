@@ -63,7 +63,7 @@
 
                         <p>
                             <strong>Fecha:</strong>
-                            {{ clase.fecha }}
+                            {{ clase.fecha.strftime('%d-%m-%Y') }}
                         </p>
 
                         <p>
@@ -83,14 +83,19 @@
                             {{ clase.estado }}
                         </p>
 
-                        <a
-                            href="{{ url_for(
-                                'asistencia_clase',
-                                id_clase=clase.id_clase
-                            ) }}"
-                        >
-                            Tomar asistencia →
-                        </a>
+                        {% if clase.estado != 'cancelada' %}
+
+    <a href="{{ url_for('asistencia_clase', id_clase=clase.id_clase) }}">
+        Tomar asistencia →
+    </a>
+
+{% else %}
+
+    <span>Clase cancelada</span>
+
+{% endif %}
+
+                    
 
                     </article>
 

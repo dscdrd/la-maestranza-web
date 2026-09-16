@@ -46,12 +46,12 @@
             </h1>
 
             <p>
-                {{ clase.fecha }}
-                ·
-                {{ clase.hora_inicio }}
-                -
-                {{ clase.hora_fin }}
-            </p>
+    {{ clase.fecha.strftime('%d-%m-%Y') }}
+    ·
+    {{ clase.hora_inicio }}
+    -
+    {{ clase.hora_fin }}
+</p>
 
         </section>
 

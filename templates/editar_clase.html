@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Editar clase | La Maestranza</title>
+
+    <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/editar_clase.css') }}">
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <a href="{{ url_for('mis_clases') }}"
+            class="btn-volver">
+            ← Volver a mis talleres
+        </a>
+
+        <p class="subtitulo">PANEL DE PROFESOR</p>
+
+        <h1>Editar clase</h1>
+
+        <p class="descripcion">
+            Modifica los datos de la clase seleccionada.
+        </p>
+
+
+        <section class="tarjeta">
+
+            <div class="encabezado-clase">
+
+                <div>
+                    <p class="etiqueta">Taller</p>
+                    <h2>{{ clase.taller }}</h2>
+                </div>
+
+                <span class="estado">
+                    {{ clase.estado }}
+                </span>
+
+            </div>
+
+
+            <form method="POST">
+
+                <div class="grupo-formulario">
+
+                    <label for="fecha">
+                        Fecha
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fecha"
+                        name="fecha"
+                        value="{{ clase.fecha }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="fila">
+
+                    <div class="grupo-formulario">
+
+                        <label for="hora_inicio">
+                            Hora de inicio
+                        </label>
+
+                        <input
+                            type="time"
+                            id="hora_inicio"
+                            name="hora_inicio"
+                            value="{{ clase.hora_inicio }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="grupo-formulario">
+
+                        <label for="hora_fin">
+                            Hora de término
+                        </label>
+
+                        <input
+                            type="time"
+                            id="hora_fin"
+                            name="hora_fin"
+                            value="{{ clase.hora_fin }}"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="grupo-formulario">
+
+                    <label for="cupo_maximo">
+                        Cupo máximo
+                    </label>
+
+                    <input
+                        type="number"
+                        id="cupo_maximo"
+                        name="cupo_maximo"
+                        value="{{ clase.cupo_maximo }}"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="acciones">
+
+                    <button type="submit"
+                            class="btn-guardar">
+                        Guardar cambios
+                    </button>
+
+                    <a href="{{ url_for('mis_clases') }}"
+                        class="btn-cancelar">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
