@@ -1,0 +1,421 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background-color: #f3f3f1;
+    color: #1b1b1b;
+}
+
+
+/* =========================================
+   CONTENEDOR
+========================================= */
+
+.contenedor-editar {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+
+    padding: 60px 25px;
+}
+
+
+/* =========================================
+   TARJETA
+========================================= */
+
+.tarjeta-editar {
+    width: 100%;
+    max-width: 900px;
+
+    background-color: #ffffff;
+
+    padding: 50px 60px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================
+   ENCABEZADO
+========================================= */
+
+.etiqueta {
+    margin: 0 0 10px;
+
+    color: #8f0d0d;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.tarjeta-editar h1 {
+    margin: 0;
+
+    font-size: 34px;
+
+    color: #171717;
+}
+
+.descripcion {
+    margin: 12px 0 35px;
+
+    color: #666666;
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   FOTO
+========================================= */
+
+.seccion-foto {
+    padding-bottom: 35px;
+    margin-bottom: 35px;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.seccion-foto h2 {
+    margin: 0 0 20px;
+
+    font-size: 18px;
+}
+
+.avatar-profesor {
+    width: 135px;
+    height: 135px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 3px solid #8f0d0d;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.aviso-foto {
+    margin-top: 15px;
+
+    color: #777777;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   FORMULARIO
+========================================= */
+
+.form-editar {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px 30px;
+}
+
+.grupo-formulario {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.grupo-formulario label {
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #333333;
+}
+
+.grupo-formulario input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d4d4d4;
+
+    border-radius: 7px;
+
+    background-color: #fafafa;
+
+    color: #222222;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.grupo-formulario input:focus {
+    background-color: #ffffff;
+
+    border-color: #8f0d0d;
+
+    box-shadow:
+        0 0 0 3px rgba(143, 13, 13, 0.10);
+}
+
+
+/* RUT NO EDITABLE */
+
+.grupo-formulario input:disabled {
+    background-color: #eeeeee;
+
+    color: #777777;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   MENSAJE
+========================================= */
+
+#mensaje-formulario {
+    min-height: 20px;
+
+    margin: 0;
+
+    color: #8f0d0d;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones-formulario {
+    grid-column: 1 / -1;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 5px;
+}
+
+.btn-volver,
+.btn-guardar {
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 22px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.btn-volver {
+    border: 1px solid #d2d2d2;
+
+    background-color: white;
+    color: #333333;
+}
+
+.btn-volver:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-guardar {
+    border: none;
+
+    background-color: #8f0d0d;
+    color: white;
+}
+
+.btn-guardar:hover {
+    background-color: #710a0a;
+}
+
+.btn-guardar:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   CAMBIAR FOTO
+========================================================= */
+
+.foto-actual {
+    margin-bottom: 18px;
+}
+
+.btn-seleccionar-foto {
+    border: none;
+
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    background-color: #8f0d0d;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn-seleccionar-foto:hover {
+    background-color: #710a0a;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   EDITOR CROPPER
+========================================================= */
+
+.editor-foto {
+    width: 100%;
+
+    margin-top: 25px;
+}
+
+.editor-foto.oculto {
+    display: none;
+}
+
+.cropper-contenedor {
+    width: 100%;
+    max-width: 650px;
+    height: 420px;
+
+    overflow: hidden;
+
+    background-color: #111111;
+
+    border-radius: 10px;
+}
+
+#imagen-recorte {
+    display: block;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   ACCIONES FOTO
+========================================================= */
+
+.acciones-foto {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.btn-cancelar-foto,
+.btn-guardar-foto {
+    border: none;
+
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.btn-cancelar-foto {
+    background-color: #262626;
+    color: #ffffff;
+}
+
+.btn-cancelar-foto:hover {
+    background-color: #111111;
+}
+
+.btn-guardar-foto {
+    background-color: #8f0d0d;
+    color: #ffffff;
+}
+
+.btn-guardar-foto:hover {
+    background-color: #710a0a;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 750px) {
+
+    .contenedor-editar {
+        padding: 25px 15px;
+    }
+
+    .tarjeta-editar {
+        padding: 30px 22px;
+    }
+
+    .form-editar {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo,
+    .acciones-formulario {
+        grid-column: 1;
+    }
+
+    .acciones-formulario {
+        flex-direction: column-reverse;
+    }
+
+    .btn-volver,
+    .btn-guardar {
+        width: 100%;
+    }
+
+}

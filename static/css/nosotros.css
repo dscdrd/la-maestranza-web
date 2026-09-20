@@ -1,0 +1,1033 @@
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background-color: #f3f3f1;
+    color: #222222;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+    position: relative;
+    z-index: 10;
+
+    min-height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 50px;
+
+    background-color: #111111;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.marca img {
+    width: 48px;
+    height: 48px;
+
+    object-fit: contain;
+}
+
+.navbar ul {
+    display: flex;
+    align-items: center;
+
+    gap: 32px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.navbar nav a {
+    color: #dddddd;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+.navbar nav a:hover {
+    color: #ffffff;
+}
+
+.navbar nav a.activo {
+    padding-bottom: 6px;
+
+    border-bottom: 2px solid #8f0d0d;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   PORTADA NOSOTROS
+========================================================= */
+
+.portada-nosotros {
+    position: relative;
+
+    min-height: calc(100vh - 80px);
+
+    display: flex;
+    align-items: flex-end;
+
+    overflow: hidden;
+
+    background-color: #111111;
+}
+
+
+/* Línea vertical */
+
+.portada-nosotros::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 8%;
+
+    width: 1px;
+    height: 100%;
+
+    background-color: rgba(143, 13, 13, 0.55);
+}
+
+
+/* Franja roja */
+
+.portada-nosotros::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 8%;
+    height: 100%;
+
+    background-color: #8f0d0d;
+}
+
+
+/* =========================================================
+   CONTENIDO PORTADA
+========================================================= */
+
+.portada-contenido {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 50px 90px;
+
+    color: #ffffff;
+}
+
+.etiqueta {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #c92929;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.portada-contenido h1 {
+    margin: 0;
+
+    font-size: clamp(60px, 10vw, 145px);
+    line-height: 0.9;
+
+    font-weight: 800;
+
+    letter-spacing: -5px;
+}
+
+.portada-contenido p {
+    max-width: 570px;
+
+    margin: 28px 0 35px;
+
+    color: #d6d6d6;
+
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOTÓN PORTADA
+========================================================= */
+
+.btn-conocer {
+    display: inline-block;
+
+    padding: 14px 22px;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.btn-conocer:hover {
+    background-color: #8f0d0d;
+    border-color: #8f0d0d;
+}
+
+
+/* =========================================================
+   INICIO EQUIPO DOCENTE
+========================================================= */
+
+.inicio-equipo {
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 110px 50px 70px;
+}
+
+.etiqueta-seccion {
+    color: #8f0d0d;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.inicio-equipo h2 {
+    margin: 12px 0 20px;
+
+    font-size: clamp(38px, 6vw, 72px);
+    line-height: 1;
+
+    font-weight: 800;
+
+    letter-spacing: -2px;
+}
+
+.inicio-equipo p {
+    max-width: 650px;
+
+    margin: 0;
+
+    color: #666666;
+
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   EQUIPO DOCENTE
+========================================================= */
+
+.equipo-docente {
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 50px 120px;
+}
+
+
+/* =========================================================
+   PERSONA
+========================================================= */
+
+.persona {
+    min-height: 650px;
+
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+
+    margin-bottom: 100px;
+
+    background-color: #ffffff;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   IMAGEN PERSONA
+========================================================= */
+
+.persona-imagen {
+    min-height: 650px;
+
+    overflow: hidden;
+
+    background-color: #dddddd;
+}
+
+.persona-imagen img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: transform 0.6s ease;
+}
+
+.persona:hover .persona-imagen img {
+    transform: scale(1.025);
+}
+
+
+/* =========================================================
+   INFORMACIÓN PERSONA
+========================================================= */
+
+.persona-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 70px;
+}
+
+.persona-area {
+    margin-bottom: 20px;
+
+    color: #8f0d0d;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.persona-info h3 {
+    margin: 0 0 35px;
+
+    color: #191919;
+
+    font-size: clamp(45px, 5vw, 72px);
+    line-height: 0.95;
+
+    letter-spacing: -3px;
+}
+
+.persona-info p {
+    max-width: 430px;
+
+    margin: 0 0 18px;
+
+    color: #606060;
+
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.persona-info::after {
+    content: "";
+
+    width: 45px;
+    height: 3px;
+
+    margin-top: 20px;
+
+    background-color: #8f0d0d;
+}
+
+
+/* =========================================================
+   PERSONA INVERTIDA
+========================================================= */
+
+.persona-invertida {
+    grid-template-columns: 0.85fr 1.15fr;
+}
+
+.persona-invertida .persona-imagen {
+    order: 2;
+}
+
+.persona-invertida .persona-info {
+    order: 1;
+}
+
+
+/* =========================================================
+   ÁGUILAS SATIVAS
+========================================================= */
+
+.aguilas {
+    padding: 120px 0;
+
+    background-color: #111111;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   ENCABEZADO ÁGUILAS
+========================================================= */
+
+.aguilas-encabezado {
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 50px 70px;
+}
+
+.aguilas-etiqueta {
+    display: block;
+
+    margin-bottom: 18px;
+
+    color: #c92929;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.aguilas-encabezado h2 {
+    max-width: 950px;
+
+    margin: 0;
+
+    font-size: clamp(50px, 8vw, 105px);
+    line-height: 0.9;
+
+    letter-spacing: -5px;
+}
+
+
+/* =========================================================
+   FOTO PRINCIPAL ÁGUILAS
+========================================================= */
+
+.aguilas-foto-principal {
+    width: 100%;
+
+    max-height: 780px;
+
+    overflow: hidden;
+}
+
+.aguilas-foto-principal img {
+    display: block;
+
+    width: 100%;
+    height: min(70vw, 780px);
+
+    object-fit: cover;
+    object-position: center;
+}
+
+
+/* =========================================================
+   PRESENTACIÓN ÁGUILAS
+========================================================= */
+
+.aguilas-presentacion {
+    max-width: 1200px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 80px;
+
+    margin: 0 auto;
+
+    padding: 100px 50px;
+}
+
+.aguilas-titulo-secundario > span {
+    color: #c92929;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.aguilas-titulo-secundario h3 {
+    margin: 18px 0 0;
+
+    font-size: clamp(40px, 5vw, 68px);
+    line-height: 1;
+
+    letter-spacing: -3px;
+}
+
+.aguilas-texto {
+    padding-top: 30px;
+}
+
+.aguilas-texto p {
+    margin: 0 0 25px;
+
+    color: #bcbcbc;
+
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   INTEGRANTES ÁGUILAS
+========================================================= */
+
+.aguilas-integrantes {
+    position: relative;
+
+    max-width: 1200px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    margin: 0 auto;
+
+    padding: 0 50px;
+
+    border-top: 1px solid #333333;
+
+    overflow: hidden;
+}
+
+
+/* Logo La Maestranza como marca de agua */
+
+.aguilas-integrantes::before {
+    content: "";
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 650px;
+    height: 650px;
+
+    transform: translate(-50%, -50%);
+
+    background-image: url("../img/logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    opacity: 0.045;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+.integrante {
+    position: relative;
+    z-index: 1;
+
+    min-height: 240px;
+
+    padding: 45px 45px 45px 0;
+
+    border-bottom: 1px solid #333333;
+}
+
+.integrante:nth-child(odd) {
+    border-right: 1px solid #333333;
+}
+
+.integrante:nth-child(even) {
+    padding-left: 45px;
+}
+
+.integrante h4 {
+    margin: 0 0 20px;
+
+    color: #ffffff;
+
+    font-size: 27px;
+}
+
+.integrante p {
+    max-width: 440px;
+
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   COLABORACIÓN Y SOPORTE
+========================================================= */
+
+.colaboracion {
+    padding: 120px 0;
+
+    background-color: #ffffff;
+    color: #191919;
+}
+
+
+/* =========================================================
+   ENCABEZADO COLABORACIÓN
+========================================================= */
+
+.colaboracion-encabezado {
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 0 50px 70px;
+}
+
+.colaboracion-encabezado h2 {
+    margin: 15px 0 0;
+
+    color: #191919;
+
+    font-size: clamp(50px, 7vw, 90px);
+    line-height: 0.9;
+
+    letter-spacing: -4px;
+}
+
+
+/* =========================================================
+   COLABORADORES
+========================================================= */
+
+.colaboradores {
+    max-width: 1200px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 30px;
+
+    margin: 0 auto;
+
+    padding: 0 50px;
+}
+
+.colaborador {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   FOTOGRAFÍA COLABORADORES
+========================================================= */
+
+.colaborador-foto {
+    width: 100%;
+    height: 620px;
+
+    overflow: hidden;
+
+    background-color: #eeeeee;
+}
+
+.colaborador-foto img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    transition: transform 0.5s ease;
+}
+
+.colaborador:hover .colaborador-foto img {
+    transform: scale(1.02);
+}
+
+
+/* =========================================================
+   INFORMACIÓN COLABORADORES
+========================================================= */
+
+.colaborador-info {
+    padding: 35px 5px 0;
+}
+
+.colaborador-area {
+    display: block;
+
+    margin-bottom: 14px;
+
+    color: #8f0d0d;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.colaborador-info h3 {
+    margin: 0 0 22px;
+
+    color: #191919;
+
+    font-size: clamp(32px, 4vw, 46px);
+    line-height: 1;
+
+    letter-spacing: -2px;
+}
+
+.colaborador-info p {
+    max-width: 520px;
+
+    margin: 0;
+
+    color: #606060;
+
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        padding: 15px 20px;
+    }
+
+    .marca span {
+        display: none;
+    }
+
+    .navbar ul {
+        gap: 15px;
+    }
+
+    .navbar nav a {
+        font-size: 12px;
+    }
+
+
+    /* PORTADA */
+
+    .portada-nosotros {
+        min-height: calc(100vh - 70px);
+    }
+
+    .portada-nosotros::before {
+        right: 5%;
+    }
+
+    .portada-nosotros::after {
+        width: 5%;
+    }
+
+    .portada-contenido {
+        padding:
+            0
+            40px
+            60px
+            25px;
+    }
+
+
+    /* EQUIPO */
+
+    .inicio-equipo {
+        padding:
+            80px
+            25px
+            50px;
+    }
+
+    .equipo-docente {
+        padding:
+            0
+            25px
+            80px;
+    }
+
+    .persona,
+    .persona-invertida {
+        min-height: auto;
+
+        grid-template-columns: 1fr;
+
+        margin-bottom: 50px;
+    }
+
+    .persona-imagen,
+    .persona-invertida .persona-imagen {
+        order: 1;
+
+        min-height: 500px;
+        height: 65vh;
+    }
+
+    .persona-info,
+    .persona-invertida .persona-info {
+        order: 2;
+
+        padding:
+            60px
+            35px
+            50px;
+    }
+
+
+    /* ÁGUILAS */
+
+    .aguilas {
+        padding: 80px 0;
+    }
+
+    .aguilas-encabezado {
+        padding:
+            0
+            25px
+            50px;
+    }
+
+    .aguilas-foto-principal img {
+        height: 65vh;
+    }
+
+    .aguilas-presentacion {
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+
+        padding:
+            70px
+            25px;
+    }
+
+    .aguilas-texto {
+        padding-top: 0;
+    }
+
+    .aguilas-integrantes {
+        grid-template-columns: 1fr;
+
+        padding: 0 25px;
+    }
+
+    .aguilas-integrantes::before {
+        width: 450px;
+        height: 450px;
+    }
+
+    .integrante,
+    .integrante:nth-child(even) {
+        min-height: auto;
+
+        padding:
+            35px
+            0;
+
+        border-right: 0;
+    }
+
+    .integrante:nth-child(odd) {
+        border-right: 0;
+    }
+
+
+    /* COLABORADORES */
+
+    .colaboracion {
+        padding: 80px 0;
+    }
+
+    .colaboracion-encabezado {
+        padding:
+            0
+            25px
+            50px;
+    }
+
+    .colaboradores {
+        grid-template-columns: 1fr;
+
+        gap: 70px;
+
+        padding: 0 25px;
+    }
+
+    .colaborador-foto {
+        height: 650px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE MÓVIL
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .navbar {
+        align-items: flex-start;
+    }
+
+    .navbar ul {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        gap: 10px 14px;
+    }
+
+
+    /* PORTADA */
+
+    .portada-contenido h1 {
+        font-size: 58px;
+
+        letter-spacing: -3px;
+    }
+
+    .portada-contenido p {
+        max-width: 90%;
+
+        font-size: 17px;
+    }
+
+    .etiqueta {
+        font-size: 11px;
+    }
+
+    .btn-conocer {
+        padding: 12px 18px;
+
+        font-size: 11px;
+    }
+
+
+    /* EQUIPO */
+
+    .persona-imagen,
+    .persona-invertida .persona-imagen {
+        min-height: 430px;
+        height: 60vh;
+    }
+
+    .persona-info,
+    .persona-invertida .persona-info {
+        padding:
+            55px
+            25px
+            40px;
+    }
+
+    .persona-info h3 {
+        font-size: 44px;
+
+        letter-spacing: -2px;
+    }
+
+    .persona-info p {
+        font-size: 15px;
+    }
+
+
+    /* ÁGUILAS */
+
+    .aguilas-encabezado h2 {
+        letter-spacing: -3px;
+    }
+
+    .aguilas-integrantes::before {
+        width: 320px;
+        height: 320px;
+
+        opacity: 0.04;
+    }
+
+
+    /* COLABORACIÓN */
+
+    .colaboracion-encabezado h2 {
+        letter-spacing: -3px;
+    }
+
+    .colaborador-foto {
+        height: 500px;
+    }
+
+    .colaborador-info h3 {
+        font-size: 38px;
+    }
+
+    .colaborador-info p {
+        font-size: 15px;
+    }
+
+}

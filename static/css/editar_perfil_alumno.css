@@ -1,3 +1,7 @@
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
 * {
     box-sizing: border-box;
 }
@@ -6,195 +10,559 @@ body {
     margin: 0;
     min-height: 100vh;
 
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 
-    background-color: #f4f4f2;
-    color: #111;
+    background-color: #f3f3f1;
+    color: #1b1b1b;
 }
 
 
-/* CONTENEDOR PRINCIPAL */
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
 
-.editar-perfil {
+.contenedor-editar {
+    width: 100%;
     min-height: 100vh;
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
-    padding: 40px 20px;
+    padding: 60px 25px;
 }
 
 
-/* TARJETA */
+/* =========================================================
+   TARJETA
+========================================================= */
 
 .tarjeta-editar {
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
 
-    background-color: white;
-
-    padding: 45px;
+    background-color: #ffffff;
 
     border-radius: 16px;
 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    padding: 50px 60px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.08);
 }
 
 
-/* ENCABEZADO */
+/* =========================================================
+   ENCABEZADO
+========================================================= */
 
-.encabezado-editar {
-    margin-bottom: 30px;
-}
-
-.encabezado-editar .subtitulo {
-    margin: 0 0 8px;
-
-    color: #a80d0d;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    letter-spacing: 4px;
-}
-
-.encabezado-editar h1 {
+.etiqueta {
     margin: 0 0 10px;
 
-    font-size: 32px;
+    color: #8f0d0d;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 3px;
 }
 
-.encabezado-editar p {
+.tarjeta-editar > h1 {
     margin: 0;
 
-    color: #666;
+    font-size: 34px;
+    font-weight: 700;
+
+    color: #171717;
+}
+
+.descripcion {
+    margin: 12px 0 35px;
+
+    color: #666666;
+
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 
-/* FORMULARIO */
+/* =========================================================
+   FOTO DE PERFIL
+========================================================= */
+
+.editar-foto {
+    padding-bottom: 35px;
+    margin-bottom: 35px;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.editar-foto h2 {
+    margin: 0 0 20px;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   FOTO ACTUAL
+========================================================= */
+
+.foto-actual {
+    margin-bottom: 18px;
+}
+
+.avatar-editar {
+    width: 135px;
+    height: 135px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 3px solid #8f0d0d;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   BOTÓN CAMBIAR FOTO
+========================================================= */
+
+.btn-seleccionar-foto {
+    border: none;
+
+    background-color: #8f0d0d;
+    color: white;
+
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn-seleccionar-foto:hover {
+    background-color: #710a0a;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   EDITOR DE FOTO
+========================================================= */
+
+.editor-foto {
+    margin-top: 25px;
+
+    width: 100%;
+}
+
+.editor-foto.oculto {
+    display: none;
+}
+
+.cropper-contenedor {
+    width: 100%;
+    max-width: 650px;
+    height: 420px;
+
+    overflow: hidden;
+
+    background-color: #111111;
+
+    border-radius: 10px;
+}
+
+#imagen-recorte {
+    display: block;
+
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   BOTONES DEL EDITOR
+========================================================= */
+
+.acciones-foto {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.btn-cancelar-foto,
+.btn-guardar-foto {
+    border: none;
+
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn-cancelar-foto {
+    background-color: #262626;
+    color: white;
+}
+
+.btn-cancelar-foto:hover {
+    background-color: #111111;
+}
+
+.btn-guardar-foto {
+    background-color: #8f0d0d;
+    color: white;
+}
+
+.btn-guardar-foto:hover {
+    background-color: #710a0a;
+}
+
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
 
 .form-editar {
     display: grid;
-    grid-template-columns: 1fr 1fr;
 
-    gap: 20px;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px 30px;
 }
 
 
-/* CAMPOS */
+/* =========================================================
+   GRUPOS
+========================================================= */
 
-.campo {
+.grupo-formulario {
     display: flex;
     flex-direction: column;
 
-    gap: 7px;
+    gap: 8px;
 }
 
-.campo label {
-    font-size: 14px;
-    font-weight: bold;
+.grupo-formulario label {
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #333333;
 }
 
-.campo input {
+.grupo-formulario input {
     width: 100%;
 
-    padding: 12px 14px;
+    padding: 13px 14px;
 
-    border: 1px solid #ccc;
+    border: 1px solid #d4d4d4;
+
     border-radius: 7px;
 
+    background-color: #fafafa;
+
+    color: #222222;
+
+    font-family: inherit;
     font-size: 15px;
 
     outline: none;
 
-    transition: 0.2s;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.campo input:focus {
-    border-color: #a80d0d;
+
+/* =========================================================
+   INPUT ACTIVO
+========================================================= */
+
+.grupo-formulario input:focus {
+    background-color: #ffffff;
+
+    border-color: #8f0d0d;
+
+    box-shadow:
+        0 0 0 3px rgba(143, 13, 13, 0.10);
 }
 
 
-/* BOTONES */
+/* =========================================================
+   MENSAJE FORMULARIO
+========================================================= */
+
+#mensaje-formulario {
+    grid-column: 1 / -1;
+
+    min-height: 20px;
+
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #8f0d0d;
+}
+
+
+/* =========================================================
+   BOTONES GUARDAR / CANCELAR
+========================================================= */
 
 .acciones-formulario {
     grid-column: 1 / -1;
 
     display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
     gap: 12px;
 
-    margin-top: 15px;
+    margin-top: 5px;
 }
 
-.btn-guardar,
-.btn-cancelar {
-    min-height: 42px;
-
+.btn-volver,
+.btn-guardar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
+    min-height: 44px;
+
     padding: 0 22px;
 
-    border-radius: 7px;
+    border-radius: 6px;
 
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
 
     text-decoration: none;
 
     cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* CANCELAR */
+
+.btn-volver {
+    border: 1px solid #d2d2d2;
+
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.btn-volver:hover {
+    background-color: #f1f1f1;
 }
 
 
 /* GUARDAR */
 
 .btn-guardar {
-    background-color: #a80d0d;
-    color: white;
+    border: none;
 
-    border: 1px solid #a80d0d;
+    background-color: #8f0d0d;
+    color: #ffffff;
 }
 
 .btn-guardar:hover {
-    background-color: #850909;
+    background-color: #710a0a;
+
+    transform: translateY(-1px);
+}
+
+.btn-guardar:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
 }
 
 
-/* CANCELAR */
+/* =========================================================
+   ZONA DESACTIVAR CUENTA
+========================================================= */
 
-.btn-cancelar {
-    background-color: #111;
-    color: white;
-
-    border: 1px solid #111;
+.zona-desactivar {
+    margin-top: 45px;
 }
 
-.btn-cancelar:hover {
-    background-color: #333;
+.zona-desactivar hr {
+    border: none;
+
+    border-top: 1px solid #e5e5e5;
+
+    margin: 0 0 30px;
+}
+
+.zona-desactivar h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+
+    color: #8f0d0d;
+}
+
+.zona-desactivar p {
+    max-width: 600px;
+
+    margin: 0 0 18px;
+
+    color: #666666;
+
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 
-/* RESPONSIVE */
+/* =========================================================
+   BOTÓN DESACTIVAR
+========================================================= */
 
-@media (max-width: 650px) {
+.btn-desactivar-cuenta {
+    border: 1px solid #8f0d0d;
+
+    background-color: transparent;
+    color: #8f0d0d;
+
+    padding: 11px 18px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-desactivar-cuenta:hover {
+    background-color: #8f0d0d;
+
+    color: #ffffff;
+}
+
+.btn-desactivar-cuenta:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 750px) {
+
+    .contenedor-editar {
+        padding: 25px 15px;
+    }
 
     .tarjeta-editar {
         padding: 30px 22px;
+
+        border-radius: 12px;
+    }
+
+    .tarjeta-editar > h1 {
+        font-size: 28px;
     }
 
     .form-editar {
         grid-template-columns: 1fr;
+
+        gap: 18px;
     }
 
     .acciones-formulario {
         grid-column: 1;
+
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-volver,
+    .btn-guardar {
+        width: 100%;
+    }
+
+    .cropper-contenedor {
+        height: 350px;
+    }
+
+}
+
+
+/* =========================================================
+   PANTALLAS MUY PEQUEÑAS
+========================================================= */
+
+@media (max-width: 450px) {
+
+    .contenedor-editar {
+        padding: 0;
+    }
+
+    .tarjeta-editar {
+        min-height: 100vh;
+
+        border-radius: 0;
+
+        padding: 25px 18px;
+    }
+
+    .avatar-editar {
+        width: 115px;
+        height: 115px;
+    }
+
+    .cropper-contenedor {
+        height: 300px;
+    }
+
+    .acciones-foto {
         flex-direction: column;
     }
 
-    .btn-guardar,
-    .btn-cancelar {
+    .btn-cancelar-foto,
+    .btn-guardar-foto {
         width: 100%;
     }
+
 }

@@ -225,3 +225,32 @@ body {
         text-align: center;
     }
 }
+
+/* =========================================================
+   MENSAJES API
+========================================================= */
+
+.mensaje-formulario {
+    margin-top: 20px;
+    padding: 12px 15px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mensaje-formulario.exito {
+    background: #e8f5e9;
+    color: #256029;
+}
+
+.mensaje-formulario.error {
+    background: #fdeaea;
+    color: #8f0d0d;
+}
+
+.btn-guardar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

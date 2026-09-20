@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,11 +12,22 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/crear_taller.css') }}"
     >
+
+    <script
+        src="{{ url_for('static', filename='js/crear_taller.js') }}"
+        defer>
+    </script>
+
 </head>
 
 <body>
 
-    <main class="contenedor">
+    <main
+    class="contenedor"
+    id="crear-taller"
+    data-api-url="{{ url_for('api.api_crear_taller') }}"
+    data-gestion-url="{{ url_for('gestion_talleres') }}"
+>
 
         <a
             class="volver"
@@ -45,7 +57,7 @@
 
         <section class="tarjeta-formulario">
 
-            <form method="POST">
+            <form id="form-crear-taller">
 
                 <div class="campo">
 
@@ -157,6 +169,12 @@
                 </div>
 
             </form>
+
+            <p
+    id="mensaje-formulario"
+    class="mensaje-formulario"
+    hidden
+></p>
 
         </section>
 

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Editar mi perfil | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/editar_perfil_profesor.css'
+        ) }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"
+    >
+</head>
+
+
+<body>
+
+    <main class="contenedor-editar">
+
+        <section class="tarjeta-editar">
+
+            <p class="etiqueta">
+                LA MAESTRANZA
+            </p>
+
+            <h1>Editar mi perfil</h1>
+
+            <p class="descripcion">
+                Actualiza tus datos personales y profesionales.
+            </p>
+
+
+            <!-- ========================================= -->
+            <!-- FOTO DE PERFIL -->
+            <!-- ========================================= -->
+
+            <section class="seccion-foto">
+
+                <h2>Foto de perfil</h2>
+
+                <div class="foto-actual">
+
+                    {% if profesor.foto_perfil %}
+
+                        <img
+                            id="avatar-profesor"
+                            src="{{ url_for(
+                                'static',
+                                filename='img/perfiles/' + profesor.foto_perfil
+                            ) }}"
+                            alt="Foto de perfil"
+                            class="avatar-profesor"
+                        >
+
+                    {% else %}
+
+                        <img
+                            id="avatar-profesor"
+                            src="{{ url_for(
+                                'static',
+                                filename='img/logo.png'
+                            ) }}"
+                            alt="Avatar predeterminado"
+                            class="avatar-profesor"
+                        >
+
+                    {% endif %}
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btn-seleccionar-foto"
+                    class="btn-seleccionar-foto"
+                >
+                    Cambiar foto
+                </button>
+
+
+                <input
+                    type="file"
+                    id="foto-perfil"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    hidden
+                >
+
+
+                <!-- EDITOR DE FOTO -->
+
+                <div
+                    id="editor-foto"
+                    class="editor-foto oculto"
+                >
+
+                    <div class="cropper-contenedor">
+
+                        <img
+                            id="imagen-recorte"
+                            alt="Imagen seleccionada"
+                        >
+
+                    </div>
+
+
+                    <div class="acciones-foto">
+
+                        <button
+                            type="button"
+                            id="btn-cancelar-foto"
+                            class="btn-cancelar-foto"
+                        >
+                            Cancelar
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="btn-guardar-foto"
+                            class="btn-guardar-foto"
+                        >
+                            Guardar foto
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================= -->
+            <!-- DATOS -->
+            <!-- ========================================= -->
+
+            <form
+                id="form-editar-profesor"
+                class="form-editar"
+                data-api-url="/api/profesor/perfil"
+                data-panel-url="{{ url_for('panel_profesor') }}"
+            >
+
+                <div class="grupo-formulario">
+
+                    <label for="nombre">
+                        Nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        value="{{ profesor.nombre }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="grupo-formulario">
+
+                    <label for="apellido">
+                        Apellido
+                    </label>
+
+                    <input
+                        type="text"
+                        id="apellido"
+                        name="apellido"
+                        value="{{ profesor.apellido }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="grupo-formulario">
+
+                    <label for="rut">
+                        RUT
+                    </label>
+
+                    <input
+                        type="text"
+                        id="rut"
+                        value="{{ profesor.rut }}"
+                        disabled
+                    >
+
+                </div>
+
+
+                <div class="grupo-formulario">
+
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        id="telefono"
+                        name="telefono"
+                        value="{{ profesor.telefono or '' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="grupo-formulario campo-completo">
+
+                    <label for="especialidad">
+                        Especialidad
+                    </label>
+
+                    <input
+                        type="text"
+                        id="especialidad"
+                        name="especialidad"
+                        value="{{ profesor.especialidad or '' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <p
+                    id="mensaje-formulario"
+                    class="campo-completo"
+                ></p>
+
+
+                <div class="acciones-formulario">
+
+                    <a
+                        href="{{ url_for('panel_profesor') }}"
+                        class="btn-volver"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn-guardar"
+                    >
+                        Guardar cambios
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js">
+</script>
+
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/editar_perfil_profesor.js'
+        ) }}"
+        defer>
+    </script>
+
+</body>
+
+</html>

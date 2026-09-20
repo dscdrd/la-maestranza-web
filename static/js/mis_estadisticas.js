@@ -1,109 +1,364 @@
 "use strict";
 
 (() => {
-    const panel = document.getElementById("estadisticas-alumno");
 
-    if (!panel) {
+    /* ======================================================
+        ELEMENTOS
+       ====================================================== */
+
+    const pagina =
+        document.getElementById(
+            "estadisticas-alumno"
+        );
+
+
+    if (!pagina) {
         return;
     }
 
-    const apiUrl = panel.dataset.apiUrl;
-    const estado = document.getElementById("estado");
-    const contenido = document.getElementById("contenido");
-    const reintentar = document.getElementById("reintentar");
-    const ranking = document.getElementById("ranking");
-    const sinReservas = document.getElementById("sin-reservas");
 
-    const campos = [
-        "talleres_vigentes",
-        "clases_contratadas_vigentes",
-        "reservas_proximas",
-        "total_reservas",
-        "reservas_canceladas"
-    ];
+    const apiUrl =
+        pagina.dataset.apiUrl;
 
-    async function cargarEstadisticas() {
-        contenido.hidden = true;
-        reintentar.hidden = true;
-        reintentar.disabled = true;
 
-        estado.textContent = "Cargando tus estadísticas…";
+    const estado =
+        document.getElementById(
+            "estado"
+        );
 
-        try {
-            const respuesta = await fetch(apiUrl, {
-                credentials: "same-origin",
-                cache: "no-store"
-            });
 
-            const tipoContenido =
-                respuesta.headers.get("content-type") || "";
+    const contenido =
+        document.getElementById(
+            "contenido"
+        );
 
-            if (!tipoContenido.includes("application/json")) {
-                throw new Error(
-                    "La respuesta no es válida. Comprueba que tu sesión siga abierta."
-                );
-            }
 
-            const datos = await respuesta.json();
+    const botonReintentar =
+        document.getElementById(
+            "reintentar"
+        );
 
-            if (!respuesta.ok) {
-                throw new Error(
-                    datos.error?.mensaje ||
-                    "No se pudieron cargar las estadísticas."
-                );
-            }
 
-            if (
-                !datos.estadisticas ||
-                !Array.isArray(datos.mis_talleres_mas_reservados) ||
-                campos.some(
-                    campo => !Number.isFinite(datos.estadisticas[campo])
-                )
-            ) {
-                throw new Error(
-                    "La API devolvió datos incompletos. Intenta nuevamente."
-                );
-            }
+    const descripcionAlumno =
+        document.getElementById(
+            "descripcion-alumno"
+        );
 
-            // Mostrar los valores personales recibidos desde la API.
-            for (const campo of campos) {
-                document.getElementById(campo).textContent =
-                    datos.estadisticas[campo];
-            }
 
-            // Crear la lista sin interpretar los nombres como HTML.
-            ranking.replaceChildren();
+    const talleresVigentes =
+        document.getElementById(
+            "talleres_vigentes"
+        );
 
-            for (const taller of datos.mis_talleres_mas_reservados) {
-                const fila = document.createElement("li");
-                const etiqueta =
-                    taller.reservas === 1 ? "reserva" : "reservas";
 
-                fila.textContent =
-                    `${taller.taller}: ${taller.reservas} ${etiqueta}`;
+    const clasesContratadas =
+        document.getElementById(
+            "clases_contratadas"
+        );
 
-                ranking.appendChild(fila);
-            }
 
-            sinReservas.hidden =
-                datos.mis_talleres_mas_reservados.length !== 0;
+    const reservasProximas =
+        document.getElementById(
+            "reservas_proximas"
+        );
 
-            estado.textContent = "";
-            contenido.hidden = false;
 
-        } catch (error) {
-            estado.textContent = error instanceof TypeError
-                ? "No se pudo conectar con el servidor. Intenta nuevamente."
-                : error.message || "No se pudieron cargar tus estadísticas.";
+    const reservasCanceladas =
+        document.getElementById(
+            "reservas_canceladas"
+        );
 
-            reintentar.hidden = false;
 
-        } finally {
-            reintentar.disabled = false;
+    const rankingTalleres =
+        document.getElementById(
+            "ranking-talleres"
+        );
+
+
+    const sinTalleres =
+        document.getElementById(
+            "sin-talleres"
+        );
+
+
+    const resumenReservas =
+        document.getElementById(
+            "resumen-reservas"
+        );
+
+
+
+    /* ======================================================
+        RENDERIZAR TALLERES
+       ====================================================== */
+
+    function mostrarTalleres(talleres) {
+
+        rankingTalleres.innerHTML = "";
+
+
+        if (
+            !Array.isArray(talleres) ||
+            talleres.length === 0
+        ) {
+
+            sinTalleres.hidden =
+                false;
+
+            return;
+
         }
+
+
+        sinTalleres.hidden =
+            true;
+
+
+        talleres.forEach(
+            (taller) => {
+
+                const fila =
+                    document.createElement(
+                        "article"
+                    );
+
+
+                fila.className =
+                    "estadistica-taller";
+
+
+                const cantidad =
+                    Number(
+                        taller.reservas || 0
+                    );
+
+
+                const palabraReserva =
+                    cantidad === 1
+                        ? "reserva"
+                        : "reservas";
+
+
+                fila.innerHTML = `
+                    <div class="nombre-taller">
+
+                        <h3>
+                            ${taller.taller}
+                        </h3>
+
+                        <span>
+                            Actividad registrada
+                        </span>
+
+                    </div>
+
+
+                    <div class="numero-reservas">
+
+                        <strong>
+                            ${cantidad}
+                        </strong>
+
+                        <span>
+                            ${palabraReserva}
+                        </span>
+
+                    </div>
+                `;
+
+
+                rankingTalleres.appendChild(
+                    fila
+                );
+
+            }
+        );
+
     }
 
-    reintentar.addEventListener("click", cargarEstadisticas);
+
+
+    /* ======================================================
+        CARGAR ESTADÍSTICAS
+       ====================================================== */
+
+    async function cargarEstadisticas() {
+
+        estado.hidden =
+            false;
+
+
+        estado.textContent =
+            "Cargando estadísticas…";
+
+
+        contenido.hidden =
+            true;
+
+
+        botonReintentar.hidden =
+            true;
+
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    apiUrl,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+
+                        credentials:
+                            "same-origin",
+
+                        cache:
+                            "no-store"
+                    }
+                );
+
+
+            const datos =
+                await respuesta.json();
+
+
+            if (!respuesta.ok) {
+
+                const mensajeError =
+                    datos.error?.mensaje ||
+                    "No se pudieron cargar las estadísticas.";
+
+
+                throw new Error(
+                    mensajeError
+                );
+
+            }
+
+
+            /* ==============================================
+                ALUMNO
+               ============================================== */
+
+            if (datos.alumno) {
+
+                descripcionAlumno.textContent =
+                    `${datos.alumno.nombre} ${datos.alumno.apellido}, esta es una vista general de tu actividad en La Maestranza.`;
+
+            }
+
+
+
+            /* ==============================================
+                    ESTADÍSTICAS
+               ============================================== */
+
+            const estadisticas =
+                datos.estadisticas || {};
+
+
+            talleresVigentes.textContent =
+                estadisticas
+                    .talleres_vigentes ?? 0;
+
+
+            clasesContratadas.textContent =
+                estadisticas
+                    .clases_contratadas_vigentes ?? 0;
+
+
+            reservasProximas.textContent =
+                estadisticas
+                    .reservas_proximas ?? 0;
+
+
+            reservasCanceladas.textContent =
+                estadisticas
+                    .reservas_canceladas ?? 0;
+
+
+
+            /* ==============================================
+                RESUMEN HISTÓRICO
+               ============================================== */
+
+            const totalReservas =
+                estadisticas
+                    .total_reservas ?? 0;
+
+
+            resumenReservas.textContent =
+                `${totalReservas} reservas registradas en tu historial.`;
+
+
+
+            /*  ==============================================
+                TALLERES
+               ============================================== */
+
+            mostrarTalleres(
+                datos
+                    .mis_talleres_mas_reservados ||
+                []
+            );
+
+
+
+            /* ==============================================
+                    MOSTRAR CONTENIDO
+               ============================================== */
+
+            estado.hidden =
+                true;
+
+
+            contenido.hidden =
+                false;
+
+
+        } catch (error) {
+
+            contenido.hidden =
+                true;
+
+
+            estado.hidden =
+                false;
+
+
+            estado.textContent =
+                error.message ||
+                "No se pudieron cargar las estadísticas.";
+
+
+            botonReintentar.hidden =
+                false;
+
+        }
+
+    }
+
+
+
+    /* ======================================================
+        REINTENTAR
+       ====================================================== */
+
+    botonReintentar.addEventListener(
+        "click",
+        cargarEstadisticas
+    );
+
+
+
+    /* ======================================================
+        INICIO
+       ====================================================== */
 
     cargarEstadisticas();
+
 })();

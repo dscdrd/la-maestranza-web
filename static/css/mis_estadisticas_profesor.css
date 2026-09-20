@@ -1,0 +1,416 @@
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f4f4f2;
+    color: #222;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BARRA SUPERIOR
+========================================================= */
+
+.barra {
+    min-height: 72px;
+    padding: 14px 6%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    background: #111;
+    color: white;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.marca span {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.enlace-panel {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.enlace-panel:hover {
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.contenedor {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto;
+    padding: 42px 30px 70px;
+}
+
+
+/* =========================================================
+   VOLVER
+========================================================= */
+
+.volver {
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    color: #8f0d0d;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.volver:hover {
+    background: #8f0d0d;
+    color: white;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.encabezado {
+    margin: 38px 0 38px;
+}
+
+.etiqueta {
+    margin: 0 0 8px;
+
+    color: #8f0d0d;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.encabezado h1 {
+    margin: 0;
+
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: -1px;
+}
+
+.descripcion {
+    margin: 8px 0 0;
+    color: #707070;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   MÉTRICAS GENERALES
+========================================================= */
+
+.metricas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    margin: 0 0 65px;
+
+    padding: 25px 0;
+
+    border-top: 1px solid #d9d9d6;
+    border-bottom: 1px solid #d9d9d6;
+}
+
+.metrica {
+    padding: 5px 28px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    border-right: 1px solid #d9d9d6;
+}
+
+.metrica:first-child {
+    padding-left: 0;
+}
+
+.metrica:last-child {
+    border-right: 0;
+}
+
+.metrica strong {
+    color: #222;
+
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.metrica span {
+    color: #777;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   SECCIÓN TALLERES
+========================================================= */
+
+.seccion-talleres {
+    margin-top: 20px;
+}
+
+.titulo-seccion {
+    margin-bottom: 25px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.titulo-seccion h2 {
+    margin: 0;
+
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.titulo-seccion > p {
+    margin: 0;
+
+    color: #888;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ESTADÍSTICA INDIVIDUAL DEL TALLER
+========================================================= */
+
+.talleres-estadisticas {
+    border-top: 1px solid #d9d9d6;
+}
+
+.estadistica-taller {
+    padding: 30px 0;
+
+    border-bottom: 1px solid #d9d9d6;
+}
+
+.encabezado-taller {
+    margin-bottom: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.encabezado-taller h3 {
+    margin: 0;
+
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.encabezado-taller span {
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BARRAS
+========================================================= */
+
+.bloque-barra {
+    margin-bottom: 20px;
+}
+
+.informacion-barra {
+    margin-bottom: 7px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.informacion-barra span {
+    color: #555;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.informacion-barra strong {
+    color: #333;
+    font-size: 13px;
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 7px;
+
+    overflow: hidden;
+
+    background: #dededb;
+    border-radius: 10px;
+}
+
+.barra-progreso {
+    width: 0;
+    height: 100%;
+
+    background: #8f0d0d;
+    border-radius: 10px;
+
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   DETALLE ASISTENCIA
+========================================================= */
+
+.detalle-asistencia {
+    margin: 5px 0 0;
+
+    color: #888;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CARGA Y ERRORES
+========================================================= */
+
+.estado-carga {
+    color: #777;
+    font-size: 14px;
+}
+
+.btn-reintentar {
+    padding: 9px 15px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #8f0d0d;
+
+    cursor: pointer;
+}
+
+.btn-reintentar:hover {
+    background: #8f0d0d;
+    color: white;
+}
+
+.sin-talleres {
+    padding: 30px 0;
+    color: #777;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .barra {
+        padding: 14px 20px;
+    }
+
+    .marca span {
+        display: none;
+    }
+
+    .contenedor {
+        padding: 30px 20px 50px;
+    }
+
+    .metricas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .metrica {
+        padding: 20px;
+        border-bottom: 1px solid #d9d9d6;
+    }
+
+    .metrica:nth-child(2) {
+        border-right: 0;
+    }
+
+    .titulo-seccion {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .metricas {
+        grid-template-columns: 1fr;
+    }
+
+    .metrica {
+        padding: 18px 0;
+        border-right: 0;
+    }
+
+    .encabezado h1 {
+        font-size: 31px;
+    }
+
+    .encabezado-taller {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+}

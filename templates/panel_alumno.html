@@ -33,9 +33,7 @@
 
             <div class="nav-acciones">
 
-                <a href="{{ url_for('inicio') }}">
-                    Inicio
-                </a>
+            
 
                 <a href="#mis-datos">Mi perfil</a>
 
@@ -99,33 +97,6 @@
                     
                         <h2>Mi perfil</h2>
 
-<!-- SUBIR FOTO -->
-<form
-    action="{{ url_for('subir_foto_perfil') }}"
-    method="POST"
-    enctype="multipart/form-data"
-    class="form-foto-perfil"
->
-
-    <label for="foto" class="btn-perfil btn-negro">
-        Seleccionar imagen
-    </label>
-
-    <input
-        type="file"
-        id="foto"
-        name="foto"
-        accept=".jpg,.jpeg,.png,.webp"
-        class="input-foto"
-        required
-    >
-
-    <button type="submit" class="btn-perfil btn-rojo">
-        Guardar foto
-    </button>
-
-</form>
-
 
 <!-- EDITAR DATOS -->
 <a
@@ -134,21 +105,6 @@
 >
     Editar mis datos
 </a>
-
-
-<!-- ELIMINAR / DESACTIVAR CUENTA -->
-<form
-    action="{{ url_for('desactivar_cuenta_alumno') }}"
-    method="POST"
-    class="form-desactivar"
-    onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta?');"
->
-
-    <button type="submit" class="btn-perfil btn-rojo">
-        Eliminar mi cuenta
-    </button>
-
-</form>
                     </div>
 
                     

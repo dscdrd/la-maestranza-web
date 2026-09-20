@@ -1,4 +1,10 @@
 import os
+from db import conectar_db
+from api import api 
+
+from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, obtener_clases_inscripcion_alumno
+
+
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
@@ -6,10 +12,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector 
 
 load_dotenv()
-
 app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
+
+app.register_blueprint(api)
 
 
 # CONFIGURACIÓN PARA FOTOS DE PERFIL
@@ -37,19 +44,6 @@ def extension_permitida(nombre_archivo):
     )
 
 
-#* Conexion a la base de datos SQL
-def conectar_db():
-
-    conexion = mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        port=int(os.getenv("DB_PORT", 3306)),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
-    )
-
-    return conexion
-
 
 #* Prueba de conexion a la base de datos
 @app.route("/prueba_db")
@@ -75,7 +69,7 @@ def subir_foto_perfil():
 
     # Verificar rol
     if session.get("rol") != "alumno":
-        return "Acceso no autorizado"
+        return "Acceso no autorizado", 403
 
     # Verificar que venga un archivo
     if "foto" not in request.files:
@@ -89,7 +83,7 @@ def subir_foto_perfil():
 
     # Verificar extensión
     if not extension_permitida(foto.filename):
-        return "Formato de imagen no permitido"
+        return "Formato de imagen no permitido", 400
 
     id_usuario = session["id_usuario"]
 
@@ -104,30 +98,36 @@ def subir_foto_perfil():
         nombre_archivo
     )
 
-    # Guardar imagen
-    foto.save(ruta_archivo)
+    try:
 
-    # Guardar nombre en MySQL
-    conexion = conectar_db()
-    cursor = conexion.cursor()
+        # Guardar imagen físicamente
+        foto.save(ruta_archivo)
 
-    sql = """
-        UPDATE alumnos
-        SET foto_perfil = %s
-        WHERE id_usuario = %s
-    """
+        # Actualizar MySQL mediante services.py
+        actualizar_foto_alumno(
+            id_usuario,
+            nombre_archivo
+        )
 
-    cursor.execute(
-        sql,
-        (nombre_archivo, id_usuario)
-    )
+        return redirect(
+            url_for("panel_alumno")
+        )
 
-    conexion.commit()
+    except Exception as error:
 
-    cursor.close()
-    conexion.close()
+        print(
+            "Error al subir foto del alumno:",
+            error
+        )
 
-    return redirect(url_for("panel_alumno"))
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="No se pudo actualizar la foto",
+            mensaje="Ocurrió un error al guardar la foto de perfil.",
+            texto_boton="Volver a mi panel",
+            destino=url_for("panel_alumno")
+        ), 500
 
 
 @app.route("/subir_foto_profesor", methods=["POST"])
@@ -168,31 +168,36 @@ def subir_foto_profesor():
         nombre_archivo
     )
 
-    # Guardar imagen
-    foto.save(ruta_archivo)
-
-    # Actualizar base de datos
-    conexion = conectar_db()
-    cursor = conexion.cursor()
-
     try:
 
-        cursor.execute("""
-            UPDATE profesores
-            SET foto_perfil = %s
-            WHERE id_usuario = %s
-        """, (
-            nombre_archivo,
-            id_usuario
-        ))
+        # Guardar imagen físicamente
+        foto.save(ruta_archivo)
 
-        conexion.commit()
+        # Actualizar MySQL mediante services.py
+        actualizar_foto_profesor(
+            id_usuario,
+            nombre_archivo
+        )
 
-    finally:
-        cursor.close()
-        conexion.close()
+        return redirect(
+            url_for("panel_profesor")
+        )
 
-    return redirect(url_for("panel_profesor"))
+    except Exception as error:
+
+        print(
+            "Error al subir foto del profesor:",
+            error
+        )
+
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="No se pudo actualizar la foto",
+            mensaje="Ocurrió un error al guardar la foto de perfil.",
+            texto_boton="Volver a mi panel",
+            destino=url_for("panel_profesor")
+        ), 500
 
 
 @app.route("/")
@@ -205,46 +210,30 @@ def inicio():
         id_usuario = session["id_usuario"]
         rol = session.get("rol")
 
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
+        if rol == "alumno":
 
-        try:
+            alumno = obtener_alumno_por_usuario(
+                id_usuario
+            )
 
-            if rol == "alumno":
+            if alumno:
+                foto_perfil = alumno["foto_perfil"]
 
-                cursor.execute("""
-                    SELECT foto_perfil
-                    FROM alumnos
-                    WHERE id_usuario = %s
-                """, (id_usuario,))
+        elif rol == "profesor":
 
-                usuario = cursor.fetchone()
+            profesor = obtener_profesor_por_usuario(
+                id_usuario
+            )
 
-                if usuario:
-                    foto_perfil = usuario["foto_perfil"]
-
-
-            elif rol == "profesor":
-
-                cursor.execute("""
-                    SELECT foto_perfil
-                    FROM profesores
-                    WHERE id_usuario = %s
-                """, (id_usuario,))
-
-                usuario = cursor.fetchone()
-
-                if usuario:
-                    foto_perfil = usuario["foto_perfil"]
-
-        finally:
-            cursor.close()
-            conexion.close()
+            if profesor:
+                foto_perfil = profesor["foto_perfil"]
 
     return render_template(
         "index.html",
         foto_perfil=foto_perfil
     )
+
+
 
 @app.route("/talleres")
 def talleres():
@@ -261,9 +250,9 @@ def seleccionar_perfil():
     return render_template("seleccionar_perfil.html")
 
 
-@app.route("/equipo")
-def equipo():
-    return render_template("equipo.html")
+@app.route("/nosotros")
+def nosotros():
+    return render_template("nosotros.html")
 
 
 @app.route("/Terapias")
@@ -293,35 +282,24 @@ def login_alumno():
         correo = request.form["correo"]
         contrasena = request.form["contrasena"]
 
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
+        # Buscar usuario mediante services.py
+        usuario = obtener_usuario_login(
+            correo,
+            "alumno"
+        )
 
-        sql = """
-            SELECT *
-            FROM usuarios
-            WHERE correo = %s 
-            AND rol = %s
-            AND activo = 1
-        """
-
-        cursor.execute(sql, (correo, "alumno"))
-
-        usuario = cursor.fetchone()
-
-        cursor.close()
-        conexion.close()
-
+        # Verificar contraseña
         if usuario and check_password_hash(
             usuario["contrasena"],
             contrasena
         ):
 
-            # Guardamos al usuario que inició sesión
             session["id_usuario"] = usuario["id_usuario"]
             session["rol"] = usuario["rol"]
 
-            # Lo enviamos a su panel
-            return redirect(url_for("panel_alumno"))
+            return redirect(
+                url_for("panel_alumno")
+            )
 
         return render_template(
             "mensaje.html",
@@ -332,7 +310,9 @@ def login_alumno():
             destino=url_for("login_alumno")
         )
 
-    return render_template("login_alumno.html")
+    return render_template(
+        "login_alumno.html"
+    )
 
 
 @app.route("/panel_alumno")
@@ -340,33 +320,24 @@ def panel_alumno():
 
     # Verificar que exista una sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+        return redirect(
+            url_for("login_alumno")
+        )
 
     # Verificar que el usuario sea alumno
     if session.get("rol") != "alumno":
-        return "Acceso no autorizado"
+        return "Acceso no autorizado", 403
 
-    # Obtener el id del usuario conectado
+    # Obtener usuario conectado
     id_usuario = session["id_usuario"]
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    sql = """
-        SELECT *
-        FROM alumnos
-        WHERE id_usuario = %s
-    """
-
-    cursor.execute(sql, (id_usuario,))
-
-    alumno = cursor.fetchone()
-
-    cursor.close()
-    conexion.close()
+    # Obtener alumno mediante services.py
+    alumno = obtener_alumno_por_usuario(
+        id_usuario
+    )
 
     if not alumno:
-        return "No se encontraron los datos del alumno"
+        return "No se encontraron los datos del alumno", 404
 
     return render_template(
         "panel_alumno.html",
@@ -375,12 +346,14 @@ def panel_alumno():
 
 
 
-@app.route("/editar_perfil_alumno", methods=["GET", "POST"])
+@app.route("/editar_perfil_alumno")
 def editar_perfil_alumno():
 
     # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+        return redirect(
+            url_for("login_alumno")
+        )
 
     # Verificar rol
     if session.get("rol") != "alumno":
@@ -391,73 +364,14 @@ def editar_perfil_alumno():
             mensaje="No tienes permisos para acceder a esta sección.",
             texto_boton="Volver al inicio",
             destino=url_for("inicio")
-        )
+        ), 403
 
     id_usuario = session["id_usuario"]
 
-    # UPDATE
-    if request.method == "POST":
-
-        nombre = request.form.get("nombre")
-        apellido = request.form.get("apellido")
-        telefono = request.form.get("telefono")
-        contacto_emergencia = request.form.get("contacto_emergencia")
-        telefono_emergencia = request.form.get("telefono_emergencia")
-
-        conexion = conectar_db()
-        cursor = conexion.cursor()
-
-        sql = """
-            UPDATE alumnos
-            SET nombre = %s,
-                apellido = %s,
-                telefono = %s,
-                contacto_emergencia = %s,
-                telefono_emergencia = %s
-            WHERE id_usuario = %s
-        """
-
-        cursor.execute(
-            sql,
-            (
-                nombre,
-                apellido,
-                telefono,
-                contacto_emergencia,
-                telefono_emergencia,
-                id_usuario
-            )
-        )
-
-        conexion.commit()
-
-        cursor.close()
-        conexion.close()
-
-        return render_template(
-            "mensaje.html",
-            tipo="exito",
-            titulo="Datos actualizados",
-            mensaje="Tus datos personales fueron modificados correctamente.",
-            texto_boton="Volver a mi perfil",
-            destino=url_for("panel_alumno")
-        )
-
-    # GET: cargar los datos actuales
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    sql = """
-        SELECT *
-        FROM alumnos
-        WHERE id_usuario = %s
-    """
-
-    cursor.execute(sql, (id_usuario,))
-    alumno = cursor.fetchone()
-
-    cursor.close()
-    conexion.close()
+    # Obtener alumno mediante services.py
+    alumno = obtener_alumno_por_usuario(
+        id_usuario
+    )
 
     if not alumno:
         return render_template(
@@ -467,60 +381,11 @@ def editar_perfil_alumno():
             mensaje="No se encontraron los datos del alumno.",
             texto_boton="Volver",
             destino=url_for("panel_alumno")
-        )
+        ), 404
 
     return render_template(
         "editar_perfil_alumno.html",
         alumno=alumno
-    )
-
-
-@app.route("/desactivar_cuenta_alumno", methods=["POST"])
-def desactivar_cuenta_alumno():
-
-    # Verificar sesión
-    if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
-
-    # Verificar que sea alumno
-    if session.get("rol") != "alumno":
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para realizar esta acción.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-    id_usuario = session["id_usuario"]
-
-    conexion = conectar_db()
-    cursor = conexion.cursor()
-
-    sql = """
-        UPDATE usuarios
-        SET activo = 0
-        WHERE id_usuario = %s
-        AND rol = 'alumno'
-    """
-
-    cursor.execute(sql, (id_usuario,))
-    conexion.commit()
-
-    cursor.close()
-    conexion.close()
-
-    # Cerrar la sesión después de desactivar la cuenta
-    session.clear()
-
-    return render_template(
-        "mensaje.html",
-        tipo="exito",
-        titulo="Cuenta desactivada",
-        mensaje="Tu cuenta ha sido desactivada correctamente.",
-        texto_boton="Volver al inicio",
-        destino=url_for("inicio")
     )
 
 @app.route("/cerrar_sesion")
@@ -534,6 +399,8 @@ def cerrar_sesion():
         return redirect(url_for("login_profesor")) #Cerrar sesion de profesor y redirigir a login de profesor
 
     return redirect(url_for("login_alumno")) 
+
+
 # =========================
 # LOGIN PROFESOR
 # =========================
@@ -546,22 +413,13 @@ def login_profesor():
         correo = request.form["correo"]
         contrasena = request.form["contrasena"]
 
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
+        # Buscar usuario mediante services.py
+        usuario = obtener_usuario_login(
+            correo,
+            "profesor"
+        )
 
-        sql = """
-            SELECT *
-            FROM usuarios
-            WHERE correo = %s AND rol = %s
-        """
-
-        cursor.execute(sql, (correo, "profesor"))
-
-        usuario = cursor.fetchone()
-
-        cursor.close()
-        conexion.close()
-
+        # Verificar contraseña
         if usuario and check_password_hash(
             usuario["contrasena"],
             contrasena
@@ -570,18 +428,22 @@ def login_profesor():
             session["id_usuario"] = usuario["id_usuario"]
             session["rol"] = usuario["rol"]
 
-            return redirect(url_for("panel_profesor"))
+            return redirect(
+                url_for("panel_profesor")
+            )
 
         return render_template(
-    "mensaje.html",
-    tipo="error",
-    titulo="Error al iniciar sesión",
-    mensaje="Correo o contraseña incorrectos.",
-    texto_boton="Volver al inicio de sesión",
-    destino=url_for("login_profesor")
-)
+            "mensaje.html",
+            tipo="error",
+            titulo="Datos incorrectos",
+            mensaje="El correo o la contraseña ingresados no son correctos.",
+            texto_boton="Volver a intentar",
+            destino=url_for("login_profesor")
+        )
 
-    return render_template("login_profesor.html")
+    return render_template(
+        "login_profesor.html"
+    )
 
 # =========================
 # PANEL PROFESOR
@@ -589,704 +451,178 @@ def login_profesor():
 
 @app.route("/panel_profesor")
 def panel_profesor():
+
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
+
+    # Verificar rol
+    if session.get("rol") != "profesor":
+        return "Acceso no autorizado", 403
+
+    # Obtener profesor mediante services.py
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
+
+    if not profesor:
+        return "No se encontraron los datos del profesor", 404
+
+    # Obtener clases mediante services.py
+    clases = obtener_clases_profesor(
+        profesor["id_profesor"]
+    )
+
+    return render_template(
+        "panel_profesor.html",
+        profesor=profesor,
+        clases=clases
+    )
+# =========================
+# EDITAR PROFESOR
+# =========================
+@app.route("/editar_perfil_profesor")
+def editar_perfil_profesor():
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(
+            url_for("login_profesor")
+        )
+
+    # Verificar rol
     if session.get("rol") != "profesor":
         return render_template(
             "mensaje.html",
             tipo="error",
             titulo="Acceso no autorizado",
-            mensaje="Esta sección está disponible solo para profesores.",
-            texto_boton="Volver a mi panel",
-            destino=url_for("mi_panel")
+            mensaje="No tienes permisos para acceder a esta sección.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
         ), 403
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT * FROM profesores WHERE id_usuario = %s", (session["id_usuario"],))
-        profesor = cursor.fetchone()
-        if not profesor:
-            return "Profesor no encontrado", 404
-        cursor.execute("""
-        SELECT
-            c.id_clase,
-            c.fecha,
-            c.hora_inicio,
-            c.hora_fin,
-            c.cupo_maximo,
-            c.estado,
-            t.id_taller,
-            t.nombre AS taller,
 
-            (
-                SELECT COUNT(*)
-                FROM reservas_clase r
-                WHERE r.id_clase = c.id_clase
-                AND r.estado = 'reservada'
-            ) AS reservados
+    # Obtener profesor mediante services.py
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
 
-        FROM clases c
+    if not profesor:
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Datos no encontrados",
+            mensaje="No se encontraron los datos del profesor.",
+            texto_boton="Volver",
+            destino=url_for("panel_profesor")
+        ), 404
 
-        INNER JOIN talleres t
-            ON c.id_taller = t.id_taller
-
-        WHERE EXISTS (
-            SELECT 1 FROM taller_profesor tp
-            WHERE tp.id_taller = t.id_taller AND tp.id_profesor = %s
-        )
-        AND c.fecha = CURDATE()
-
-        ORDER BY c.fecha, c.hora_inicio
-    """, (profesor["id_profesor"],))
-        clases_hoy = cursor.fetchall()
-        return render_template("panel_profesor.html", profesor=profesor, clases_hoy=clases_hoy)
-    finally:
-        cursor.close()
-        conexion.close()
+    return render_template(
+        "editar_perfil_profesor.html",
+        profesor=profesor
+    )
 
 
 @app.route("/mis_clases")
 def mis_clases():
-    if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-    if session.get("rol") != "profesor":
-        return "Acceso no autorizado", 403
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT id_profesor FROM profesores WHERE id_usuario = %s", (session["id_usuario"],))
-        profesor = cursor.fetchone()
-        if not profesor:
-            return "Profesor no encontrado", 404
-        cursor.execute("""
-            SELECT t.id_taller, t.nombre, t.horario
-            FROM talleres t
-            WHERE EXISTS (
-                SELECT 1 FROM taller_profesor tp
-                WHERE tp.id_taller = t.id_taller AND tp.id_profesor = %s
-            )
-            ORDER BY t.nombre
-        """, (profesor["id_profesor"],))
-        talleres = cursor.fetchall()
-        cursor.execute("""
-        SELECT
-            c.id_clase,
-            c.fecha,
-            c.hora_inicio,
-            c.hora_fin,
-            c.cupo_maximo,
-            c.estado,
-            t.id_taller,
-            t.nombre AS taller,
-
-            (
-                SELECT COUNT(*)
-                FROM reservas_clase r
-                WHERE r.id_clase = c.id_clase
-                AND r.estado = 'reservada'
-            ) AS reservados
-
-        FROM clases c
-
-        INNER JOIN talleres t
-            ON c.id_taller = t.id_taller
-
-        WHERE EXISTS (
-            SELECT 1 FROM taller_profesor tp
-            WHERE tp.id_taller = t.id_taller AND tp.id_profesor = %s
-        )
-
-        ORDER BY c.fecha DESC, c.hora_inicio
-    """, (profesor["id_profesor"],))
-        clases = cursor.fetchall()
-        for taller in talleres:
-            taller["clases"] = [c for c in clases if c["id_taller"] == taller["id_taller"]]
-        return render_template("mis_talleres_profesor.html", talleres=talleres)
-    finally:
-        cursor.close()
-        conexion.close()
-
-
-# CREAR CLASE CRUD 
-
-@app.route("/profesor/taller/<int:id_taller>/crear_clase", methods=["POST"])
-def crear_clase_profesor(id_taller):
 
     # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
 
+    # Verificar rol
     if session.get("rol") != "profesor":
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para realizar esta acción.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
+        return "Acceso no autorizado", 403
 
-    fecha = request.form.get("fecha")
-    hora_inicio = request.form.get("hora_inicio")
-    hora_fin = request.form.get("hora_fin")
-    cupo_maximo = request.form.get("cupo_maximo")
+    # Obtener profesor
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    if not profesor:
+        return "Profesor no encontrado", 404
 
-    try:
+    # Obtener talleres del profesor
+    talleres = obtener_talleres_profesor(
+        profesor["id_profesor"]
+    )
 
-        # Obtener el profesor que inició sesión
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
+    # Obtener clases del profesor
+    clases = obtener_clases_profesor(
+        profesor["id_profesor"]
+    )
 
-        profesor = cursor.fetchone()
+    # Agrupar las clases dentro de cada taller
+    for taller in talleres:
 
-        if not profesor:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Profesor no encontrado",
-                mensaje="No se encontró el perfil del profesor.",
-                texto_boton="Volver",
-                destino=url_for("mis_clases")
-            )
+        taller["clases"] = [
+            clase
+            for clase in clases
+            if clase["id_taller"] == taller["id_taller"]
+        ]
 
-        # Comprobar que el taller pertenece al profesor
-        cursor.execute("""
-            SELECT 1
-            FROM taller_profesor
-            WHERE id_profesor = %s
-            AND id_taller = %s
-        """, (
-            profesor["id_profesor"],
-            id_taller
-        ))
-
-        taller_asignado = cursor.fetchone()
-
-        if not taller_asignado:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Taller no autorizado",
-                mensaje="Este taller no está asignado a tu perfil.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_clases")
-            )
-
-        # Crear la clase
-        cursor.execute("""
-            INSERT INTO clases
-                (id_taller, fecha, hora_inicio, hora_fin, cupo_maximo, estado)
-            VALUES
-                (%s, %s, %s, %s, %s, 'programada')
-        """, (
-            id_taller,
-            fecha,
-            hora_inicio,
-            hora_fin,
-            cupo_maximo
-        ))
-
-        conexion.commit()
-
-        return render_template(
-            "mensaje.html",
-            tipo="exito",
-            titulo="Clase creada",
-            mensaje="La nueva clase fue creada correctamente.",
-            texto_boton="Volver a mis talleres",
-            destino=url_for("mis_clases")
-        )
-
-    finally:
-        cursor.close()
-        conexion.close()
+    return render_template(
+        "mis_talleres_profesor.html",
+        talleres=talleres
+    )
 
 
-@app.route("/profesor/clase/<int:id_clase>/editar", methods=["GET", "POST"])
+
+@app.route("/profesor/clase/<int:id_clase>/editar", methods=["GET"])
 def editar_clase(id_clase):
 
     # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-
-    # Verificar rol
-    if session.get("rol") != "profesor":
-        return "Acceso no autorizado", 403
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # Obtener el profesor conectado
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-
-        profesor = cursor.fetchone()
-
-        if not profesor:
-            return "Profesor no encontrado", 404
-
-        # Buscar la clase y comprobar que pertenece
-        # a uno de los talleres del profesor
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.id_taller,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.cupo_maximo,
-                c.estado,
-                t.nombre AS taller
-            FROM clases c
-
-            INNER JOIN talleres t
-                ON c.id_taller = t.id_taller
-
-            INNER JOIN taller_profesor tp
-                ON tp.id_taller = t.id_taller
-
-            WHERE c.id_clase = %s
-            AND tp.id_profesor = %s
-        """, (
-            id_clase,
-            profesor["id_profesor"]
-        ))
-
-        clase = cursor.fetchone()
-
-        if not clase:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Clase no encontrada",
-                mensaje="No puedes editar esta clase.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_clases")
-            )
-
-        # -------------------------
-        # ACTUALIZAR LA CLASE
-        # -------------------------
-
-        if request.method == "POST":
-
-            fecha = request.form["fecha"]
-            hora_inicio = request.form["hora_inicio"]
-            hora_fin = request.form["hora_fin"]
-            cupo_maximo = request.form["cupo_maximo"]
-
-            cursor.execute("""
-                UPDATE clases
-                SET
-                    fecha = %s,
-                    hora_inicio = %s,
-                    hora_fin = %s,
-                    cupo_maximo = %s
-                WHERE id_clase = %s
-            """, (
-                fecha,
-                hora_inicio,
-                hora_fin,
-                cupo_maximo,
-                id_clase
-            ))
-
-            conexion.commit()
-
-            return render_template(
-                "mensaje.html",
-                tipo="exito",
-                titulo="Clase actualizada",
-                mensaje="Los datos de la clase fueron modificados correctamente.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_clases")
-            )
-
-        # Si es GET, mostrar formulario
-        return render_template(
-            "editar_clase.html",
-            clase=clase
+        return redirect(
+            url_for("login_profesor")
         )
 
-    finally:
-        cursor.close()
-        conexion.close()
-
-
-
-@app.route("/profesor/clase/<int:id_clase>/cancelar", methods=["POST"])
-def cancelar_clase(id_clase):
-
-    # Verificar sesión
-    if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-
     # Verificar rol
     if session.get("rol") != "profesor":
         return "Acceso no autorizado", 403
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    # Obtener profesor conectado
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
 
-    try:
+    if not profesor:
+        return "Profesor no encontrado", 404
 
-        # Obtener profesor conectado
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
+    # Obtener todas las clases pertenecientes al profesor
+    clases = obtener_clases_profesor(
+        profesor["id_profesor"]
+    )
 
-        profesor = cursor.fetchone()
+    # Buscar la clase solicitada
+    clase = next(
+        (
+            clase
+            for clase in clases
+            if clase["id_clase"] == id_clase
+        ),
+        None
+    )
 
-        if not profesor:
-            return "Profesor no encontrado", 404
-
-
-        # Verificar que la clase pertenece a un taller
-        # asignado al profesor
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.estado,
-                t.nombre AS taller
-            FROM clases c
-
-            INNER JOIN talleres t
-                ON c.id_taller = t.id_taller
-
-            INNER JOIN taller_profesor tp
-                ON tp.id_taller = t.id_taller
-
-            WHERE c.id_clase = %s
-            AND tp.id_profesor = %s
-        """, (
-            id_clase,
-            profesor["id_profesor"]
-        ))
-
-        clase = cursor.fetchone()
-
-        if not clase:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Clase no encontrada",
-                mensaje="No puedes cancelar esta clase.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_clases")
-            )
-
-
-        # Evitar cancelar nuevamente una clase cancelada
-        if clase["estado"] == "cancelada":
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Clase ya cancelada",
-                mensaje="Esta clase ya se encuentra cancelada.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_clases")
-            )
-
-
-        # Cancelación lógica de la clase
-        cursor.execute("""
-            UPDATE clases
-            SET estado = 'cancelada'
-            WHERE id_clase = %s
-        """, (id_clase,))
-
-
-        # Cancelar reservas activas asociadas a la clase
-        cursor.execute("""
-            UPDATE reservas_clase
-            SET
-                estado = 'cancelada',
-                fecha_cancelacion = NOW()
-            WHERE id_clase = %s
-            AND estado = 'reservada'
-        """, (id_clase,))
-
-
-        # Guardar los cambios
-        conexion.commit()
-
-
+    # Si la clase no pertenece al profesor
+    # o no existe
+    if not clase:
         return render_template(
             "mensaje.html",
-            tipo="exito",
-            titulo="Clase cancelada",
-            mensaje="La clase fue cancelada correctamente.",
+            tipo="error",
+            titulo="Clase no encontrada",
+            mensaje="No puedes editar esta clase.",
             texto_boton="Volver a mis talleres",
             destino=url_for("mis_clases")
         )
 
-    finally:
-        cursor.close()
-        conexion.close()
-
-
-@app.route("/mis_clases_profesor")
-def mis_clases_profesor():
-
-    if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-
-    if session.get("rol") != "profesor":
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para acceder a esta sección.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # Obtener profesor conectado
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-
-        profesor = cursor.fetchone()
-
-        if not profesor:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Profesor no encontrado",
-                mensaje="No encontramos tu perfil de profesor.",
-                texto_boton="Volver al panel",
-                destino=url_for("panel_profesor")
-            )
-
-        # Obtener clases de los talleres asignados
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.estado,
-                t.nombre AS taller,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'reservada'
-                        THEN r.id_reserva
-                    END
-                ) AS alumnos_reservados
-
-            FROM clases c
-
-            INNER JOIN talleres t
-                ON c.id_taller = t.id_taller
-
-            INNER JOIN taller_profesor tp
-                ON tp.id_taller = t.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON r.id_clase = c.id_clase
-
-            WHERE tp.id_profesor = %s
-
-            GROUP BY
-                c.id_clase,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.estado,
-                t.nombre
-
-            ORDER BY
-                t.nombre,
-                c.fecha,
-                c.hora_inicio
-
-        """, (profesor["id_profesor"],))
-
-        clases = cursor.fetchall()
-
-
-        # Agrupar clases por taller
-        clases_por_taller = {}
-
-        for clase in clases:
-
-            nombre_taller = clase["taller"]
-
-            if nombre_taller not in clases_por_taller:
-                clases_por_taller[nombre_taller] = []
-
-            clases_por_taller[nombre_taller].append(clase)
-
-
-        return render_template(
-            "mis_clases_profesor.html",
-            clases_por_taller=clases_por_taller
-        )
-
-    finally:
-
-        cursor.close()
-        conexion.close()
-
-@app.route("/asistencia/clase/<int:id_clase>")
-def asistencia_clase(id_clase):
-
-    if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-
-    if session.get("rol") != "profesor":
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para acceder a esta sección.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # =========================================
-        # OBTENER PROFESOR CONECTADO
-        # =========================================
-
-        cursor.execute("""
-            SELECT
-                id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-
-        profesor = cursor.fetchone()
-
-        if not profesor:
-
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Profesor no encontrado",
-                mensaje="No encontramos tu perfil de profesor.",
-                texto_boton="Volver al panel",
-                destino=url_for("panel_profesor")
-            )
-
-
-        # =========================================
-        # VERIFICAR QUE LA CLASE PERTENEZCA
-        # A UN TALLER DEL PROFESOR
-        # =========================================
-
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.estado,
-                t.nombre AS taller
-
-            FROM clases c
-
-            INNER JOIN talleres t
-                ON c.id_taller = t.id_taller
-
-            INNER JOIN taller_profesor tp
-                ON tp.id_taller = t.id_taller
-
-            WHERE c.id_clase = %s
-            AND tp.id_profesor = %s
-        """, (
-            id_clase,
-            profesor["id_profesor"]
-        ))
-
-        clase = cursor.fetchone()
-
-
-        if not clase:
-
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Clase no encontrada",
-                mensaje="La clase no existe o no pertenece a uno de tus talleres.",
-                texto_boton="Volver a mis clases",
-                destino=url_for("mis_clases_profesor")
-            )
-
-
-        # =========================================
-        # OBTENER ALUMNOS CON RESERVA ACTIVA
-        # =========================================
-
-        cursor.execute("""
-            SELECT
-                r.id_reserva,
-
-                a.id_alumno,
-                a.nombre,
-                a.apellido,
-
-                asi.estado AS asistencia
-
-            FROM reservas_clase r
-
-            INNER JOIN inscripciones i
-                ON r.id_inscripcion = i.id_inscripcion
-
-            INNER JOIN alumnos a
-                ON i.id_alumno = a.id_alumno
-
-            LEFT JOIN asistencias asi
-                ON asi.id_reserva = r.id_reserva
-
-            WHERE r.id_clase = %s
-            AND r.estado = 'reservada'
-
-            ORDER BY
-                a.apellido,
-                a.nombre
-        """, (id_clase,))
-
-        alumnos = cursor.fetchall()
-
-
-        return render_template(
-            "asistencia_clase.html",
-            clase=clase,
-            alumnos=alumnos
-        )
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
-
+    return render_template(
+        "editar_clase.html",
+        clase=clase
+    )
 
 @app.route(
     "/asistencia/reserva/<int:id_reserva>",
@@ -1294,9 +630,13 @@ def asistencia_clase(id_clase):
 )
 def registrar_asistencia(id_reserva):
 
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
 
+    # Verificar rol
     if session.get("rol") != "profesor":
         return render_template(
             "mensaje.html",
@@ -1307,6 +647,7 @@ def registrar_asistencia(id_reserva):
             destino=url_for("inicio")
         )
 
+    # Obtener estado enviado por el formulario
     estado_asistencia = request.form.get("estado")
 
     if estado_asistencia not in ["presente", "ausente"]:
@@ -1319,19 +660,12 @@ def registrar_asistencia(id_reserva):
             destino=url_for("panel_profesor")
         )
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
     try:
 
         # Obtener profesor conectado
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-
-        profesor = cursor.fetchone()
+        profesor = obtener_profesor_por_usuario(
+            session["id_usuario"]
+        )
 
         if not profesor:
             return render_template(
@@ -1343,31 +677,12 @@ def registrar_asistencia(id_reserva):
                 destino=url_for("panel_profesor")
             )
 
-
         # Verificar que la reserva pertenezca
-        # a una clase de un taller del profesor
-        cursor.execute("""
-            SELECT
-                r.id_reserva,
-                r.id_clase,
-                r.estado AS estado_reserva
-
-            FROM reservas_clase r
-
-            INNER JOIN clases c
-                ON r.id_clase = c.id_clase
-
-            INNER JOIN taller_profesor tp
-                ON c.id_taller = tp.id_taller
-
-            WHERE r.id_reserva = %s
-            AND tp.id_profesor = %s
-        """, (
+        # a una clase del profesor
+        reserva = obtener_reserva_profesor(
             id_reserva,
             profesor["id_profesor"]
-        ))
-
-        reserva = cursor.fetchone()
+        )
 
         if not reserva:
             return render_template(
@@ -1376,10 +691,10 @@ def registrar_asistencia(id_reserva):
                 titulo="Reserva no encontrada",
                 mensaje="La reserva no existe o no pertenece a uno de tus talleres.",
                 texto_boton="Volver a mis clases",
-                destino=url_for("mis_clases_profesor")
+                destino=url_for("mis_clases")
             )
 
-
+        # Verificar que la reserva siga activa
         if reserva["estado_reserva"] != "reservada":
             return render_template(
                 "mensaje.html",
@@ -1388,45 +703,31 @@ def registrar_asistencia(id_reserva):
                 mensaje="Esta reserva ya no se encuentra activa.",
                 texto_boton="Volver a la clase",
                 destino=url_for(
-                    "asistencia_clase",
+                    "alumnos_clase",
                     id_clase=reserva["id_clase"]
                 )
             )
 
-
-        # Insertar o actualizar asistencia
-        cursor.execute("""
-            INSERT INTO asistencias (
-                id_reserva,
-                id_profesor,
-                estado
-            )
-            VALUES (%s, %s, %s)
-            ON DUPLICATE KEY UPDATE               
-                id_profesor = VALUES(id_profesor),
-                estado = VALUES(estado),
-                fecha_registro = CURRENT_TIMESTAMP
-        """, (
+        # Registrar o actualizar asistencia
+        registrar_asistencia_reserva(
             id_reserva,
             profesor["id_profesor"],
             estado_asistencia
-        ))
-
-        conexion.commit()
+        )
 
         return redirect(
             url_for(
-                "asistencia_clase",
+                "alumnos_clase",
                 id_clase=reserva["id_clase"]
             )
         )
 
-
     except mysql.connector.Error as error:
 
-        conexion.rollback()
-
-        print("Error al registrar asistencia:", error)
+        print(
+            "Error al registrar asistencia:",
+            error
+        )
 
         return render_template(
             "mensaje.html",
@@ -1434,338 +735,85 @@ def registrar_asistencia(id_reserva):
             titulo="No pudimos registrar la asistencia",
             mensaje="Ocurrió un error al guardar la asistencia.",
             texto_boton="Volver a mis clases",
-            destino=url_for("mis_clases_profesor")
+            destino=url_for("mis_clases")
         )
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
-
-
 
 
 @app.route("/clase/<int:id_clase>/alumnos")
 def alumnos_clase(id_clase):
 
-    # Verificar que exista una sesión
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
 
-    # Verificar que sea profesor
+    # Verificar rol
     if session.get("rol") != "profesor":
-        return "Acceso no autorizado"
+        return "Acceso no autorizado", 403
 
-    id_usuario = session["id_usuario"]
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    # Buscar al profesor conectado
-    cursor.execute("""
-        SELECT id_profesor
-        FROM profesores
-        WHERE id_usuario = %s
-    """, (id_usuario,))
-
-    profesor = cursor.fetchone()
+    # Obtener profesor conectado
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
 
     if not profesor:
-        cursor.close()
-        conexion.close()
-        return "Profesor no encontrado"
+        return "Profesor no encontrado", 404
 
-    id_profesor = profesor["id_profesor"]
+    # Obtener las clases pertenecientes al profesor
+    clases = obtener_clases_profesor(
+        profesor["id_profesor"]
+    )
 
-    # Buscar la clase y comprobar que pertenece
-    # a un taller asignado a este profesor
-    cursor.execute("""
-        SELECT
-            c.id_clase,
-            c.fecha,
-            c.hora_inicio,
-            c.hora_fin,
-            c.cupo_maximo,
-            c.estado,
-            t.nombre AS taller
-
-        FROM clases c
-
-        INNER JOIN talleres t
-            ON c.id_taller = t.id_taller
-
-        INNER JOIN taller_profesor tp
-            ON t.id_taller = tp.id_taller
-
-        WHERE c.id_clase = %s
-        AND tp.id_profesor = %s
-    """, (id_clase, id_profesor))
-
-    clase = cursor.fetchone()
+    # Buscar la clase solicitada dentro de sus clases
+    clase = next(
+        (
+            clase
+            for clase in clases
+            if clase["id_clase"] == id_clase
+        ),
+        None
+    )
 
     if not clase:
-        cursor.close()
-        conexion.close()
-        return "Clase no encontrada o acceso no autorizado"
+        return "Clase no encontrada o acceso no autorizado", 404
 
-    # Obtener los alumnos de esa clase
-    cursor.execute("""
-        SELECT
-            a.id_alumno,
-            a.nombre,
-            a.apellido,
-            a.rut,
-            r.estado,
-            r.fecha_reserva,
-            r.fecha_cancelacion
+    # Obtener alumnos, reservas y asistencias
+    alumnos = obtener_alumnos_clase(
+        id_clase
+    )
 
-        FROM reservas_clase r
+    # Calcular alumnos con reserva activa
+    total_inscritos = sum(
+        1
+        for alumno in alumnos
+        if alumno["estado_reserva"] == "reservada"
+    )
 
-        INNER JOIN inscripciones i
-            ON r.id_inscripcion = i.id_inscripcion
-
-        INNER JOIN alumnos a
-            ON i.id_alumno = a.id_alumno
-
-        WHERE r.id_clase = %s
-
-        ORDER BY a.apellido, a.nombre
-    """, (id_clase,))
-
-    alumnos = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
+    # Calcular alumnos presentes
+    total_presentes = sum(
+        1
+        for alumno in alumnos
+        if alumno["estado_reserva"] == "reservada"
+        and alumno["asistencia"] == "presente"
+    )
 
     return render_template(
         "alumnos_clase.html",
         clase=clase,
-        alumnos=alumnos
+        alumnos=alumnos,
+        total_inscritos=total_inscritos,
+        total_presentes=total_presentes
     )
 
 # =========================
 # REGISTRO ALUMNO
 # =========================
 
-# =========================
-# REGISTRO ALUMNO
-# =========================
-
-@app.route("/registro_alumno", methods=["GET", "POST"])
+@app.route("/registro_alumno")
 def registro_alumno():
 
-    if request.method == "POST":
-
-        nombre = request.form["nombre"]
-        apellido = request.form["apellido"]
-        rut = request.form["rut"]
-        fecha_nacimiento = request.form["fecha_nacimiento"]
-        correo = request.form["correo"]
-        telefono = request.form["telefono"]
-        contacto_emergencia = request.form["contacto_emergencia"]
-        telefono_emergencia = request.form["telefono_emergencia"]
-
-        contrasena = request.form["contrasena"]
-        contrasena_confirmacion = request.form["confirmar_contrasena"]
-
-        # Recibir checkbox de condiciones
-        acepta_condiciones = request.form.get("acepta_condiciones")
-
-
-        # =========================
-        # VALIDAR CONTRASEÑAS
-        # =========================
-
-        if contrasena != contrasena_confirmacion:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Las contraseñas no coinciden",
-                mensaje="Verifica que ambas contraseñas sean iguales e inténtalo nuevamente.",
-                texto_boton="Volver al registro",
-                destino=url_for("registro_alumno")
-            )
-
-
-        # =========================
-        # VALIDAR CONDICIONES
-        # =========================
-
-        if not acepta_condiciones:
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Debes aceptar las condiciones",
-                mensaje="Para registrarte debes aceptar el reglamento y las condiciones de La Maestranza.",
-                texto_boton="Volver al registro",
-                destino=url_for("registro_alumno")
-            )
-
-
-        # =========================
-        # ENCRIPTAR CONTRASEÑA
-        # =========================
-
-        contrasena_hash = generate_password_hash(contrasena)
-
-        conexion = conectar_db()
-        cursor = conexion.cursor()
-
-        try:
-
-            # =========================
-            # VALIDAR CORREO DUPLICADO
-            # =========================
-
-            sql_buscar_correo = """
-                SELECT id_usuario
-                FROM usuarios
-                WHERE correo = %s
-            """
-
-            cursor.execute(sql_buscar_correo, (correo,))
-
-            usuario_existente = cursor.fetchone()
-
-            if usuario_existente:
-                return render_template(
-                    "mensaje.html",
-                    tipo="aviso",
-                    titulo="Correo ya registrado",
-                    mensaje="El correo ingresado ya se encuentra asociado a una cuenta.",
-                    texto_boton="Volver al registro",
-                    destino=url_for("registro_alumno")
-                )
-
-
-            # =========================
-            # VALIDAR RUT DUPLICADO
-            # =========================
-
-            sql_buscar_rut = """
-                SELECT id_alumno
-                FROM alumnos
-                WHERE rut = %s
-            """
-
-            cursor.execute(sql_buscar_rut, (rut,))
-
-            alumno_existente = cursor.fetchone()
-
-            if alumno_existente:
-                return render_template(
-                    "mensaje.html",
-                    tipo="aviso",
-                    titulo="RUT ya registrado",
-                    mensaje="El RUT ingresado ya se encuentra registrado.",
-                    texto_boton="Volver al registro",
-                    destino=url_for("registro_alumno")
-                )
-
-
-            # =========================
-            # INSERTAR USUARIO
-            # =========================
-
-            sql_usuario = """
-                INSERT INTO usuarios (
-                    correo,
-                    contrasena,
-                    rol
-                )
-                VALUES (%s, %s, %s)
-            """
-
-            datos_usuario = (
-                correo,
-                contrasena_hash,
-                "alumno"
-            )
-
-            cursor.execute(sql_usuario, datos_usuario)
-
-            # Obtener el id_usuario creado por MySQL
-            id_usuario = cursor.lastrowid
-
-
-            # =========================
-            # INSERTAR ALUMNO
-            # =========================
-
-            sql_alumno = """
-                INSERT INTO alumnos (
-                    id_usuario,
-                    nombre,
-                    apellido,
-                    rut,
-                    fecha_nacimiento,
-                    telefono,
-                    contacto_emergencia,
-                    telefono_emergencia
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """
-
-            datos_alumno = (
-                id_usuario,
-                nombre,
-                apellido,
-                rut,
-                fecha_nacimiento,
-                telefono,
-                contacto_emergencia,
-                telefono_emergencia
-            )
-
-            cursor.execute(sql_alumno, datos_alumno)
-
-
-            # =========================
-            # GUARDAR CAMBIOS
-            # =========================
-
-            conexion.commit()
-
-
-            # =========================
-            # REGISTRO EXITOSO
-            # =========================
-
-            return render_template(
-                "mensaje.html",
-                tipo="exito",
-                titulo="Registro completado",
-                mensaje="Tu cuenta de alumno fue creada correctamente.",
-                texto_boton="Volver al inicio",
-                destino=url_for("inicio")
-            )
-
-
-        except Exception as error:
-
-            conexion.rollback()
-
-            print("Error al registrar alumno:", error)
-
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="No pudimos completar el registro",
-                mensaje="Ocurrió un error al registrar tu cuenta. Inténtalo nuevamente.",
-                texto_boton="Volver al registro",
-                destino=url_for("registro_alumno")
-            )
-
-
-        finally:
-
-            cursor.close()
-            conexion.close()
-
-
     return render_template("registro_alumno.html")
-
 
 
 # =========================
@@ -1799,14 +847,18 @@ def mi_panel():
 
     return redirect(url_for("seleccionar_perfil"))
 
-#TALLERES
 
+#----------------------------------------------------
+# TALLERES
+#----------------------------------------------------
 @app.route("/gestion_talleres")
 def gestion_talleres():
 
     # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
 
     # Verificar rol
     if session.get("rol") != "profesor":
@@ -1819,37 +871,15 @@ def gestion_talleres():
             destino=url_for("inicio")
         )
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    # Obtener talleres mediante services.py
+    talleres = obtener_talleres()
 
-    try:
+    return render_template(
+        "gestion_talleres.html",
+        talleres=talleres
+    )
 
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo,
-                imagen,
-                estado
-            FROM talleres
-            ORDER BY nombre
-        """)
-
-        talleres = cursor.fetchall()
-
-        return render_template(
-            "gestion_talleres.html",
-            talleres=talleres
-        )
-
-    finally:
-        cursor.close()
-        conexion.close()
-
-
-@app.route("/crear_taller", methods=["GET", "POST"])
+@app.route("/crear_taller", methods=["GET"])
 def crear_taller():
 
     if "id_usuario" not in session:
@@ -1865,61 +895,19 @@ def crear_taller():
             destino=url_for("inicio")
         )
 
-    if request.method == "POST":
-
-        nombre = request.form.get("nombre")
-        descripcion = request.form.get("descripcion")
-        horario = request.form.get("horario")
-        cupo_maximo = request.form.get("cupo_maximo")
-        imagen = request.form.get("imagen")
-
-        conexion = conectar_db()
-        cursor = conexion.cursor()
-
-        try:
-
-            cursor.execute("""
-                INSERT INTO talleres (
-                    nombre,
-                    descripcion,
-                    horario,
-                    cupo_maximo,
-                    imagen,
-                    estado
-                )
-                VALUES (%s, %s, %s, %s, %s, 'activo')
-            """, (
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo,
-                imagen
-            ))
-
-            conexion.commit()
-
-            return render_template(
-                "mensaje.html",
-                tipo="exito",
-                titulo="Taller creado",
-                mensaje="El nuevo taller fue creado correctamente.",
-                texto_boton="Volver a gestión de talleres",
-                destino=url_for("gestion_talleres")
-            )
-
-        finally:
-            cursor.close()
-            conexion.close()
-
     return render_template("crear_taller.html")
 
 
-@app.route("/editar_taller/<int:id_taller>", methods=["GET", "POST"])
+@app.route("/editar_taller/<int:id_taller>", methods=["GET"])
 def editar_taller(id_taller):
 
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
+        return redirect(
+            url_for("login_profesor")
+        )
 
+    # Verificar rol
     if session.get("rol") != "profesor":
         return render_template(
             "mensaje.html",
@@ -1930,190 +918,42 @@ def editar_taller(id_taller):
             destino=url_for("inicio")
         )
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    # Obtener taller mediante services.py
+    taller = obtener_taller_por_id(
+        id_taller
+    )
 
-    try:
-
-        # Buscar taller
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo,
-                imagen,
-                estado
-            FROM talleres
-            WHERE id_taller = %s
-        """, (id_taller,))
-
-        taller = cursor.fetchone()
-
-        if not taller:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Taller no encontrado",
-                mensaje="El taller solicitado no existe.",
-                texto_boton="Volver a gestión de talleres",
-                destino=url_for("gestion_talleres")
-            )
-
-        # Guardar cambios
-        if request.method == "POST":
-
-            nombre = request.form.get("nombre")
-            descripcion = request.form.get("descripcion")
-            horario = request.form.get("horario")
-            cupo_maximo = request.form.get("cupo_maximo")
-            imagen = request.form.get("imagen")
-
-            cursor.execute("""
-                UPDATE talleres
-                SET
-                    nombre = %s,
-                    descripcion = %s,
-                    horario = %s,
-                    cupo_maximo = %s,
-                    imagen = %s
-                WHERE id_taller = %s
-            """, (
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo,
-                imagen,
-                id_taller
-            ))
-
-            conexion.commit()
-
-            return render_template(
-                "mensaje.html",
-                tipo="exito",
-                titulo="Taller actualizado",
-                mensaje="Los datos del taller fueron actualizados correctamente.",
-                texto_boton="Volver a gestión de talleres",
-                destino=url_for("gestion_talleres")
-            )
-
-        return render_template(
-            "editar_taller.html",
-            taller=taller
-        )
-
-    finally:
-        cursor.close()
-        conexion.close()
-
-
-@app.route("/desactivar_taller/<int:id_taller>", methods=["POST"])
-def desactivar_taller(id_taller):
-
-    if "id_usuario" not in session:
-        return redirect(url_for("login_profesor"))
-
-    if session.get("rol") != "profesor":
+    if not taller:
         return render_template(
             "mensaje.html",
             tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para desactivar talleres.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # Comprobar que el taller existe
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre,
-                estado
-            FROM talleres
-            WHERE id_taller = %s
-        """, (id_taller,))
-
-        taller = cursor.fetchone()
-
-        if not taller:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Taller no encontrado",
-                mensaje="El taller solicitado no existe.",
-                texto_boton="Volver a gestión de talleres",
-                destino=url_for("gestion_talleres")
-            )
-
-        # Comprobar si ya está inactivo
-        if taller["estado"] == "inactivo":
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Taller inactivo",
-                mensaje="Este taller ya se encuentra desactivado.",
-                texto_boton="Volver a gestión de talleres",
-                destino=url_for("gestion_talleres")
-            )
-
-        # Desactivación lógica
-        cursor.execute("""
-            UPDATE talleres
-            SET estado = 'inactivo'
-            WHERE id_taller = %s
-        """, (id_taller,))
-
-        conexion.commit()
-
-        return render_template(
-            "mensaje.html",
-            tipo="exito",
-            titulo="Taller desactivado",
-            mensaje="El taller fue desactivado correctamente.",
+            titulo="Taller no encontrado",
+            mensaje="El taller solicitado no existe.",
             texto_boton="Volver a gestión de talleres",
             destino=url_for("gestion_talleres")
         )
 
-    finally:
-        cursor.close()
-        conexion.close()
+    return render_template(
+        "editar_taller.html",
+        taller=taller
+    )
+
 
 @app.route("/talleres_disponibles")
 def talleres_disponibles():
 
-    if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+    """    # Verificar sesión
+        if "id_usuario" not in session:
+            return redirect(
+                url_for("login_alumno")
+            )
 
-    if session.get("rol") != "alumno":
-        return "Acceso no autorizado"
+        # Verificar rol
+        if session.get("rol") != "alumno":
+            return "Acceso no autorizado"  """
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            id_taller,
-            nombre,
-            descripcion,
-            horario,
-            cupo_maximo,
-            imagen
-        FROM talleres
-        WHERE estado = 'activo'
-        ORDER BY nombre
-    """)
-
-    talleres = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
+    # Obtener solamente talleres activos desde services.py
+    talleres = obtener_talleres_activos()
 
     return render_template(
         "talleres_disponibles.html",
@@ -2125,57 +965,36 @@ def talleres_disponibles():
 @app.route("/taller/<int:id_taller>/planes")
 def planes_taller(id_taller):
 
+    """# Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
-
-    if session.get("rol") != "alumno":
-        return "Acceso no autorizado"
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            id_taller,
-            nombre,
-            descripcion,
-            horario,
-            cupo_maximo
-        FROM talleres
-        WHERE id_taller = %s
-        AND estado = 'activo'
-    """, (id_taller,))
-
-    taller = cursor.fetchone()
-
-    if not taller:
-        cursor.close()
-        conexion.close()
-        return render_template(
-        "mensaje.html",
-        tipo="error",
-        titulo="Taller no disponible",
-        mensaje="Este taller no existe o actualmente se encuentra desactivado.",
-        texto_boton="Volver a talleres",
-        destino=url_for("talleres_disponibles")
+        return redirect(
+            url_for("login_alumno")
         )
 
-    cursor.execute("""
-        SELECT
-            id_plan,
-            nombre,
-            tipo,
-            cantidad_clases,
-            precio
-        FROM planes
-        WHERE id_taller = %s
-        ORDER BY cantidad_clases
-    """, (id_taller,))
+    # Verificar rol
+    if session.get("rol") != "alumno":
+        return "Acceso no autorizado" """
 
-    planes = cursor.fetchall()
+    # Obtener taller activo mediante services.py
+    taller = obtener_taller_activo_por_id(
+        id_taller
+    )
 
-    cursor.close()
-    conexion.close()
+    # Verificar que el taller exista y esté activo
+    if not taller:
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Taller no disponible",
+            mensaje="Este taller no existe o actualmente se encuentra desactivado.",
+            texto_boton="Volver a talleres",
+            destino=url_for("talleres_disponibles")
+        )
+
+    # Obtener planes del taller mediante services.py
+    planes = obtener_planes_taller(
+        id_taller
+    )
 
     return render_template(
         "planes_taller.html",
@@ -2183,41 +1002,25 @@ def planes_taller(id_taller):
         planes=planes
     )
 
+
 @app.route("/taller/<int:id_taller>/plan/<int:id_plan>/confirmar")
 def confirmar_inscripcion(id_taller, id_plan):
 
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+        return redirect(
+            url_for("login_alumno")
+        )
 
+    # Verificar rol
     if session.get("rol") != "alumno":
         return "Acceso no autorizado"
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            t.id_taller,
-            t.nombre AS taller,
-            t.horario,
-            p.id_plan,
-            p.nombre AS plan,
-            p.tipo,
-            p.cantidad_clases,
-            p.precio
-        FROM planes p
-
-        INNER JOIN talleres t
-            ON p.id_taller = t.id_taller
-
-        WHERE p.id_plan = %s
-        AND t.id_taller = %s        # comprueba que el plan realmente pertenezca al taller
-    """, (id_plan, id_taller))
-
-    datos = cursor.fetchone()
-
-    cursor.close()
-    conexion.close()
+    # Obtener plan mediante services.py
+    datos = obtener_plan_taller(
+        id_taller,
+        id_plan
+    )
 
     if not datos:
         return "El plan seleccionado no corresponde a este taller"
@@ -2228,13 +1031,29 @@ def confirmar_inscripcion(id_taller, id_plan):
     )
 
 
-@app.route("/taller/<int:id_taller>/plan/<int:id_plan>/inscribir", methods=["POST"])
+@app.route(
+    "/taller/<int:id_taller>/plan/<int:id_plan>/inscribir",
+    methods=["POST"]
+)
 def inscribir_taller(id_taller, id_plan):
 
+    # =====================================================
+    # 1. VERIFICAR SESIÓN
+    # =====================================================
+
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+
+        return redirect(
+            url_for("login_alumno")
+        )
+
+
+    # =====================================================
+    # 2. VERIFICAR ROL
+    # =====================================================
 
     if session.get("rol") != "alumno":
+
         return render_template(
             "mensaje.html",
             tipo="error",
@@ -2244,23 +1063,26 @@ def inscribir_taller(id_taller, id_plan):
             destino=url_for("inicio")
         )
 
-    id_usuario = session["id_usuario"]
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    # =====================================================
+    # 3. PROCESAR INSCRIPCIÓN
+    # =====================================================
 
     try:
 
-        # 1. Buscar al alumno que inició sesión
-        cursor.execute("""
-            SELECT id_alumno
-            FROM alumnos
-            WHERE id_usuario = %s
-        """, (id_usuario,))
+        resultado = procesar_inscripcion_taller(
+            session["id_usuario"],
+            id_taller,
+            id_plan
+        )
 
-        alumno = cursor.fetchone()
 
-        if not alumno:
+        # =================================================
+        # ALUMNO NO ENCONTRADO
+        # =================================================
+
+        if resultado["resultado"] == "alumno_no_encontrado":
+
             return render_template(
                 "mensaje.html",
                 tipo="error",
@@ -2270,104 +1092,100 @@ def inscribir_taller(id_taller, id_plan):
                 destino=url_for("inicio")
             )
 
-        id_alumno = alumno["id_alumno"]
 
+        # =================================================
+        # PLAN NO VÁLIDO
+        # =================================================
 
-        # 2. Comprobar que el plan pertenece al taller
-        cursor.execute("""
-            SELECT
-                id_plan,
-                id_taller,
-                cantidad_clases,
-                precio
-            FROM planes
-            WHERE id_plan = %s
-            AND id_taller = %s
-        """, (id_plan, id_taller))
+        if resultado["resultado"] == "plan_no_valido":
 
-        plan = cursor.fetchone()
-
-        if not plan:
             return render_template(
                 "mensaje.html",
                 tipo="error",
                 titulo="Plan no válido",
                 mensaje="El plan seleccionado no corresponde a este taller.",
                 texto_boton="Volver a talleres",
-                destino=url_for("talleres_disponibles")
+                destino=url_for(
+                    "talleres_disponibles"
+                )
             )
 
 
-        # 3. Comprobar si ya tiene una inscripción activa
-        cursor.execute("""
-            SELECT id_inscripcion
-            FROM inscripciones
-            WHERE id_alumno = %s
-            AND id_taller = %s
-            AND estado = 'activa'
-        """, (id_alumno, id_taller))
+        # =================================================
+        # MENSUALIDAD EXISTENTE
+        # =================================================
 
-        inscripcion_existente = cursor.fetchone()
+        if resultado["resultado"] == "mensual_existente":
 
-        if inscripcion_existente:
             return render_template(
                 "mensaje.html",
                 tipo="aviso",
                 titulo="Ya estás inscrito",
-                mensaje="Ya tienes una inscripción activa en este taller.",
+                mensaje="Ya tienes una mensualidad activa en este taller.",
                 texto_boton="Ir a mis talleres",
                 destino=url_for("mis_talleres")
             )
 
 
-        # 4. Crear la inscripción
-        cursor.execute("""
-            INSERT INTO inscripciones (
-                id_alumno,
-                id_taller,
-                fecha_inscripcion,
-                estado,
-                id_plan,
-                fecha_inicio,
-                fecha_vencimiento,
-                clases_contratadas,
-                precio_acordado
-            )
-            VALUES (
-                %s,
-                %s,
-                CURDATE(),
-                'activa',
-                %s,
-                CURDATE(),
-                DATE_ADD(CURDATE(), INTERVAL 1 MONTH),
-                %s,
-                %s
-            )
-        """, (
-            id_alumno,
-            id_taller,
-            id_plan,
-            plan["cantidad_clases"],
-            plan["precio"]
-        ))
+        # =================================================
+        # CLASE SUELTA AGREGADA
+        # =================================================
 
-        conexion.commit()
+        if resultado["resultado"] == "clase_agregada":
 
-        return render_template(
-            "mensaje.html",
-            tipo="exito",
-            titulo="Inscripción realizada",
-            mensaje="Tu inscripción fue realizada correctamente.",
-            texto_boton="Ir a mis talleres",
-            destino=url_for("mis_talleres")
-        )
+            return render_template(
+                "mensaje.html",
+                tipo="exito",
+                titulo="Clase agregada",
+                mensaje=(
+                    "La nueva clase suelta fue agregada "
+                    "correctamente a tu inscripción."
+                ),
+                texto_boton="Ir a mis talleres",
+                destino=url_for("mis_talleres")
+            )
+
+
+        # =================================================
+        # NUEVA INSCRIPCIÓN
+        # =================================================
+
+        if resultado["resultado"] == "inscripcion_creada":
+
+            if resultado["tipo"] == "suelta":
+
+                mensaje = (
+                    "La clase suelta fue contratada correctamente. "
+                    "Puedes contratar más clases sueltas si lo deseas."
+                )
+
+            else:
+
+                mensaje = (
+                    "Tu inscripción mensual fue realizada correctamente."
+                )
+
+
+            return render_template(
+                "mensaje.html",
+                tipo="exito",
+                titulo="Inscripción realizada",
+                mensaje=mensaje,
+                texto_boton="Ir a mis talleres",
+                destino=url_for("mis_talleres")
+            )
+
+
+    # =====================================================
+    # 4. ERROR
+    # =====================================================
 
     except Exception as error:
 
-        conexion.rollback()
-
-        print("Error al realizar inscripción:", error)
+        print(
+            "Error al realizar inscripción:",
+            error
+        )
 
         return render_template(
             "mensaje.html",
@@ -2375,189 +1193,397 @@ def inscribir_taller(id_taller, id_plan):
             titulo="No pudimos realizar la inscripción",
             mensaje="Ocurrió un error al procesar tu inscripción.",
             texto_boton="Volver a talleres",
-            destino=url_for("talleres_disponibles")
+            destino=url_for(
+                "talleres_disponibles"
+            )
         )
-
-    finally:
-
-        cursor.close()
-        conexion.close()
-
 
 @app.route("/mis_talleres")
 def mis_talleres():
 
+    # Verificar sesión
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+        return redirect(
+            url_for("login_alumno")
+        )
 
+    # Verificar rol
     if session.get("rol") != "alumno":
         return "Acceso no autorizado"
 
     id_usuario = session["id_usuario"]
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            i.id_inscripcion,
-            i.estado,
-            i.fecha_inicio,
-            i.fecha_vencimiento,
-            i.clases_contratadas,
-            i.precio_acordado,
-
-            t.id_taller,
-            t.nombre AS taller,
-            t.horario,
-
-            p.nombre AS plan
-
-        FROM inscripciones i
-
-        INNER JOIN alumnos a
-            ON i.id_alumno = a.id_alumno
-
-        INNER JOIN talleres t
-            ON i.id_taller = t.id_taller
-
-        INNER JOIN planes p
-            ON i.id_plan = p.id_plan
-
-        WHERE a.id_usuario = %s
-        AND i.estado = 'activa'
-
-        ORDER BY t.nombre
-    """, (id_usuario,))
-
-    inscripciones = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
+    # Obtener talleres agrupados del alumno
+    inscripciones = obtener_talleres_activos_alumno(
+        id_usuario
+    )
 
     return render_template(
         "mis_talleres.html",
         inscripciones=inscripciones
     )
 
+@app.route("/taller/<int:id_taller>/mis_clases")
+def clases_disponibles_taller(id_taller):
+
+    # Verificar sesión
+    if "id_usuario" not in session:
+        return redirect(
+            url_for("login_alumno")
+        )
+
+    # Verificar rol
+    if session.get("rol") != "alumno":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para acceder a esta sección.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    id_usuario = session["id_usuario"]
+
+    # Obtener resumen del taller y saldo de clases
+    resumen = obtener_resumen_taller_alumno(
+        id_usuario,
+        id_taller
+    )
+
+    # El alumno no tiene una inscripción activa
+    # en este taller
+    if not resumen:
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Taller no encontrado",
+            mensaje=(
+                "No tienes una inscripción activa "
+                "en este taller."
+            ),
+            texto_boton="Volver a mis talleres",
+            destino=url_for("mis_talleres")
+        )
+
+    # Obtener clases futuras del taller
+    clases = obtener_clases_disponibles_taller_alumno(
+        id_usuario,
+        id_taller
+    )
+
+    return render_template(
+        "clases_disponibles_alumno.html",
+        inscripcion=resumen,
+        clases=clases,
+        clases_usadas=resumen["clases_usadas"],
+        clases_disponibles=resumen["clases_disponibles"]
+    )
+
+@app.route(
+    "/taller/<int:id_taller>/clase/<int:id_clase>/reservar",
+    methods=["POST"]
+)
+def reservar_clase_taller(id_taller, id_clase):
+
+    # ====================================================
+    # 1. Verificar sesión y rol
+    # ====================================================
+
+    if "id_usuario" not in session:
+        return redirect(
+            url_for("login_alumno")
+        )
+
+    if session.get("rol") != "alumno":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para reservar clases.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    id_usuario = session["id_usuario"]
+
+
+    # ====================================================
+    # 2. Verificar saldo total del taller
+    # ====================================================
+
+    resumen = obtener_resumen_taller_alumno(
+        id_usuario,
+        id_taller
+    )
+
+    if not resumen:
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Taller no disponible",
+            mensaje="No tienes una inscripción activa en este taller.",
+            texto_boton="Volver a mis talleres",
+            destino=url_for("mis_talleres")
+        )
+
+    if resumen["clases_disponibles"] <= 0:
+        return render_template(
+            "mensaje.html",
+            tipo="aviso",
+            titulo="Sin clases disponibles",
+            mensaje="Ya utilizaste todas las clases que tienes contratadas.",
+            texto_boton="Volver a mis clases",
+            destino=url_for(
+                "clases_disponibles_taller",
+                id_taller=id_taller
+            )
+        )
+
+
+    # ====================================================
+    # 3. Buscar una inscripción que todavía tenga saldo
+    # ====================================================
+
+    inscripcion = obtener_inscripcion_con_saldo(
+        id_usuario,
+        id_taller
+    )
+
+    if not inscripcion:
+        return render_template(
+            "mensaje.html",
+            tipo="aviso",
+            titulo="Sin saldo disponible",
+            mensaje=(
+                "No se encontró una inscripción con "
+                "clases disponibles para realizar la reserva."
+            ),
+            texto_boton="Volver a mis clases",
+            destino=url_for(
+                "clases_disponibles_taller",
+                id_taller=id_taller
+            )
+        )
+
+
+    # ====================================================
+    # 4. Validar clase y crear reserva
+    # ====================================================
+
+    try:
+
+        # ====================================================
+        # Verificar que la clase:
+        # - pertenezca al taller
+        # - esté programada
+        # - todavía no haya comenzado
+        # ====================================================
+
+        clase = obtener_clase_disponible_taller(
+            id_clase,
+            id_taller
+        )
+
+        if not clase:
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Clase no disponible",
+                mensaje=(
+                    "La clase seleccionada no existe, "
+                    "ya comenzó o no está disponible."
+                ),
+                texto_boton="Volver a mis clases",
+                destino=url_for(
+                    "clases_disponibles_taller",
+                    id_taller=id_taller
+                )
+            )
+
+
+        # ====================================================
+        # 5. Verificar si el alumno ya reservó esta clase
+        # ====================================================
+
+        reserva_existente = obtener_reserva_previa_clase(
+            id_usuario,
+            id_clase
+        )
+
+
+        # ====================================================
+        # Ya tiene una reserva activa
+        # ====================================================
+
+        if (
+            reserva_existente
+            and reserva_existente["estado"] == "reservada"
+        ):
+
+            return render_template(
+                "mensaje.html",
+                tipo="aviso",
+                titulo="Clase ya reservada",
+                mensaje=(
+                    "Ya tienes una reserva activa "
+                    "para esta clase."
+                ),
+                texto_boton="Volver a mis clases",
+                destino=url_for(
+                    "clases_disponibles_taller",
+                    id_taller=id_taller
+                )
+            )
+
+
+        # ====================================================
+        # Ya reservó y canceló esta clase anteriormente
+        # ====================================================
+
+        if (
+            reserva_existente
+            and reserva_existente["estado"] == "cancelada"
+        ):
+
+            return render_template(
+                "mensaje.html",
+                tipo="aviso",
+                titulo="Reserva cancelada anteriormente",
+                mensaje=(
+                    "Ya cancelaste anteriormente esta clase. "
+                    "No puedes volver a reservar el mismo horario."
+                ),
+                texto_boton="Volver a mis clases",
+                destino=url_for(
+                    "clases_disponibles_taller",
+                    id_taller=id_taller
+                )
+            )
+
+
+        # ====================================================
+        # 6. Verificar cupos
+        # ====================================================
+
+        reservados = contar_reservas_activas_clase(
+            id_clase
+        )
+
+        if reservados >= clase["cupo_maximo"]:
+
+            return render_template(
+                "mensaje.html",
+                tipo="aviso",
+                titulo="Clase completa",
+                mensaje="Esta clase ya no tiene cupos disponibles.",
+                texto_boton="Volver a mis clases",
+                destino=url_for(
+                    "clases_disponibles_taller",
+                    id_taller=id_taller
+                )
+            )
+
+
+        # ====================================================
+        # 7. Crear la reserva
+        # ====================================================
+
+        crear_reserva_clase(
+            inscripcion["id_inscripcion"],
+            id_clase
+        )
+
+
+        # ====================================================
+        # 8. Reserva realizada
+        # ====================================================
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Clase reservada",
+            mensaje="Tu clase fue reservada correctamente.",
+            texto_boton="Volver a mis clases",
+            destino=url_for(
+                "clases_disponibles_taller",
+                id_taller=id_taller
+            )
+        )
+
+
+    # ====================================================
+    # 9. Manejo de errores
+    # ====================================================
+
+    except Exception as error:
+
+        print(
+            "Error al reservar clase:",
+            error
+        )
+
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="No pudimos realizar la reserva",
+            mensaje="Ocurrió un error al intentar reservar la clase.",
+            texto_boton="Volver a mis clases",
+            destino=url_for(
+                "clases_disponibles_taller",
+                id_taller=id_taller
+            )
+        )
+
 @app.route("/inscripcion/<int:id_inscripcion>/clases")
 def clases_disponibles_alumno(id_inscripcion):
 
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+
+        return redirect(
+            url_for("login_alumno")
+        )
+
 
     if session.get("rol") != "alumno":
+
         return render_template(
-        "mensaje.html",
-        tipo="error",
-        titulo="Acceso no autorizado",
-        mensaje="No tienes permisos para acceder a esta sección.",
-        texto_boton="Volver al inicio",
-        destino=url_for("inicio")
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para acceder a esta sección.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+
+    resultado = obtener_clases_inscripcion_alumno(
+        id_inscripcion,
+        session["id_usuario"]
     )
 
-    id_usuario = session["id_usuario"]
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+    if not resultado:
 
-    # Verificar que la inscripción pertenezca al alumno conectado
-    cursor.execute("""
-        SELECT
-            i.id_inscripcion,
-            i.id_taller,
-            i.estado,
-            i.clases_contratadas,
-            t.nombre AS taller
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Inscripción no encontrada",
+            mensaje=(
+                "La inscripción no existe, "
+                "no está activa o no te pertenece."
+            ),
+            texto_boton="Ir a mis talleres",
+            destino=url_for("mis_talleres")
+        )
 
-        FROM inscripciones i
-
-        INNER JOIN alumnos a
-            ON i.id_alumno = a.id_alumno
-
-        INNER JOIN talleres t
-            ON i.id_taller = t.id_taller
-
-        WHERE i.id_inscripcion = %s
-        AND a.id_usuario = %s
-        AND i.estado = 'activa'
-    """, (id_inscripcion, id_usuario))
-
-    inscripcion = cursor.fetchone()
-
-    if not inscripcion:
-        cursor.close()
-        conexion.close()
-        return "Inscripción no encontrada o acceso no autorizado"
-
-    id_taller = inscripcion["id_taller"]
-
-    # Contar cuántas clases ha reservado esta inscripción
-    cursor.execute("""
-        SELECT COUNT(*) AS usadas
-        FROM reservas_clase
-        WHERE id_inscripcion = %s
-        AND consume_clase = 1
-    """, (id_inscripcion,))
-
-    resultado = cursor.fetchone()
-
-    clases_usadas = resultado["usadas"]
-
-    clases_disponibles = (
-        inscripcion["clases_contratadas"] - clases_usadas
-    )
-
-    # Obtener las clases del taller,
-    # contar reservas activas
-    # y verificar si el alumno ya reservó cada clase
-    cursor.execute("""
-        SELECT
-            c.id_clase,
-            c.fecha,
-            c.hora_inicio,
-            c.hora_fin,
-            c.cupo_maximo,
-            c.estado,
-
-            (
-                SELECT COUNT(*)
-                FROM reservas_clase r
-                WHERE r.id_clase = c.id_clase
-                AND r.estado = 'reservada'
-            ) AS reservados,
-
-            (
-                SELECT r2.id_reserva
-                FROM reservas_clase r2
-                WHERE r2.id_clase = c.id_clase
-                AND r2.id_inscripcion = %s
-                AND r2.estado = 'reservada'
-                LIMIT 1
-            ) AS mi_reserva
-
-        FROM clases c
-
-        WHERE c.id_taller = %s
-        AND c.estado = 'programada'
-        -- solo muestra clases futuras 
-        AND TIMESTAMP(c.fecha, c.hora_inicio) > NOW()  
-        
-
-        ORDER BY c.fecha, c.hora_inicio
-    """, (id_inscripcion, id_taller))
-
-    clases = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
 
     return render_template(
         "clases_disponibles_alumno.html",
-        inscripcion=inscripcion,
-        clases=clases,
-        clases_usadas=clases_usadas,
-        clases_disponibles=clases_disponibles
+        inscripcion=resultado["inscripcion"],
+        clases=resultado["clases"],
+        clases_usadas=resultado["clases_usadas"],
+        clases_disponibles=resultado["clases_disponibles"]
     )
 
 
@@ -2817,474 +1843,137 @@ def reservar_clase(id_inscripcion, id_clase):
         cursor.close()
         conexion.close()
 #* ------------------------------------------------------------- #
-@app.route("/reserva/<int:id_reserva>/cancelar", methods=["POST"])
+@app.route(
+    "/reserva/<int:id_reserva>/cancelar",
+    methods=["POST"]
+)
 def cancelar_reserva(id_reserva):
 
+    # ====================================================
+    # 1. Verificar sesión y rol
+    # ====================================================
+
     if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
+        return redirect(
+            url_for("login_alumno")
+        )
 
     if session.get("rol") != "alumno":
         return render_template(
-        "mensaje.html",
-        tipo="error",
-        titulo="Acceso no autorizado",
-        mensaje="No tienes permisos para realizar esta acción.",
-        texto_boton="Volver al inicio",
-        destino=url_for("inicio")
-    )
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para realizar esta acción.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
 
     id_usuario = session["id_usuario"]
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+
+    # ====================================================
+    # 2. Verificar que la reserva pertenezca al alumno
+    # ====================================================
 
     try:
-        # Verificar que la reserva pertenezca al alumno conectado
-        cursor.execute("""
-            SELECT
-                r.id_reserva,
-                r.id_inscripcion,
-                r.estado
-            FROM reservas_clase r
 
-            INNER JOIN inscripciones i
-                ON r.id_inscripcion = i.id_inscripcion
-
-            INNER JOIN alumnos a
-                ON i.id_alumno = a.id_alumno
-
-            WHERE r.id_reserva = %s
-            AND a.id_usuario = %s
-        """, (id_reserva, id_usuario))
-
-        reserva = cursor.fetchone()
+        reserva = obtener_reserva_alumno(
+            id_reserva,
+            id_usuario
+        )
 
         if not reserva:
             return render_template(
-        "mensaje.html",
-        tipo="error",
-        titulo="Reserva no encontrada",
-        mensaje="No encontramos esta reserva o no tienes acceso a ella.",
-        texto_boton="Volver a mis talleres",
-        destino=url_for("mis_talleres")
-    )
+                "mensaje.html",
+                tipo="error",
+                titulo="Reserva no encontrada",
+                mensaje=(
+                    "No encontramos esta reserva "
+                    "o no tienes acceso a ella."
+                ),
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_talleres")
+            )
+
+
+        # ====================================================
+        # 3. Verificar que la reserva siga activa
+        # ====================================================
 
         if reserva["estado"] != "reservada":
             return render_template(
-        "mensaje.html",
-        tipo="aviso",
-        titulo="Reserva no activa",
-        mensaje="Esta reserva ya no se encuentra activa.",
-        texto_boton="Volver a mis talleres",
-        destino=url_for("mis_talleres")
-    )
+                "mensaje.html",
+                tipo="aviso",
+                titulo="Reserva no activa",
+                mensaje="Esta reserva ya no se encuentra activa.",
+                texto_boton="Volver a mis talleres",
+                destino=url_for("mis_talleres")
+            )
 
-        # Cancelar sin borrar: recuperar la clase solo con dos horas o más.
-        cursor.execute("""
-            UPDATE reservas_clase r
-            INNER JOIN clases c ON c.id_clase = r.id_clase
-            SET
-                r.estado = 'cancelada',
-                r.fecha_cancelacion = NOW(),
-                r.consume_clase = CASE
-                    WHEN TIMESTAMP(c.fecha, c.hora_inicio)
-                        >= DATE_ADD(NOW(), INTERVAL 2 HOUR)
-                    THEN 0
-                    ELSE 1
-                END
-            WHERE r.id_reserva = %s
-                AND r.estado = 'reservada'
-        """, (id_reserva,))
 
-        conexion.commit()
+        # ====================================================
+        # 4. Cancelar reserva
+        #
+        # 2 horas o más:
+        #     recupera el crédito
+        #
+        # Menos de 2 horas:
+        #     consume el crédito
+        # ====================================================
 
-        return redirect(url_for(
-            "clases_disponibles_alumno",
-            id_inscripcion=reserva["id_inscripcion"]
-        ))
+        cancelada = cancelar_reserva_alumno(
+            id_reserva
+        )
+
+        if not cancelada:
+            return render_template(
+                "mensaje.html",
+                tipo="aviso",
+                titulo="No se pudo cancelar",
+                mensaje=(
+                    "La reserva ya no se encuentra activa "
+                    "o no pudo ser cancelada."
+                ),
+                texto_boton="Volver a mis clases",
+                destino=url_for(
+                    "clases_disponibles_taller",
+                    id_taller=reserva["id_taller"]
+                )
+            )
+
+
+        # ====================================================
+        # 5. Volver a las clases del taller
+        # ====================================================
+
+        return redirect(
+            url_for(
+                "clases_disponibles_taller",
+                id_taller=reserva["id_taller"]
+            )
+        )
+
+
+    # ====================================================
+    # 6. Manejo de errores
+    # ====================================================
 
     except Exception as error:
-        conexion.rollback()
-        print("Error al cancelar reserva:", error)
+
+        print(
+            "Error al cancelar reserva:",
+            error
+        )
+
         return render_template(
-    "mensaje.html",
-    tipo="error",
-    titulo="No pudimos cancelar la reserva",
-    mensaje="Ocurrió un error al intentar cancelar la clase.",
-    texto_boton="Volver a mis talleres",
-    destino=url_for("mis_talleres")
-)
-
-    finally:
-        cursor.close()
-        conexion.close()
-
-# =========================
-# API TALLERES  - desde línea 1249 hasta 1792
-# =========================
-
-@app.route("/api/talleres", methods=["GET"])
-def api_talleres():
-
-    conexion = None
-    cursor = None
-
-    try:
-
-        conexion = conectar_db()
-
-        cursor = conexion.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo
-            FROM talleres
-            ORDER BY id_taller
-        """)
-
-        talleres = cursor.fetchall()
-
-        return jsonify({"talleres": talleres}), 200
-
-
-    except mysql.connector.Error:
-
-        app.logger.exception("Error al consultar los talleres")
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudieron consultar los talleres."
-            }
-        }), 500
-
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-@app.route("/api/talleres/<int:id_taller>", methods=["GET"])
-def api_taller_detalle(id_taller):
-
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre,
-                descripcion,
-                horario,
-                cupo_maximo
-            FROM talleres
-            WHERE id_taller = %s
-        """, (id_taller,))
-
-        taller = cursor.fetchone()
-
-        if not taller:
-            return jsonify({
-                "error": {
-                    "codigo": "taller_no_encontrado",
-                    "mensaje": "El taller solicitado no existe."
-                }
-            }), 404
-
-        return jsonify({
-            "taller": taller
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar el detalle del taller"
+            "mensaje.html",
+            tipo="error",
+            titulo="No pudimos cancelar la reserva",
+            mensaje="Ocurrió un error al intentar cancelar la clase.",
+            texto_boton="Volver a mis talleres",
+            destino=url_for("mis_talleres")
         )
 
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudo consultar el taller."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-
-@app.route("/api/talleres/<int:id_taller>/clases", methods=["GET"])
-def api_clases_taller(id_taller):
-
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        # Verificar que el taller exista
-        cursor.execute("""
-            SELECT
-                id_taller,
-                nombre
-            FROM talleres
-            WHERE id_taller = %s
-        """, (id_taller,))
-
-        taller = cursor.fetchone()
-
-        if not taller:
-            return jsonify({
-                "error": {
-                    "codigo": "taller_no_encontrado",
-                    "mensaje": "El taller solicitado no existe."
-                }
-            }), 404
-
-        # Obtener las clases del taller
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.cupo_maximo,
-                c.estado,
-
-                (
-                    SELECT COUNT(*)
-                    FROM reservas_clase r
-                    WHERE r.id_clase = c.id_clase
-                    AND r.estado = 'reservada'
-                ) AS alumnos_reservados
-
-            FROM clases c
-
-            WHERE c.id_taller = %s
-            AND c.estado = 'programada'
-            AND TIMESTAMP(c.fecha, c.hora_inicio) > NOW()  -- solo clases futuras
-
-            ORDER BY c.fecha, c.hora_inicio
-        """, (id_taller,))
-
-        clases = cursor.fetchall()
-
-        # Convertir tipos de MySQL a valores compatibles con JSON
-        for clase in clases:
-
-            if clase["fecha"] is not None:
-                clase["fecha"] = str(clase["fecha"])
-
-            if clase["hora_inicio"] is not None:
-                clase["hora_inicio"] = str(clase["hora_inicio"])
-
-            if clase["hora_fin"] is not None:
-                clase["hora_fin"] = str(clase["hora_fin"])
-
-        return jsonify({
-            "taller": {
-                "id_taller": taller["id_taller"],
-                "nombre": taller["nombre"]
-            },
-            "total_clases": len(clases),
-            "clases": clases
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar las clases del taller"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudieron consultar las clases."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-@app.route("/api/estadisticas/resumen", methods=["GET"])
-def api_estadisticas_resumen():
-
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        # Total de alumnos
-        cursor.execute("""
-            SELECT COUNT(*) AS total_alumnos
-            FROM alumnos
-        """)
-        total_alumnos = cursor.fetchone()["total_alumnos"]
-
-        # Total de talleres
-        cursor.execute("""
-            SELECT COUNT(*) AS total_talleres
-            FROM talleres
-        """)
-        total_talleres = cursor.fetchone()["total_talleres"]
-
-        # Total de clases
-        cursor.execute("""
-            SELECT COUNT(*) AS total_clases
-            FROM clases
-        """)
-        total_clases = cursor.fetchone()["total_clases"]
-
-        # Reservas activas
-        cursor.execute("""
-            SELECT COUNT(*) AS reservas_activas
-            FROM reservas_clase
-            WHERE estado = 'reservada'
-        """)
-        reservas_activas = cursor.fetchone()["reservas_activas"]
-
-        # Reservas canceladas
-        cursor.execute("""
-            SELECT COUNT(*) AS reservas_canceladas
-            FROM reservas_clase
-            WHERE estado = 'cancelada'
-        """)
-        reservas_canceladas = cursor.fetchone()["reservas_canceladas"]
-
-        return jsonify({
-            "estadisticas": {
-                "total_alumnos": total_alumnos,
-                "total_talleres": total_talleres,
-                "total_clases": total_clases,
-                "reservas_activas": reservas_activas,
-                "reservas_canceladas": reservas_canceladas
-            }
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar estadísticas"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudieron obtener las estadísticas."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-
-@app.route("/api/estadisticas/talleres", methods=["GET"])
-def api_estadisticas_talleres():
-
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                t.id_taller,
-                t.nombre AS taller,
-                COUNT(r.id_reserva) AS total_reservas,
-
-                SUM(
-                    CASE
-                        WHEN r.estado = 'reservada' THEN 1
-                        ELSE 0
-                    END
-                ) AS reservas_activas,
-
-                SUM(
-                    CASE
-                        WHEN r.estado = 'cancelada' THEN 1
-                        ELSE 0
-                    END
-                ) AS reservas_canceladas
-
-            FROM talleres t
-
-            LEFT JOIN clases c
-                ON t.id_taller = c.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON c.id_clase = r.id_clase
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY total_reservas DESC
-        """)
-
-        talleres = cursor.fetchall()
-
-        return jsonify({
-            "total_talleres": len(talleres),
-            "talleres": talleres
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar estadísticas por taller"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudieron obtener las estadísticas por taller."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
 
 
 @app.route("/api/estadisticas/ocupacion-talleres", methods=["GET"])
@@ -3772,90 +2461,6 @@ def mis_estadisticas():
     return render_template("mis_estadisticas.html")
 
 
-@app.route("/api/alumno/estadisticas", methods=["GET"])
-def api_alumno_estadisticas():
-    if "id_usuario" not in session:
-        return jsonify({"error": {"mensaje": "Inicia sesión para consultar tus estadísticas."}}), 401
-    if session.get("rol") != "alumno":
-        return jsonify({"error": {"mensaje": "Acceso exclusivo para alumnos."}}), 403
-
-    conexion = None
-    cursor = None
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT id_alumno FROM alumnos WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-        alumno = cursor.fetchone()
-        if not alumno:
-            return jsonify({"error": {"mensaje": "No se encontró tu perfil de alumno."}}), 404
-
-        # Planes activos cuya vigencia incluye el día actual.
-        cursor.execute("""
-            SELECT COUNT(DISTINCT id_taller) AS talleres_vigentes,
-                COALESCE(SUM(clases_contratadas), 0) AS clases_contratadas_vigentes
-            FROM inscripciones
-            WHERE id_alumno = %s AND estado = 'activa'
-            AND fecha_inicio <= CURDATE()
-            AND fecha_vencimiento >= CURDATE()
-        """, (alumno["id_alumno"],))
-        planes = cursor.fetchone()
-
-        # Historial personal: no se recibe un id de alumno del navegador.
-        cursor.execute("""
-            SELECT COUNT(*) AS total_reservas,
-                COALESCE(SUM(CASE WHEN r.estado = 'cancelada' THEN 1 ELSE 0 END), 0) AS reservas_canceladas,
-                COALESCE(SUM(CASE WHEN r.estado = 'reservada'
-                    AND c.estado = 'programada'
-                    AND TIMESTAMP(c.fecha, c.hora_inicio) > NOW()
-                    THEN 1 ELSE 0 END), 0) AS reservas_proximas
-            FROM reservas_clase r
-            INNER JOIN inscripciones i ON i.id_inscripcion = r.id_inscripcion
-            INNER JOIN clases c ON c.id_clase = r.id_clase
-            WHERE i.id_alumno = %s
-        """, (alumno["id_alumno"],))
-        reservas = cursor.fetchone()
-
-        cursor.execute("""
-            SELECT t.nombre AS taller, COUNT(*) AS reservas
-            FROM reservas_clase r
-            INNER JOIN inscripciones i ON i.id_inscripcion = r.id_inscripcion
-            INNER JOIN clases c ON c.id_clase = r.id_clase
-            INNER JOIN talleres t ON t.id_taller = c.id_taller
-            WHERE i.id_alumno = %s AND r.estado = 'reservada'
-            AND c.estado <> 'cancelada'
-            GROUP BY t.id_taller, t.nombre
-            ORDER BY reservas DESC, t.nombre
-        """, (alumno["id_alumno"],))
-        talleres = cursor.fetchall()
-
-        respuesta = jsonify({
-            "estadisticas": {
-                "talleres_vigentes": int(planes["talleres_vigentes"]),
-                "clases_contratadas_vigentes": int(planes["clases_contratadas_vigentes"]),
-                "reservas_proximas": int(reservas["reservas_proximas"]),
-                "total_reservas": int(reservas["total_reservas"]),
-                "reservas_canceladas": int(reservas["reservas_canceladas"]),
-                "porcentaje_asistencia": None,
-                "porcentaje_inasistencia": None
-            },
-            "mis_talleres_mas_reservados": [
-                {"taller": t["taller"], "reservas": int(t["reservas"])} for t in talleres
-            ]
-        })
-        respuesta.headers["Cache-Control"] = "no-store"
-        return respuesta, 200
-    except mysql.connector.Error:
-        app.logger.exception("Error al consultar estadísticas del alumno")
-        return jsonify({"error": {"mensaje": "No se pudieron cargar tus estadísticas. Intenta nuevamente."}}), 500
-    finally:
-        if cursor is not None:
-            cursor.close()
-        if conexion is not None:
-            conexion.close()
-
-
 
 # FUNCIONES NUEVAS PARA ESTADISTICAS DEL PROFESOR 
 
@@ -4219,8 +2824,9 @@ def api_profesor_estadisticas():
 
 
 
-
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(debug=True)
+
+"""  if __name__ == "__main__":
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host="0.0.0.0", port=port, debug=False) """

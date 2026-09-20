@@ -1,112 +1,650 @@
-/* Cuadrícula de estadísticas */
-.metricas {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 18px;
-    margin: 24px 0;
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
 }
 
-/* Tarjetas */
-.metrica {
-    min-width: 0;
-}
 
-.metrica h2 {
-    font-size: 18px;
-}
+body {
+    margin: 0;
 
-.metrica strong {
-    display: block;
-    margin: 12px 0;
-    font-size: 32px;
-    color: #8f0d0d;
-}
+    background: #f4f4f2;
+    color: #222;
 
-.metrica p,
-.nota {
-    color: #666;
+    font-family: Arial, sans-serif;
+
     line-height: 1.5;
 }
 
-/* Ranking personal */
-.lista {
-    padding-left: 24px;
-}
 
-.lista li {
-    margin: 14px 0;
-    overflow-wrap: anywhere;
-}
+/* =========================================================
+   BARRA SUPERIOR
+========================================================= */
 
-/* Navegación */
-.volver {
-    display: inline-block;
-    margin-bottom: 24px;
-    color: #8f0d0d;
-    font-weight: bold;
-    text-decoration: none;
-}
+.barra {
+    min-height: 72px;
 
-.volver:hover {
-    text-decoration: underline;
-}
+    padding: 14px 6%;
 
-/* Estados de carga y error */
-#estado {
-    margin-top: 20px;
-    line-height: 1.5;
-}
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-#reintentar {
-    margin-top: 12px;
-    padding: 10px 16px;
-    border: 1px solid #8f0d0d;
-    border-radius: 8px;
-    background: white;
-    color: #8f0d0d;
-    font: inherit;
-    cursor: pointer;
-}
+    gap: 30px;
 
-#reintentar:hover {
-    background: #8f0d0d;
+    background: #111;
+
     color: white;
 }
 
-.volver:focus-visible,
-#reintentar:focus-visible {
-    outline: 3px solid #8f0d0d;
-    outline-offset: 4px;
+
+.marca {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
 }
 
-[hidden] {
-    display: none !important;
+
+.logo {
+    width: 48px;
+    height: 48px;
+
+    object-fit: contain;
 }
 
-/* Pantallas pequeñas */
-@media (max-width: 550px) {
+
+.marca span {
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+
+.enlace-panel {
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+
+.enlace-panel:hover {
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.contenedor {
+    width: 100%;
+
+    max-width: 1180px;
+
+    margin: 0 auto;
+
+    padding: 42px 30px 70px;
+}
+
+
+/* =========================================================
+   VOLVER
+========================================================= */
+
+.volver {
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    color: #8f0d0d;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+
+.volver:hover {
+    background: #8f0d0d;
+
+    color: white;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.encabezado {
+    margin: 38px 0 38px;
+}
+
+
+.etiqueta {
+    margin: 0 0 8px;
+
+    color: #8f0d0d;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.encabezado h1 {
+    margin: 0;
+
+    font-size: 38px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+}
+
+
+.descripcion {
+    margin: 8px 0 0;
+
+    color: #707070;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   MÉTRICAS PRINCIPALES
+========================================================= */
+
+.metricas {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    margin: 0 0 65px;
+
+    padding: 25px 0;
+
+    border-top:
+        1px solid #d9d9d6;
+
+    border-bottom:
+        1px solid #d9d9d6;
+}
+
+
+.metrica {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 5px 28px;
+
+    border-right:
+        1px solid #d9d9d6;
+}
+
+
+.metrica:first-child {
+    padding-left: 0;
+}
+
+
+.metrica:last-child {
+    border-right: 0;
+}
+
+
+.metrica strong {
+    color: #222;
+
+    font-size: 32px;
+    font-weight: 500;
+}
+
+
+.metrica span {
+    color: #777;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   TÍTULOS DE SECCIÓN
+========================================================= */
+
+.titulo-seccion {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 25px;
+}
+
+
+.titulo-seccion h2 {
+    margin: 0;
+
+    font-size: 25px;
+    font-weight: 600;
+}
+
+
+.titulo-seccion > p {
+    margin: 0;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SECCIÓN ASISTENCIA
+========================================================= */
+
+.seccion-asistencia {
+    margin-bottom: 70px;
+}
+
+
+/* =========================================================
+   RESUMEN DE ASISTENCIA
+========================================================= */
+
+.resumen-asistencia {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 45px;
+
+    padding: 30px 0;
+
+    border-top:
+        1px solid #d9d9d6;
+
+    border-bottom:
+        1px solid #d9d9d6;
+}
+
+
+/* =========================================================
+   BLOQUE INDIVIDUAL
+========================================================= */
+
+.dato-asistencia {
+    min-width: 0;
+}
+
+
+.cabecera-asistencia {
+    display: flex;
+
+    align-items: baseline;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 10px;
+}
+
+
+.cabecera-asistencia span {
+    color: #555;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.cabecera-asistencia strong {
+    color: #8f0d0d;
+
+    font-size: 26px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   BARRA BASE
+========================================================= */
+
+.barra-asistencia {
+    width: 100%;
+    height: 7px;
+
+    overflow: hidden;
+
+    background: #dededb;
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   PROGRESO ASISTENCIA
+========================================================= */
+
+.progreso-asistencia {
+    width: 0;
+    height: 100%;
+
+    background: #8f0d0d;
+
+    border-radius: 10px;
+
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   PROGRESO INASISTENCIA
+========================================================= */
+
+.progreso-inasistencia {
+    width: 0;
+    height: 100%;
+
+    background: #6f6f6f;
+
+    border-radius: 10px;
+
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   TEXTO BAJO LAS BARRAS
+========================================================= */
+
+.dato-asistencia > p {
+    margin: 10px 0 0;
+
+    color: #888;
+
+    font-size: 12px;
+}
+
+
+.dato-asistencia > p strong {
+    color: #444;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TOTAL ASISTENCIAS REGISTRADAS
+========================================================= */
+
+.total-asistencias {
+    margin: 14px 0 0;
+
+    color: #888;
+
+    font-size: 12px;
+}
+
+
+.total-asistencias strong {
+    color: #8f0d0d;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SECCIÓN TALLERES
+========================================================= */
+
+.seccion-talleres {
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   LISTA DE TALLERES
+========================================================= */
+
+.talleres-estadisticas {
+    border-top:
+        1px solid #d9d9d6;
+}
+
+
+.estadistica-taller {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    padding: 25px 4px;
+
+    border-bottom:
+        1px solid #d9d9d6;
+}
+
+
+.nombre-taller {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.nombre-taller h3 {
+    margin: 0;
+
+    color: #333;
+
+    font-size: 18px;
+    font-weight: 500;
+}
+
+
+.nombre-taller span {
+    color: #888;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   NÚMERO DE RESERVAS
+========================================================= */
+
+.numero-reservas {
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 6px;
+}
+
+
+.numero-reservas strong {
+    color: #8f0d0d;
+
+    font-size: 25px;
+    font-weight: 500;
+}
+
+
+.numero-reservas span {
+    color: #777;
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   CARGA Y ERRORES
+========================================================= */
+
+.estado-carga {
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+.btn-reintentar {
+    padding: 9px 15px;
+
+    border:
+        1px solid #8f0d0d;
+
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #8f0d0d;
+
+    cursor: pointer;
+}
+
+
+.btn-reintentar:hover {
+    background: #8f0d0d;
+
+    color: white;
+}
+
+
+.sin-talleres {
+    padding: 30px 0;
+
+    color: #777;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .barra {
+        padding: 14px 20px;
+    }
+
+
+    .marca span {
+        display: none;
+    }
+
+
+    .contenedor {
+        padding:
+            30px 20px 50px;
+    }
+
+
+    .metricas {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .metrica {
+        padding: 20px;
+
+        border-bottom:
+            1px solid #d9d9d6;
+    }
+
+
+    .metrica:nth-child(2) {
+        border-right: 0;
+    }
+
+
+    .titulo-seccion {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .resumen-asistencia {
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
     .metricas {
         grid-template-columns: 1fr;
     }
-}
 
 
-a.volver {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 10px 18px;
-    margin-bottom: 24px;
-    box-sizing: border-box;
-    border: 1px solid #8f0d0d;
-    border-radius: 10px;
-    background: #fff;
-    color: #8f0d0d;
-    font-weight: 600;
-    text-decoration: none;
-}
+    .metrica {
+        padding: 18px 0;
 
-a.volver:hover {
-    background: #8f0d0d;
-    color: #fff;
+        border-right: 0;
+    }
+
+
+    .encabezado h1 {
+        font-size: 31px;
+    }
+
+
+    .estadistica-taller {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .cabecera-asistencia strong {
+        font-size: 22px;
+    }
+
 }

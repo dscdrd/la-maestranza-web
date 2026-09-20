@@ -34,7 +34,7 @@
                     Inicio
                 </a>
 
-                <a href="#mi-perfil">Mi perfil</a>
+                
 
                 <a href="{{ url_for('cerrar_sesion') }}"
                 class="btn-cerrar">
@@ -99,34 +99,17 @@
 
                     <h2>Mi perfil</h2>
 
-                    <form
-    action="{{ url_for('subir_foto_profesor') }}"
-    method="POST"
-    enctype="multipart/form-data"
-    class="form-foto-perfil"
+                    <form>
+                        <a
+                            href="{{ url_for('editar_perfil_profesor') }}"
+                            class="btn-editar-perfil"
 >
+    Editar mis datos
+</a>
+                    </form>
+    
 
-    <label for="foto-profesor" class="btn-seleccionar-foto">
-        Seleccionar imagen
-    </label>
 
-    <input
-        type="file"
-        id="foto-profesor"
-        name="foto"
-        accept=".jpg,.jpeg,.png,.webp"
-        class="input-foto"
-        required
-    >
-
-    <button
-        type="submit"
-        class="btn-guardar-foto"
-    >
-        Guardar foto
-    </button>
-
-</form>
                 </div>
 
                 <span class="estado">
@@ -189,23 +172,35 @@
         <section class="opciones" aria-label="Opciones del profesor">
 
             <article class="tarjeta opcion">
-                <div class="icono" aria-hidden="true">◇</div>
-                <h3>Mis talleres</h3>
-                <p>Consulta tus talleres asignados, sus clases y alumnos reservados.</p>
-                <a href="{{ url_for('mis_clases') }}">Ver mis talleres →</a>
-            </article>
+
+    <div class="icono">◇</div>
+
+    <h2>Mis talleres y asistencia</h2>
+
+    <p>
+        Consulta tus talleres, administra sus clases,
+        revisa alumnos y registra asistencia.
+    </p>
+
+    <a class="enlace-tarjeta" href="{{ url_for('mis_clases') }}">
+    Ver →
+</a>
+    
+    </a>
+
+</article>
 
 
             <article class="tarjeta opcion">
                 <div class="icono" aria-hidden="true">▥</div>
                 <h3>Mis estadísticas</h3>
                 <p>Revisa un resumen de tus talleres, alumnos, reservas y ocupación.</p>
-                <a href="{{ url_for('mis_estadisticas_profesor') }}">
-    Ver mis estadísticas →</a>
+                <a class="enlace-tarjeta" href="{{ url_for('mis_estadisticas_profesor') }}">
+    Ver  →</a>
             </article>
 
 
-            <article class="tarjeta">
+            <article class="tarjeta opcion">
 
     <div class="icono">⚙</div>
 
@@ -216,22 +211,15 @@
     </p>
 
     <a class="enlace-tarjeta" href="{{ url_for('gestion_talleres') }}">
-        Gestionar talleres →
+        Gestionar  →
     </a>
 
 </article>
 
-
-            <article class="tarjeta opcion">
-                <div class="icono" aria-hidden="true">✔</div>
-                <h3>Tomar asistencia</h3>
-                <p>Revisa tus clases y registra la asistencia de los alumnos.</p>
-                <a href="{{ url_for('mis_clases_profesor') }}"> Ver mis clases → </a>
-</article>
         </section>
         <section class="tarjeta clases-hoy">
             <h2>Clases de hoy</h2>
-            <p class="nota">Incluye las sesiones de hoy, aunque ya hayan comenzado. Las canceladas se indican en la lista.</p>
+            
             {% for clase in clases_hoy %}
             <article class="fila-clase">
                 <div>
@@ -246,7 +234,7 @@
             {% else %}
             <p>No tienes clases asignadas para hoy.</p>
             {% endfor %}
-            <p class="nota">El registro de asistencia se incorporará en el siguiente paso.</p>
+            
         </section>
 
     </main>

@@ -2,8 +2,13 @@
 <html lang="es">
 
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script
+        src="{{ url_for('static', filename='js/gestion_talleres.js') }}"
+        defer>
+    </script>
 
     <title>Gestión de talleres | La Maestranza</title>
 
@@ -15,7 +20,11 @@
 
 <body>
 
-    <main class="contenedor">
+    <main
+        class="contenedor"
+        id="gestion-talleres"
+        data-api-base="/api/talleres"
+    >
 
         <!-- VOLVER -->
 
@@ -135,35 +144,14 @@
                             </a>
 
 
-                            {% if taller.estado == 'activo' %}
-
-                                <form
-                                    method="POST"
-                                    action="{{ url_for(
-                                        'desactivar_taller',
-                                        id_taller=taller.id_taller
-                                    ) }}"
-                                >
-
-                                    <button
-                                        class="btn-desactivar"
-                                        type="submit"
-                                        onclick="return confirm(
-                                            '¿Seguro que deseas desactivar este taller?'
-                                        );"
-                                    >
-                                        Desactivar
-                                    </button>
-
-                                </form>
-
-                            {% else %}
-
-                                <span class="texto-inactivo">
-                                    Taller desactivado
-                                </span>
-
-                            {% endif %}
+                            <button
+                                type="button"
+                                class="btn-eliminar"
+                                data-id-taller="{{ taller.id_taller }}"
+                                data-nombre-taller="{{ taller.nombre }}"
+                            >
+                                Eliminar
+                            </button>
 
                         </div>
 

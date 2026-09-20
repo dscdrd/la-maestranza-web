@@ -14,31 +14,23 @@
     const contenido = document.getElementById("contenido");
     const reintentar = document.getElementById("reintentar");
 
-    const rankingTalleres =
+    const contenedorTalleres =
         document.getElementById("ranking-talleres");
 
     const sinTalleres =
         document.getElementById("sin-talleres");
 
 
-    const campos = [
-        "talleres_asignados",
-        "alumnos_activos",
-        "proximas_clases",
-        "reservas_activas",
-        "reservas_canceladas",
-        "ocupacion_promedio"
-    ];
-
+    // ========================================================
+    // CARGAR ESTADÍSTICAS DESDE LA API
+    // ========================================================
 
     async function cargarEstadisticas() {
 
         contenido.hidden = true;
         reintentar.hidden = true;
-        reintentar.disabled = true;
 
-        estado.textContent = "Cargando tus estadísticas…";
-
+        estado.textContent = "Cargando estadísticas…";
 
         try {
 
@@ -47,222 +39,232 @@
                 cache: "no-store"
             });
 
-
-            const tipoContenido =
-                respuesta.headers.get("content-type") || "";
-
-
-            if (!tipoContenido.includes("application/json")) {
-
-                throw new Error(
-                    "La respuesta no es válida. Comprueba que tu sesión siga abierta."
-                );
-            }
-
-
             const datos = await respuesta.json();
 
-
             if (!respuesta.ok) {
-
                 throw new Error(
-                    datos.error?.mensaje ||
+                    datos.error ||
                     "No se pudieron cargar las estadísticas."
                 );
             }
 
 
-            if (
-                !datos.estadisticas ||
-                !Array.isArray(datos.talleres) ||
-                campos.some(
-                    campo =>
-                        !Number.isFinite(
-                            Number(datos.estadisticas[campo])
-                        )
-                )
-            ) {
+            // =================================================
+            // ESTADÍSTICAS GENERALES
+            // =================================================
 
-                throw new Error(
-                    "La API devolvió datos incompletos. Intenta nuevamente."
-                );
-            }
+            document.getElementById(
+                "talleres_asignados"
+            ).textContent = datos.talleres_asignados;
 
+            document.getElementById(
+                "alumnos_activos"
+            ).textContent = datos.alumnos_activos;
 
-            // =========================================
-            // MOSTRAR MÉTRICAS
-            // =========================================
+            document.getElementById(
+                "reservas_activas"
+            ).textContent = datos.reservas_activas;
 
-            for (const campo of campos) {
-
-                const elemento =
-                    document.getElementById(campo);
-
-                let valor =
-                    datos.estadisticas[campo];
+            document.getElementById(
+                "reservas_canceladas"
+            ).textContent = datos.reservas_canceladas;
 
 
-                if (campo === "ocupacion_promedio") {
+            // =================================================
+            // ESTADÍSTICAS POR TALLER
+            // =================================================
 
-                    valor =
-                        `${Number(valor).toFixed(2)} %`;
-                }
-
-
-                elemento.textContent = valor;
-            }
-
-
-            // =========================================
-            // MOSTRAR ESTADÍSTICAS POR TALLER
-            // =========================================
-
-            rankingTalleres.replaceChildren();
-
+            contenedorTalleres.replaceChildren();
 
             for (const taller of datos.talleres) {
 
                 const tarjeta =
                     document.createElement("article");
 
-                tarjeta.classList.add(
-                    "tarjeta",
-                    "tarjeta-taller-estadistica"
+                tarjeta.classList.add("estadistica-taller");
+
+
+                // ---------------------------------------------
+                // ENCABEZADO
+                // ---------------------------------------------
+
+                const encabezado =
+                    document.createElement("div");
+
+                encabezado.classList.add(
+                    "encabezado-taller"
                 );
 
 
                 const titulo =
                     document.createElement("h3");
 
-                titulo.textContent =
-                    taller.taller;
+                titulo.textContent = taller.nombre;
 
+
+                const resumen =
+                    document.createElement("span");
+
+                resumen.textContent =
+                    `${taller.alumnos_activos} alumnos · ` +
+                    `${taller.reservas_activas} reservas`;
+
+
+                encabezado.appendChild(titulo);
+                encabezado.appendChild(resumen);
+
+
+                // ---------------------------------------------
+                // OCUPACIÓN
+                // ---------------------------------------------
+
+                const ocupacion = crearBarra(
+                    "Ocupación",
+                    taller.ocupacion
+                );
+
+
+                // ---------------------------------------------
+                // ASISTENCIA
+                // ---------------------------------------------
+
+                const asistencia = crearBarra(
+                    "Asistencia",
+                    taller.asistencia
+                );
+
+
+                // ---------------------------------------------
+                // DETALLE DE ASISTENCIA
+                // ---------------------------------------------
 
                 const detalle =
-                    document.createElement("div");
+                    document.createElement("p");
 
                 detalle.classList.add(
-                    "detalle-estadisticas-taller"
+                    "detalle-asistencia"
                 );
 
-
-                const datosTaller = [
-
-                    {
-                        etiqueta: "Clases creadas",
-                        valor: Number(
-                            taller.total_clases || 0
-                        )
-                    },
-
-                    {
-                        etiqueta: "Cupos totales",
-                        valor: Number(
-                            taller.cupos_totales || 0
-                        )
-                    },
-
-                    {
-                        etiqueta: "Reservas activas",
-                        valor: Number(
-                            taller.reservas_activas || 0
-                        )
-                    },
-
-                    {
-                        etiqueta: "Reservas canceladas",
-                        valor: Number(
-                            taller.reservas_canceladas || 0
-                        )
-                    },
-
-                    {
-                        etiqueta: "Ocupación",
-                        valor:
-                            `${Number(
-                                taller.porcentaje_ocupacion || 0
-                            ).toFixed(2)} %`
-                    }
-
-                ];
+                detalle.textContent =
+                    `${taller.presentes} presentes · ` +
+                    `${taller.ausentes} ausentes · ` +
+                    `${taller.reservas_canceladas} canceladas`;
 
 
-                for (const dato of datosTaller) {
-
-                    const fila =
-                        document.createElement("div");
-
-                    fila.classList.add(
-                        "fila-estadistica-taller"
-                    );
-
-
-                    const etiqueta =
-                        document.createElement("span");
-
-                    etiqueta.textContent =
-                        dato.etiqueta;
-
-
-                    const valor =
-                        document.createElement("strong");
-
-                    valor.textContent =
-                        dato.valor;
-
-
-                    fila.appendChild(etiqueta);
-                    fila.appendChild(valor);
-
-                    detalle.appendChild(fila);
-                }
-
-
-                tarjeta.appendChild(titulo);
+                tarjeta.appendChild(encabezado);
+                tarjeta.appendChild(ocupacion);
+                tarjeta.appendChild(asistencia);
                 tarjeta.appendChild(detalle);
 
-                rankingTalleres.appendChild(
-                    tarjeta
-                );
+                contenedorTalleres.appendChild(tarjeta);
             }
 
 
-            // =========================================
-            // MENSAJE SI NO HAY TALLERES
-            // =========================================
+            // =================================================
+            // SIN TALLERES
+            // =================================================
 
             sinTalleres.hidden =
                 datos.talleres.length !== 0;
 
 
             estado.textContent = "";
-
             contenido.hidden = false;
 
 
         } catch (error) {
 
             estado.textContent =
-                error instanceof TypeError
-                    ? "No se pudo conectar con el servidor. Intenta nuevamente."
-                    : error.message ||
-                      "No se pudieron cargar tus estadísticas.";
+                error.message ||
+                "No se pudieron cargar las estadísticas.";
 
             reintentar.hidden = false;
 
-
-        } finally {
-
-            reintentar.disabled = false;
         }
     }
 
+
+    // ========================================================
+    // CREAR BARRA DE PORCENTAJE
+    // ========================================================
+
+    function crearBarra(etiqueta, porcentaje) {
+
+        const valor =
+            Math.min(
+                100,
+                Math.max(0, Number(porcentaje) || 0)
+            );
+
+
+        const bloque =
+            document.createElement("div");
+
+        bloque.classList.add("bloque-barra");
+
+
+        const informacion =
+            document.createElement("div");
+
+        informacion.classList.add(
+            "informacion-barra"
+        );
+
+
+        const nombre =
+            document.createElement("span");
+
+        nombre.textContent = etiqueta;
+
+
+        const numero =
+            document.createElement("strong");
+
+        numero.textContent =
+            `${valor.toFixed(1)} %`;
+
+
+        informacion.appendChild(nombre);
+        informacion.appendChild(numero);
+
+
+        const fondo =
+            document.createElement("div");
+
+        fondo.classList.add("barra-fondo");
+
+
+        const progreso =
+            document.createElement("div");
+
+        progreso.classList.add("barra-progreso");
+
+        progreso.style.width = `${valor}%`;
+
+
+        fondo.appendChild(progreso);
+
+        bloque.appendChild(informacion);
+        bloque.appendChild(fondo);
+
+
+        return bloque;
+    }
+
+
+    // ========================================================
+    // REINTENTAR
+    // ========================================================
 
     reintentar.addEventListener(
         "click",
         cargarEstadisticas
     );
 
+
+    // ========================================================
+    // INICIAR
+    // ========================================================
 
     cargarEstadisticas();
 

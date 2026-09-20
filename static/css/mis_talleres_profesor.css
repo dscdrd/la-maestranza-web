@@ -1,0 +1,472 @@
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+
+    background: #f4f4f2;
+    color: #333;
+
+    font-family: Arial, sans-serif;
+}
+
+
+/* =========================================================
+   BARRA SUPERIOR
+========================================================= */
+
+.barra {
+    min-height: 72px;
+
+    padding: 14px 6%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    background: #111;
+
+    color: white;
+}
+
+
+.marca {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.logo {
+    width: 48px;
+    height: 48px;
+
+    object-fit: contain;
+}
+
+
+.marca span {
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+
+.enlace-panel {
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+
+.enlace-panel:hover {
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.panel {
+    width: 100%;
+
+    max-width: 1180px;
+
+    margin: 0 auto;
+
+    padding: 42px 30px 70px;
+}
+
+
+/* =========================================================
+   VOLVER
+========================================================= */
+
+.volver {
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    color: #8f0d0d;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+
+.volver:hover {
+    background: #8f0d0d;
+
+    color: white;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.bienvenida {
+    margin: 38px 0 38px;
+}
+
+
+.etiqueta {
+    margin: 0 0 8px;
+
+    color: #8f0d0d;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.bienvenida h1 {
+    margin: 0;
+
+    color: #171717;
+
+    font-size: 38px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+}
+
+
+.bienvenida > p:last-child {
+    margin: 8px 0 0;
+
+    color: #707070;
+
+    font-size: 15px;
+}
+
+
+.nota {
+    color: #777;
+}
+
+
+/* =========================================================
+   TALLERES
+========================================================= */
+
+.lista-talleres {
+    border-top: 1px solid #d5d5d5;
+}
+
+
+.taller {
+    border-bottom: 1px solid #d5d5d5;
+}
+
+
+summary {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 24px 4px;
+
+    list-style: none;
+
+    cursor: pointer;
+}
+
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+
+summary span {
+    color: #4b4b4b;
+
+    font-size: 18px;
+    font-weight: 500;
+}
+
+
+summary b {
+    color: #8f0d0d;
+
+    font-size: 24px;
+    font-weight: 300;
+
+    transition: 0.2s;
+}
+
+
+.taller[open] summary span {
+    color: #8f0d0d;
+}
+
+
+.taller[open] summary b {
+    transform: rotate(45deg);
+}
+
+
+.contenido-taller {
+    padding: 0 4px 30px;
+}
+
+
+/* =========================================================
+   CREAR CLASE
+========================================================= */
+
+.crear-clase {
+    margin: 25px 0;
+}
+
+
+.crear-clase h2 {
+    margin-bottom: 16px;
+
+    font-size: 19px;
+}
+
+
+.form-clase {
+    display: flex;
+
+    align-items: end;
+    flex-wrap: wrap;
+
+    gap: 15px;
+}
+
+
+.form-clase label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.form-clase input {
+    height: 40px;
+
+    padding: 8px 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 7px;
+
+    background: white;
+    color: #333;
+}
+
+
+/* =========================================================
+   CUPO COMPACTO
+========================================================= */
+
+.form-clase .input-cupo {
+    width: 65px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   BOTÓN CREAR
+========================================================= */
+
+.btn-crear {
+    height: 40px;
+
+    padding: 0 16px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #8f0d0d;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.btn-crear:hover {
+    background: #8f0d0d;
+
+    color: white;
+}
+
+
+/* =========================================================
+   CLASES
+========================================================= */
+
+.fila-clase {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 22px 4px;
+
+    border-top: 1px solid #ddd;
+}
+
+
+.datos-clase h3,
+.datos-clase p {
+    margin: 0 0 5px;
+}
+
+
+.datos-clase h3 {
+    color: #4b4b4b;
+
+    font-size: 18px;
+}
+
+
+.datos-clase small {
+    color: #777;
+}
+
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.acciones-clase {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.acciones-clase a,
+.acciones-clase button {
+    padding: 0;
+
+    border: 0;
+
+    background: none;
+
+    color: #8f0d0d;
+
+    font: inherit;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+
+.acciones-clase a:hover,
+.acciones-clase button:hover {
+    text-decoration: underline;
+}
+
+
+.acciones-clase form {
+    margin: 0;
+}
+
+
+/* =========================================================
+   CANCELADA
+========================================================= */
+
+.estado-cancelada {
+    color: #999;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .barra {
+        padding: 14px 20px;
+    }
+
+
+    .marca span {
+        display: none;
+    }
+
+
+    .panel {
+        padding: 30px 20px 50px;
+    }
+
+
+    .bienvenida h1 {
+        font-size: 34px;
+    }
+
+
+    .form-clase {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .form-clase .input-cupo {
+        width: 80px;
+    }
+
+
+    .fila-clase {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .acciones-clase {
+        flex-wrap: wrap;
+    }
+
+}

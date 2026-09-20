@@ -1,69 +1,150 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Registro Alumno</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro_alumno.css') }}">
+    <title>Registro Alumno | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/registro_alumno.css') }}"
+    >
 </head>
+
 
 <body>
 
     <main class="registro">
 
+
+        <!-- ==================================================
+             LADO IZQUIERDO
+             ================================================== -->
+
         <section class="registro-izquierda">
 
-            <p class="texto-superior"></p>
 
-            <div class="titulo-comunidad"></div>
+            <!-- Logo decorativo de fondo -->
 
-            <!-- Logo decorativo lateral -->
-    <img
-        src="{{ url_for('static', filename='img/logo.png') }}"
-        alt="Logo La Maestranza"
-        class="logo-lateral"
-    >
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt=""
+                class="logo-lateral"
+            >
 
-<h1>
-    SÉ PARTE DE<br>
-    NUESTRA COMUNIDAD
-</h1>
-
-            <h2>INSCRÍBETE CON NOSOTROS</h2>
 
             <div class="contenido-formulario">
 
-                <form class="form-registro" method="POST">
 
-                    <input
-                        type="text"
-                        name="nombre"
-                        placeholder="Nombre:"
-                        required
-                    >
+                <!-- ==========================================
+                     ENCABEZADO
+                     ========================================== -->
 
-                    <input
-                        type="text"
-                        name="apellido"
-                        placeholder="Apellido:"
-                        required
-                    >
+                <header class="encabezado-registro">
 
-                    <input
-                        type="text"
-                        name="rut"
-                        placeholder="Ingresa tu RUT : 1111111-1"
-                        required
-                    >
+                    <span class="subtitulo-registro">
+                        INSCRIPCIÓN DE ALUMNOS
+                    </span>
 
-                    <div class="campo-fecha">
+                    <h1>
+                        SÉ PARTE DE<br>
+                        NUESTRA COMUNIDAD
+                    </h1>
+
+                    <p>
+                        Completa tus datos para crear tu cuenta
+                        en La Maestranza.
+                    </p>
+
+                </header>
+
+
+                <!-- ==========================================
+                     FORMULARIO
+                     ========================================== -->
+
+                <form
+                    class="form-registro"
+                    id="form-registro-alumno"
+                    data-api-url="/api/alumnos"
+                    data-inicio-url="{{ url_for('inicio') }}"
+                >
+
+
+                    <!-- ======================================
+                         DATOS PERSONALES
+                         ====================================== -->
+
+                    <div class="titulo-seccion">
+                        Datos personales
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="nombre">
+                            Nombre
+                        </label>
+
+                        <input
+                            type="text"
+                            name="nombre"
+                            id="nombre"
+                            placeholder="Ingresa tu nombre"
+                            autocomplete="given-name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="apellido">
+                            Apellido
+                        </label>
+
+                        <input
+                            type="text"
+                            name="apellido"
+                            id="apellido"
+                            placeholder="Ingresa tu apellido"
+                            autocomplete="family-name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="rut">
+                            RUT
+                        </label>
+
+                        <input
+                            type="text"
+                            name="rut"
+                            id="rut"
+                            placeholder="12345678-9"
+                            maxlength="10"
+                            autocomplete="off"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
 
                         <label for="fecha_nacimiento">
-                            Fecha de nacimiento:
+                            Fecha de nacimiento
                         </label>
 
                         <input
@@ -75,76 +156,198 @@
 
                     </div>
 
-                    <input
-                        type="email"
-                        name="correo"
-                        placeholder="Correo Electrónico:"
-                        required
-                    >
 
-                    <input
-                        type="tel"
-                        name="telefono"
-                        placeholder="Teléfono:"
-                        required
-                    >
+                    <!-- ======================================
+                         CONTACTO
+                         ====================================== -->
 
-                    <input
-                        type="text"
-                        name="contacto_emergencia"
-                        placeholder="Nombre del contacto de emergencia:"
-                        required
-                    >
-
-                    <input
-                        type="tel"
-                        name="telefono_emergencia"
-                        placeholder="Teléfono de emergencia:"
-                        required
-                    >
-
-                    <input
-                        type="password"
-                        name="contrasena"
-                        placeholder="Contraseña:"
-                        required
-                    >
-
-                    <input
-                        type="password"
-                        name="confirmar_contrasena"
-                        placeholder="Confirmar contraseña:"
-                        required
-                    >
+                    <div class="titulo-seccion">
+                        Información de contacto
+                    </div>
 
 
-                    <!-- ACEPTACIÓN DE REGLAMENTO -->
+                    <div class="campo">
 
-                    <div class="condiciones">
+                        <label for="correo">
+                            Correo electrónico
+                        </label>
 
-                        <label class="aceptar-condiciones">
+                        <input
+                            type="email"
+                            name="correo"
+                            id="correo"
+                            placeholder="correo@ejemplo.cl"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="telefono">
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="telefono"
+                            id="telefono"
+                            placeholder="+56 9 1234 5678"
+                            autocomplete="tel"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ======================================
+                         CONTACTO DE EMERGENCIA
+                         ====================================== -->
+
+                    <div class="titulo-seccion">
+                        Contacto de emergencia
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="contacto_emergencia">
+                            Nombre del contacto
+                        </label>
+
+                        <input
+                            type="text"
+                            name="contacto_emergencia"
+                            id="contacto_emergencia"
+                            placeholder="Nombre y apellido"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="telefono_emergencia">
+                            Teléfono de emergencia
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="telefono_emergencia"
+                            id="telefono_emergencia"
+                            placeholder="+56 9 1234 5678"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ======================================
+                         SEGURIDAD
+                         ====================================== -->
+
+                    <div class="titulo-seccion">
+                        Seguridad de la cuenta
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="contrasena">
+                            Contraseña
+                        </label>
+
+                        <input
+                            type="password"
+                            name="contrasena"
+                            id="contrasena"
+                            placeholder="Crea una contraseña"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="confirmar_contrasena">
+                            Confirmar contraseña
+                        </label>
+
+                        <input
+                            type="password"
+                            name="confirmar_contrasena"
+                            id="confirmar_contrasena"
+                            placeholder="Repite tu contraseña"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ======================================
+                         REGLAMENTO
+                         ====================================== -->
+
+                    <div class="bloque-reglamento">
+
+                        <div class="aceptacion">
 
                             <input
                                 type="checkbox"
                                 name="acepta_condiciones"
                                 id="acepta_condiciones"
+                                disabled
                                 required
                             >
 
-                            Acepto el reglamento y las condiciones de La Maestranza
+                            <label for="acepta_condiciones">
 
-                        </label>
+                                He leído y acepto el reglamento
+                                y las condiciones de La Maestranza.
+
+                            </label>
+
+                        </div>
+
 
                         <button
                             type="button"
                             class="btn-reglamento"
-                            onclick="abrirReglamento()"
+                            id="btn-abrir-reglamento"
                         >
-                            Ver reglamento
+                            Leer reglamento
                         </button>
 
                     </div>
 
+
+                    <!-- Explicación mientras está bloqueado -->
+
+                    <p
+                        class="aviso-reglamento"
+                        id="aviso-reglamento"
+                    >
+                        Lee el reglamento completo para habilitar
+                        la aceptación.
+                    </p>
+
+
+                    <!-- ======================================
+                         MENSAJE API
+                         ====================================== -->
+
+                    <p id="mensaje-registro"></p>
+
+
+                    <!-- ======================================
+                         BOTÓN REGISTRARSE
+                         ====================================== -->
 
                     <button
                         type="submit"
@@ -153,6 +356,7 @@
                         Registrarse
                     </button>
 
+
                 </form>
 
             </div>
@@ -160,11 +364,15 @@
         </section>
 
 
+        <!-- ==================================================
+             FOTOGRAFÍA DERECHA
+             ================================================== -->
+
         <section class="registro-derecha">
 
             <img
                 src="{{ url_for('static', filename='img/inscripciones.jpg') }}"
-                alt="Maestranza Escuela del Movimiento"
+                alt="Comunidad de La Maestranza"
             >
 
         </section>
@@ -172,87 +380,169 @@
     </main>
 
 
-    <!-- MODAL DEL REGLAMENTO -->
 
-    <div id="modal-reglamento" class="modal-reglamento">
+    <!-- ======================================================
+         MODAL REGLAMENTO
+         ====================================================== -->
 
-        <div class="contenido-reglamento">
+    <div
+        id="modal-reglamento"
+        class="modal-reglamento"
+        aria-hidden="true"
+    >
 
-            <button
-                type="button"
-                class="cerrar-reglamento"
-                onclick="cerrarReglamento()"
+        <div class="ventana-reglamento">
+
+
+            <!-- Encabezado fijo -->
+
+            <div class="cabecera-reglamento">
+
+                <div>
+
+                    <span>
+                        LA MAESTRANZA
+                    </span>
+
+                    <h2>
+                        Reglamento
+                    </h2>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="cerrar-reglamento"
+                    id="btn-cerrar-reglamento"
+                    aria-label="Cerrar reglamento"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!--
+                Esta es la zona que realmente se desplaza.
+                El JS observa el scroll de ESTE elemento.
+            -->
+
+            <div
+                class="texto-reglamento"
+                id="texto-reglamento"
             >
-                ×
-            </button>
 
-            <h2>Reglamento La Maestranza</h2>
+                <p>
+                    Al registrarse como alumno de La Maestranza,
+                    el usuario declara conocer y aceptar las normas
+                    de funcionamiento de la escuela.
+                </p>
 
-            <p>
-                Al registrarse como alumno de La Maestranza, el usuario
-                declara conocer y aceptar las normas de funcionamiento
-                de la escuela.
-            </p>
 
-            <h3>1. Respeto y convivencia</h3>
+                <h3>
+                    1. Respeto y convivencia
+                </h3>
 
-            <p>
-                Todos los alumnos deberán mantener una actitud respetuosa
-                hacia profesores, alumnos y miembros de la comunidad.
-            </p>
+                <p>
+                    Todos los alumnos deberán mantener una actitud
+                    respetuosa hacia profesores, alumnos y miembros
+                    de la comunidad.
+                </p>
 
-            <h3>2. Uso de las instalaciones</h3>
 
-            <p>
-                Los espacios, materiales y equipamiento deberán utilizarse
-                de manera responsable.
-            </p>
+                <h3>
+                    2. Uso de las instalaciones
+                </h3>
 
-            <h3>3. Horarios</h3>
+                <p>
+                    Los espacios, materiales y equipamiento deberán
+                    utilizarse de manera responsable.
+                </p>
 
-            <p>
-                Los alumnos deberán respetar los horarios establecidos
-                para las clases y talleres.
-            </p>
 
-            <h3>4. Pagos</h3>
+                <h3>
+                    3. Horarios
+                </h3>
 
-            <p>
-                Los pagos correspondientes a talleres o mensualidades
-                deberán realizarse dentro de los plazos establecidos.
-            </p>
+                <p>
+                    Los alumnos deberán respetar los horarios
+                    establecidos para las clases y talleres.
+                </p>
 
-            <h3>5. Seguridad</h3>
 
-            <p>
-                El alumno deberá informar antecedentes médicos relevantes
-                para la realización de actividad física.
-            </p>
+                <h3>
+                    4. Pagos
+                </h3>
 
-            <button
-                type="button"
-                class="btn-entendido"
-                onclick="cerrarReglamento()"
-            >
-                Entendido
-            </button>
+                <p>
+                    Los pagos correspondientes a talleres o
+                    mensualidades deberán realizarse dentro de
+                    los plazos establecidos.
+                </p>
+
+
+                <h3>
+                    5. Seguridad
+                </h3>
+
+                <p>
+                    El alumno deberá informar antecedentes médicos
+                    relevantes para la realización de actividad física.
+                </p>
+
+
+                <!-- Espacio final para hacer evidente el término -->
+
+                <div class="fin-lectura">
+
+                    <span>
+                        FIN DEL REGLAMENTO
+                    </span>
+
+                    <p>
+                        Has llegado al final del documento.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Pie fijo -->
+
+            <div class="pie-reglamento">
+
+                <p id="estado-lectura">
+                    Desplázate hasta el final para continuar.
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn-reglamento-leido"
+                    id="btn-reglamento-leido"
+                    disabled
+                >
+                    He leído el reglamento
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <script>
 
-        function abrirReglamento() {
-            document.getElementById("modal-reglamento").style.display = "flex";
-        }
+    <!-- ======================================================
+         JAVASCRIPT
+         ====================================================== -->
 
-        function cerrarReglamento() {
-            document.getElementById("modal-reglamento").style.display = "none";
-        }
-
-    </script>
+    <script
+        src="{{ url_for('static', filename='js/registro_alumno.js') }}"
+        defer
+    ></script>
 
 </body>
 

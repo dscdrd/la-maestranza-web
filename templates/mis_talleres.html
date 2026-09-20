@@ -62,7 +62,7 @@
 
 
     <!-- =========================
-    CONTENIDO
+         CONTENIDO
     ========================== -->
 
     <main class="pagina-talleres">
@@ -70,7 +70,7 @@
         <section class="encabezado">
 
             <p class="subtitulo">
-                MIS INSCRIPCIONES
+                MIS TALLERES
             </p>
 
             <h1>
@@ -78,8 +78,8 @@
             </h1>
 
             <p class="descripcion">
-                Revisa tus talleres activos, el plan contratado
-                y las clases disponibles.
+                Revisa tus talleres activos y las clases
+                que tienes disponibles.
             </p>
 
         </section>
@@ -109,8 +109,8 @@
 
                                 </div>
 
-                                <span class="estado estado-{{ inscripcion.estado|lower }}">
-                                    {{ inscripcion.estado }}
+                                <span class="estado estado-activa">
+                                    Activo
                                 </span>
 
                             </div>
@@ -121,11 +121,11 @@
                                 <div class="dato">
 
                                     <span>
-                                        Plan
+                                        Clases contratadas
                                     </span>
 
                                     <strong>
-                                        {{ inscripcion.plan }}
+                                        {{ inscripcion.clases_contratadas }}
                                     </strong>
 
                                 </div>
@@ -134,11 +134,11 @@
                                 <div class="dato">
 
                                     <span>
-                                        Clases contratadas
+                                        Compras realizadas
                                     </span>
 
                                     <strong>
-                                        {{ inscripcion.clases_contratadas }}
+                                        {{ inscripcion.total_inscripciones }}
                                     </strong>
 
                                 </div>
@@ -178,8 +178,8 @@
 
                                 <a
                                     href="{{ url_for(
-                                        'clases_disponibles_alumno',
-                                        id_inscripcion=inscripcion.id_inscripcion
+                                        'clases_disponibles_taller',
+                                        id_taller=inscripcion.id_taller
                                     ) }}"
                                     class="btn-principal"
                                 >
@@ -202,7 +202,7 @@
             <section class="sin-talleres">
 
                 <p class="subtitulo">
-                    MIS INSCRIPCIONES
+                    MIS TALLERES
                 </p>
 
                 <h2>
@@ -211,7 +211,7 @@
 
                 <p>
                     Puedes revisar los talleres disponibles
-                    y elegir el plan que más te acomode.
+                    y contratar las clases que más te acomoden.
                 </p>
 
                 <a

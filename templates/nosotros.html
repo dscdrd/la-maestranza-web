@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Nosotros | La Maestranza</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/nosotros.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
+
+    <header class="navbar">
+
+        <a
+            href="{{ url_for('inicio') }}"
+            class="marca"
+        >
+
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo La Maestranza"
+            >
+
+            <span>
+                MAESTRANZA
+            </span>
+
+        </a>
+
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="{{ url_for('inicio') }}">
+                        Inicio
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('talleres') }}">
+                        Talleres
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('terapias') }}">
+                        Servicios terapéuticos
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ url_for('nosotros') }}"
+                        class="activo"
+                    >
+                        Nosotros
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+
+    <main>
+
+
+        <!-- =====================================================
+             PORTADA
+        ====================================================== -->
+
+        <section class="portada-nosotros">
+
+            <div class="portada-contenido">
+
+                <span class="etiqueta">
+                    LA MAESTRANZA
+                </span>
+
+                <h1>
+                    NOSOTROS
+                </h1>
+
+                <p>
+                    Personas que enseñan, entrenan, crean
+                    y hacen posible nuestra escuela.
+                </p>
+
+                <a
+                    href="#equipo"
+                    class="btn-conocer"
+                >
+                    CONOCE AL EQUIPO
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             PRESENTACIÓN EQUIPO DOCENTE
+        ====================================================== -->
+
+        <section
+            id="equipo"
+            class="inicio-equipo"
+        >
+
+            <span class="etiqueta-seccion">
+                QUIÉNES SOMOS
+            </span>
+
+            <h2>
+                EQUIPO DOCENTE
+            </h2>
+
+            <p>
+                Nuestro equipo reúne distintas disciplinas,
+                experiencias y formas de entender el movimiento.
+            </p>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             EQUIPO DOCENTE
+        ====================================================== -->
+
+        <section class="equipo-docente">
+
+
+            <!-- ALEXANDRA LEAL -->
+
+            <article class="persona">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/ale.jpg') }}"
+                        alt="Alexandra Leal"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        ARTES AÉREAS
+                    </span>
+
+                    <h3>
+                        Alexandra<br>
+                        Leal
+                    </h3>
+
+                    <p>
+                        Instructora en artes aéreas circenses (FIAAC 2024),
+                        especializada en aro aéreo. Cuenta con experiencia
+                        escénica activa como portora en la Troupe Club de
+                        las Águilas Sativas. En Maestranza Escuela es
+                        monitora de los talleres de Aro aéreo
+                        "Arandela Aérea" e Infancias en Movimiento.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- EDMUNDO ROBLES -->
+
+            <article class="persona persona-invertida">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/mundi.jpg') }}"
+                        alt="Edmundo Robles"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        ACONDICIONAMIENTO FÍSICO
+                    </span>
+
+                    <h3>
+                        Edmundo<br>
+                        Robles
+                    </h3>
+
+                    <p>
+                        Kinesiólogo con más de 10 años de trayectoria clínica,
+                        certificado en rehabilitación traumato deportiva.
+                        Aerealista desde 2019 con formación en tela, trapecio
+                        fijo, petit volant y mano a mano. Se desempeña como
+                        portor en la Troupe Club de las Águilas Sativas.
+                        Es nuestro monitor de Acondicionamiento físico
+                        y Crossfit.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- FELIPE HERNÁNDEZ -->
+
+            <article class="persona">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/pipe.png') }}"
+                        alt="Felipe Hernández"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        CIRCO INTEGRAL
+                    </span>
+
+                    <h3>
+                        Felipe<br>
+                        Hernández
+                    </h3>
+
+                    <p>
+                        Acróbata aéreo con más de 6 años de experiencia,
+                        egresado de El Circo del Mundo (generación 2022).
+                        Especialista en tela, cuerda lisa, cuadro fijo y
+                        petit volant, desempeñándose como portor y volante
+                        en la Troupe Club de las Águilas Sativas.
+                        Es nuestro monitor del taller de Circo Integral.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- MARIAGRACIA CUADRADO -->
+
+            <article class="persona persona-invertida">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/mare.png') }}"
+                        alt="Mariagracia Cuadrado"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        FLEXIBILIDAD
+                    </span>
+
+                    <h3>
+                        Mariagracia<br>
+                        Cuadrado
+                    </h3>
+
+                    <p>
+                        Artista escénica profesional y bailarina titulada
+                        de la Universidad de Chile. Cuenta con una destacada
+                        trayectoria en danza contemporánea e investigación
+                        del movimiento corporal. En Maestranza Escuela está
+                        a cargo del taller de Flexibilidad.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- ÁLVARO CARRASCO -->
+
+            <article class="persona">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/alvaro.jpg') }}"
+                        alt="Álvaro Carrasco"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        KARATE KYOKUSHIN
+                    </span>
+
+                    <h3>
+                        Álvaro<br>
+                        Carrasco
+                    </h3>
+
+                    <p>
+                        Artista marcial con más de 5 años de práctica y
+                        dedicación continua en Karate formativo. Desde el
+                        año 2024 forma parte de la escuela liderando las
+                        clases de Karate Kyokushin, fomentando la técnica,
+                        disciplina y autocontrol en sus estudiantes.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- ANDRÉS CONEI -->
+
+            <article class="persona persona-invertida">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/conei.jpg') }}"
+                        alt="Andrés Conei"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        STRAPS
+                    </span>
+
+                    <h3>
+                        Andrés<br>
+                        Conei
+                    </h3>
+
+                    <p>
+                        Artista circense de amplia trayectoria en las artes
+                        escénicas y aéreas. Destaca por su dominio y técnica
+                        dinámica en disciplinas como straps, cuerda lisa y
+                        tela. En nuestra escuela es el monitor a cargo del
+                        taller de Straps.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- BODI -->
+
+            <article class="persona">
+
+                <div class="persona-imagen">
+
+                    <img
+                        src="{{ url_for('static', filename='img/nosotros/bodi.png') }}"
+                        alt="Bodi"
+                    >
+
+                </div>
+
+
+                <div class="persona-info">
+
+                    <span class="persona-area">
+                        ACROBACIA
+                    </span>
+
+                    <h3>
+                        Bodi
+                    </h3>
+
+                    <p>
+                        Artista circense enfocada en la preparación física,
+                        la acrobacia de piso y la flexibilidad dinámica.
+                        Su trabajo combina el rigor técnico con la exploración
+                        corporal. En Maestranza Escuela guía los talleres de
+                        Infancias en Movimiento y Acrobacia.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+             CLUB DE LAS ÁGUILAS SATIVAS
+        ====================================================== -->
+
+        <section class="aguilas">
+
+
+            <!-- ENCABEZADO -->
+
+            <div class="aguilas-encabezado">
+
+                <span class="aguilas-etiqueta">
+                    PETIT VOLANT · FLIGHT ATTACK
+                </span>
+
+                <h2>
+                    CLUB DE LAS<br>
+                    ÁGUILAS SATIVAS
+                </h2>
+
+            </div>
+
+
+
+            <!-- FOTO PRINCIPAL -->
+
+            <div class="aguilas-foto-principal">
+
+                <img
+                    src="{{ url_for('static', filename='img/nosotros/aguilas.jpg') }}"
+                    alt="Club de las Águilas Sativas"
+                >
+
+            </div>
+
+
+
+            <!-- PRESENTACIÓN -->
+
+            <div class="aguilas-presentacion">
+
+                <div class="aguilas-titulo-secundario">
+
+                    <span>
+                        LA TROUPE
+                    </span>
+
+                    <h3>
+                        Petit Volant<br>
+                        y acrobacia aérea.
+                    </h3>
+
+                </div>
+
+
+                <div class="aguilas-texto">
+
+                    <p>
+                        El Club de las Águilas Sativas es nuestra troupe
+                        especializada en Petit Volant y acrobacias aéreas
+                        de alto impacto. Este colectivo reúne tanto a
+                        nuestros profesores de casa como a destacados
+                        referentes del circo contemporáneo, garantizando
+                        un espacio de entrenamiento riguroso, técnico y
+                        con altos estándares de seguridad.
+                    </p>
+
+                    <p>
+                        La troupe lidera nuestras clases regulares de
+                        Petit Volant y los encuentros de vuelos
+                        "Flight Attack", conformada por un equipo de
+                        amplia trayectoria escénica:
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- INTEGRANTES -->
+
+            <div class="aguilas-integrantes">
+
+
+                <div class="integrante">
+
+                    <h4>
+                        Juan Pablo Reyes
+                    </h4>
+
+                    <p>
+                        Egresado de El Circo del Mundo y uno de los
+                        acróbatas de petit volant con mayor experiencia
+                        de la región; es el guía principal y maestro
+                        técnico tanto en las clases regulares como en
+                        los encuentros abiertos de vuelo.
+                    </p>
+
+                </div>
+
+
+
+                <div class="integrante">
+
+                    <h4>
+                        Criss Roger
+                    </h4>
+
+                    <p>
+                        Artista circense integral y especialista en
+                        trapecio fijo, quien aporta su destreza en el
+                        aire desempeñándose como monitor guía y
+                        acróbata volante.
+                    </p>
+
+                </div>
+
+
+
+                <div class="integrante">
+
+                    <h4>
+                        Felipe Hernández
+                    </h4>
+
+                    <p>
+                        Monitor de nuestra escuela, acróbata de vuelo
+                        y portor fundamental en la estructura del equipo.
+                    </p>
+
+                </div>
+
+
+
+                <div class="integrante">
+
+                    <h4>
+                        Edmundo Robles
+                    </h4>
+
+                    <p>
+                        Monitor, kinesiólogo y portor, pieza clave en
+                        la confianza y biomecánica de cada lanzamiento.
+                    </p>
+
+                </div>
+
+
+
+                <div class="integrante">
+
+                    <h4>
+                        Alexandra Leal
+                    </h4>
+
+                    <p>
+                        Monitora e instructora aérea, quien aporta su
+                        técnica, precisión y solidez en el rol de portora.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+                COLABORACIÓN Y SOPORTE
+        ====================================================== -->
+
+        <section class="colaboracion">
+
+
+            <div class="colaboracion-encabezado">
+
+                <span class="etiqueta-seccion">
+                    DETRÁS DE LA ESCENA
+                </span>
+
+                <h2>
+                    COLABORACIÓN<br>
+                    Y SOPORTE
+                </h2>
+
+            </div>
+
+
+
+            <div class="colaboradores">
+
+
+                <!-- TATI ROSSO -->
+
+                <article class="colaborador">
+
+                    <div class="colaborador-foto">
+
+                        <img
+                            src="{{ url_for('static', filename='img/nosotros/tati.jpg') }}"
+                            alt="Tati Rosso"
+                        >
+
+                    </div>
+
+
+                    <div class="colaborador-info">
+
+                        <span class="colaborador-area">
+                            REALIZACIÓN  AUDIOVISUAL
+                        </span>
+
+                        <h3>
+                            Tati Rosso
+                        </h3>
+
+                        <p>
+                            Realizadora audiovisual con más de 12 años
+                            de trayectoria en el sector público, privado
+                            y comunitario. Especializada en fotografía
+                            y registro de artes escénicas, música y cultura.
+                            Es la encargada de la cobertura fotográfica
+                            y creación audiovisual de nuestros talleres
+                            y eventos. Alumna activa de nuestros talleres
+                            y actividades.
+                        </p>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- CLAUDIO CUADRADO -->
+
+                <article class="colaborador">
+
+                    <div class="colaborador-foto">
+
+                        <img
+                            src="{{ url_for('static', filename='img/nosotros/claudio.png') }}"
+                            alt="Claudio Cuadrado"
+                        >
+
+                    </div>
+
+
+                    <div class="colaborador-info">
+
+                        <span class="colaborador-area">
+                            MÚSICA · TECNOLOGÍA
+                        </span>
+
+                        <h3>
+                            Claudio Cuadrado
+                        </h3>
+
+                        <p>
+                            DJ con más de 10 años de experiencia, en
+                            proceso de titulación de la carrera Técnico
+                            en Informática. Está a cargo de la ambientación
+                            musical y soporte técnico de eventos, además
+                            del diseño y desarrollo de nuestra plataforma
+                            web oficial. Alumno activo de nuestros talleres,
+                            el último año se ha enfocado en la técnica del
+                            Petit Volant.
+                        </p>
+
+                    </div>
+
+                </article>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

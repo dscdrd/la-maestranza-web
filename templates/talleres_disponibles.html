@@ -130,6 +130,16 @@
                             <div class="datos-taller">
 
                                 <p>
+                                    <strong>Profesor/a:</strong>
+
+                                    {% if taller.profesor %}
+                                        {{ taller.profesor }}
+                                    {% else %}
+                                        Profesor por confirmar
+                                    {% endif %}
+                                </p>
+
+                                <p>
                                     <strong>Horario:</strong>
                                     {{ taller.horario }}
                                 </p>

@@ -4,19 +4,13 @@
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Mis estadísticas | La Maestranza</title>
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/panel_profesor.css') }}"
-    >
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/mis_estadisticas.css') }}"
+        href="{{ url_for('static', filename='css/mis_estadisticas_profesor.css') }}"
     >
 
     <script
@@ -29,11 +23,49 @@
 
 <body>
 
+    <!-- =====================================================
+            BARRA SUPERIOR
+    ====================================================== -->
+
+    <header class="barra">
+
+        <div class="marca">
+
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo La Maestranza"
+                class="logo"
+            >
+
+            <span>
+                MAESTRANZA - ESCUELA DEL MOVIMIENTO
+            </span>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('panel_profesor') }}"
+            class="enlace-panel"
+        >
+            Mi panel
+        </a>
+
+    </header>
+
+
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+
     <main
-        class="panel"
+        class="contenedor"
         id="estadisticas-profesor"
-        data-api-url="{{ url_for('api_profesor_estadisticas') }}"
+        data-api-url="{{ url_for('api.estadisticas_profesor') }}"
     >
+
+
+        <!-- VOLVER -->
 
         <a
             class="volver"
@@ -43,9 +75,13 @@
         </a>
 
 
-        <section class="bienvenida">
+        <!-- =================================================
+             ENCABEZADO
+        ================================================== -->
 
-            <p class="subtitulo">
+        <section class="encabezado">
+
+            <p class="etiqueta">
                 PANEL DE PROFESOR
             </p>
 
@@ -53,25 +89,30 @@
                 Mis estadísticas
             </h1>
 
-            <p>
-                Resumen de tus talleres, alumnos,
-                reservas y ocupación.
+            <p class="descripcion">
+                Una vista general de la actividad de tus talleres.
             </p>
 
         </section>
 
 
+        <!-- =================================================
+             ESTADO DE CARGA / ERROR
+        ================================================== -->
+
         <p
             id="estado"
+            class="estado-carga"
             role="status"
             aria-live="polite"
         >
-            Cargando tus estadísticas…
+            Cargando estadísticas…
         </p>
 
 
         <button
             id="reintentar"
+            class="btn-reintentar"
             type="button"
             hidden
         >
@@ -79,158 +120,125 @@
         </button>
 
 
+        <!-- =================================================
+             CONTENIDO GENERADO DESDE LA API
+        ================================================== -->
+
         <div
             id="contenido"
             hidden
         >
 
+
+            <!-- =============================================
+                 INDICADORES GENERALES
+            ============================================== -->
+
             <section
                 class="metricas"
-                aria-label="Resumen del profesor"
+                aria-label="Resumen general"
             >
 
-                <article class="tarjeta metrica">
+                <div class="metrica">
 
-                    <h2>
-                        Talleres asignados
-                    </h2>
-
-                    <strong
-                        id="talleres_asignados"
-                    >
+                    <strong id="talleres_asignados">
+                        0
                     </strong>
 
-                    <p>
-                        Talleres actualmente asignados
-                        a tu perfil.
-                    </p>
+                    <span>
+                        Talleres
+                    </span>
 
-                </article>
+                </div>
 
 
-                <article class="tarjeta metrica">
+                <div class="metrica">
 
-                    <h2>
+                    <strong id="alumnos_activos">
+                        0
+                    </strong>
+
+                    <span>
                         Alumnos activos
-                    </h2>
+                    </span>
 
-                    <strong
-                        id="alumnos_activos"
-                    >
+                </div>
+
+
+                <div class="metrica">
+
+                    <strong id="reservas_activas">
+                        0
                     </strong>
 
-                    <p>
-                        Alumnos con inscripciones activas
-                        en tus talleres.
-                    </p>
+                    <span>Clases reservadas
+                        
+                    </span>
 
-                </article>
+                </div>
 
 
-                <article class="tarjeta metrica">
+                <div class="metrica">
 
-                    <h2>
-                        Próximas clases
-                    </h2>
-
-                    <strong
-                        id="proximas_clases"
-                    >
+                    <strong id="reservas_canceladas">
+                        0
                     </strong>
 
-                    <p>
-                        Clases programadas que todavía
-                        no han comenzado.
-                    </p>
+                    <span>
+                        Clases Canceladas
+                    </span>
 
-                </article>
-
-
-                <article class="tarjeta metrica">
-
-                    <h2>
-                        Reservas activas
-                    </h2>
-
-                    <strong
-                        id="reservas_activas"
-                    >
-                    </strong>
-
-                    <p>
-                        Reservas actualmente activas
-                        en tus talleres.
-                    </p>
-
-                </article>
-
-
-                <article class="tarjeta metrica">
-
-                    <h2>
-                        Reservas canceladas
-                    </h2>
-
-                    <strong
-                        id="reservas_canceladas"
-                    >
-                    </strong>
-
-                    <p>
-                        Total histórico de reservas
-                        canceladas.
-                    </p>
-
-                </article>
-
-
-                <article class="tarjeta metrica">
-
-                    <h2>
-                        Ocupación promedio
-                    </h2>
-
-                    <strong
-                        id="ocupacion_promedio"
-                    >
-                    </strong>
-
-                    <p>
-                        Porcentaje promedio de ocupación
-                        de tus talleres.
-                    </p>
-
-                </article>
+                </div>
 
             </section>
 
 
-            <section>
+            <!-- =============================================
+                 ESTADÍSTICAS POR TALLER
+            ============================================== -->
 
-    <h2>
-        Estadísticas por taller
-    </h2>
+            <section class="seccion-talleres">
 
-    <p class="nota">
-        Resumen de clases, cupos, reservas y ocupación
-        de cada uno de tus talleres.
-    </p>
+                <div class="titulo-seccion">
 
-    <div
-        id="ranking-talleres"
-        class="talleres-estadisticas"
-    >
-    </div>
+                    <div>
 
-    <p
-        id="sin-talleres"
-        hidden
-    >
-        No tienes talleres asignados
-        para mostrar.
-    </p>
+                        <p class="etiqueta">
+                            RENDIMIENTO
+                        </p>
 
-</section>
+                        <h2>
+                            Estadísticas por taller
+                        </h2>
+
+                    </div>
+
+
+                    <p>
+                        Ocupación y asistencia de tus talleres.
+                    </p>
+
+                </div>
+
+
+                <!-- JavaScript genera los talleres aquí -->
+
+                <div
+                    id="ranking-talleres"
+                    class="talleres-estadisticas"
+                >
+                </div>
+
+
+                <p
+                    id="sin-talleres"
+                    class="sin-talleres"
+                    hidden
+                >
+                    No tienes talleres asignados para mostrar.
+                </p>
+
+            </section>
 
 
         </div>

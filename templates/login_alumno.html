@@ -8,15 +8,18 @@
 </head>
 <body>
     <main class="login_alumno">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo de la Maestranza Escuela del Movimiento" class="logo-alumno">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" 
+        alt="Logo de la Maestranza Escuela del Movimiento" class="logo-alumno">
 
         <h1>INICIAR SESIÓN</h1>
+
+
         <form class="form-login" method="POST"> 
 
             <h2>PERFIL ALUMNO</h2>
 
             <input type="email" name="correo" placeholder="Correo electrónico" required>
-
+            
             <input type="password" name="contrasena" placeholder="Contraseña" required>
 
             <button type="submit" class="btn-ingresar">Iniciar Sesión</button>
