@@ -1,14 +1,9 @@
-from db import conectar_db
-
-
-
-
 # ============================================================
 # SERVICIOS - LÓGICA DE NEGOCIO
 # LA MAESTRANZA
 # ============================================================
 
-
+from db import conectar_db
 
 # ============================================================
 # USUARIOS / AUTENTICACIÓN
@@ -428,256 +423,6 @@ def eliminar_cuenta_alumno(id_usuario):
 
 
 
-def obtener_estadisticas_alumno(id_usuario):
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # ==================================================
-        # 1. OBTENER ALUMNO
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-                id_alumno,
-                nombre,
-                apellido
-            FROM alumnos
-            WHERE id_usuario = %s
-        """, (id_usuario,))
-
-        alumno = cursor.fetchone()
-
-        if not alumno:
-            return None
-
-
-        id_alumno = alumno["id_alumno"]
-
-
-        # ==================================================
-        # 2. TALLERES Y CLASES CONTRATADAS VIGENTES
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-                COUNT(DISTINCT id_taller)
-                    AS talleres_vigentes,
-
-                COALESCE(
-                    SUM(clases_contratadas),
-                    0
-                )
-                    AS clases_contratadas_vigentes
-
-            FROM inscripciones
-
-            WHERE id_alumno = %s
-            AND estado = 'activa'
-            AND fecha_inicio <= CURDATE()
-            AND fecha_vencimiento >= CURDATE()
-        """, (id_alumno,))
-
-        planes = cursor.fetchone()
-
-
-        # ==================================================
-        # 3. RESERVAS
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-
-                COUNT(*)
-                    AS total_reservas,
-
-                COALESCE(
-                    SUM(
-                        CASE
-                            WHEN r.estado = 'cancelada'
-                            THEN 1
-                            ELSE 0
-                        END
-                    ),
-                    0
-                )
-                    AS reservas_canceladas,
-
-                COALESCE(
-                    SUM(
-                        CASE
-                            WHEN r.estado = 'reservada'
-                            AND c.estado = 'programada'
-                            AND TIMESTAMP(
-                                c.fecha,
-                                c.hora_inicio
-                            ) > NOW()
-                            THEN 1
-                            ELSE 0
-                        END
-                    ),
-                    0
-                )
-                    AS reservas_proximas
-
-            FROM reservas_clase r
-
-            INNER JOIN inscripciones i
-                ON i.id_inscripcion =
-                    r.id_inscripcion
-
-            INNER JOIN clases c
-                ON c.id_clase =
-                    r.id_clase
-
-            WHERE i.id_alumno = %s
-        """, (id_alumno,))
-
-        reservas = cursor.fetchone()
-
-
-        # ==================================================
-        # 4. TALLERES MÁS RESERVADOS
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-
-                t.nombre AS taller,
-
-                COUNT(*) AS reservas
-
-            FROM reservas_clase r
-
-            INNER JOIN inscripciones i
-                ON i.id_inscripcion =
-                    r.id_inscripcion
-
-            INNER JOIN clases c
-                ON c.id_clase =
-                    r.id_clase
-
-            INNER JOIN talleres t
-                ON t.id_taller =
-                    c.id_taller
-
-            WHERE i.id_alumno = %s
-
-            AND r.estado = 'reservada'
-
-            AND c.estado <> 'cancelada'
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY
-                reservas DESC,
-                t.nombre
-        """, (id_alumno,))
-
-        talleres = cursor.fetchall()
-
-
-        # ==================================================
-        # 5. NORMALIZAR DATOS
-        # ==================================================
-
-        estadisticas = {
-
-            "talleres_vigentes":
-                int(
-                    planes["talleres_vigentes"]
-                    or 0
-                ),
-
-            "clases_contratadas_vigentes":
-                int(
-                    planes[
-                        "clases_contratadas_vigentes"
-                    ]
-                    or 0
-                ),
-
-            "reservas_proximas":
-                int(
-                    reservas["reservas_proximas"]
-                    or 0
-                ),
-
-            "total_reservas":
-                int(
-                    reservas["total_reservas"]
-                    or 0
-                ),
-
-            "reservas_canceladas":
-                int(
-                    reservas[
-                        "reservas_canceladas"
-                    ]
-                    or 0
-                ),
-
-            "porcentaje_asistencia":
-                None,
-
-            "porcentaje_inasistencia":
-                None
-
-        }
-
-
-        talleres_formateados = [
-
-            {
-                "taller":
-                    taller["taller"],
-
-                "reservas":
-                    int(
-                        taller["reservas"]
-                        or 0
-                    )
-            }
-
-            for taller in talleres
-
-        ]
-
-
-        # ==================================================
-        # 6. RESULTADO
-        # ==================================================
-
-        return {
-
-            "alumno": {
-                "id_alumno":
-                    id_alumno,
-
-                "nombre":
-                    alumno["nombre"],
-
-                "apellido":
-                    alumno["apellido"]
-            },
-
-            "estadisticas":
-                estadisticas,
-
-            "mis_talleres_mas_reservados":
-                talleres_formateados
-
-        }
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
 
 
 def obtener_estadisticas_alumno(id_usuario):
@@ -1008,6 +753,377 @@ def obtener_estadisticas_alumno(id_usuario):
 # ------------------------------------------------------------
 # PROFESORES
 # ------------------------------------------------------------
+
+def eliminar_cuenta_profesor(id_usuario):
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # Obtener profesor
+        cursor.execute(
+            """
+            SELECT id_profesor
+            FROM profesores
+            WHERE id_usuario = %s
+            """,
+            (id_usuario,)
+        )
+
+        profesor = cursor.fetchone()
+
+        if not profesor:
+            return False
+
+
+        id_profesor = profesor["id_profesor"]
+
+
+        # Eliminar relaciones con talleres
+        cursor.execute(
+            """
+            DELETE FROM taller_profesor
+            WHERE id_profesor = %s
+            """,
+            (id_profesor,)
+        )
+
+
+        # Eliminar profesor
+        cursor.execute(
+            """
+            DELETE FROM profesores
+            WHERE id_profesor = %s
+            """,
+            (id_profesor,)
+        )
+
+
+        # Eliminar usuario
+        cursor.execute(
+            """
+            DELETE FROM usuarios
+            WHERE id_usuario = %s
+            """,
+            (id_usuario,)
+        )
+
+
+        conexion.commit()
+
+        return True
+
+
+    except Exception:
+
+        conexion.rollback()
+
+        raise
+
+
+    finally:
+
+        cursor.close()
+        conexion.close()
+
+def obtener_estadisticas_profesor(id_usuario):
+
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # ==================================================
+        # 1. OBTENER PROFESOR
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+                id_profesor,
+                nombre,
+                apellido
+            FROM profesores
+            WHERE id_usuario = %s
+        """, (id_usuario,))
+
+        profesor = cursor.fetchone()
+
+        if not profesor:
+            return None
+
+
+        id_profesor = profesor["id_profesor"]
+
+
+        # ==================================================
+        # 2. TALLERES ASIGNADOS
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(DISTINCT id_taller) AS total
+            FROM taller_profesor
+            WHERE id_profesor = %s
+        """, (id_profesor,))
+
+        talleres_asignados = int(
+            cursor.fetchone()["total"] or 0
+        )
+
+
+        # ==================================================
+        # 3. ALUMNOS ACTIVOS
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(DISTINCT i.id_alumno) AS total
+            FROM inscripciones i
+
+            INNER JOIN taller_profesor tp
+                ON i.id_taller = tp.id_taller
+
+            WHERE tp.id_profesor = %s
+            AND i.estado = 'activa'
+        """, (id_profesor,))
+
+        alumnos_activos = int(
+            cursor.fetchone()["total"] or 0
+        )
+
+
+        # ==================================================
+        # 4. PRÓXIMAS CLASES
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+                COUNT(DISTINCT c.id_clase) AS total
+            FROM clases c
+
+            INNER JOIN taller_profesor tp
+                ON c.id_taller = tp.id_taller
+
+            WHERE tp.id_profesor = %s
+            AND c.estado = 'programada'
+            AND TIMESTAMP(
+                c.fecha,
+                c.hora_inicio
+            ) > NOW()
+        """, (id_profesor,))
+
+        proximas_clases = int(
+            cursor.fetchone()["total"] or 0
+        )
+
+
+        # ==================================================
+        # 5. RESERVAS ACTIVAS Y CANCELADAS
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+
+                COUNT(
+                    CASE
+                        WHEN r.estado = 'reservada'
+                        THEN r.id_reserva
+                    END
+                ) AS reservas_activas,
+
+                COUNT(
+                    CASE
+                        WHEN r.estado = 'cancelada'
+                        THEN r.id_reserva
+                    END
+                ) AS reservas_canceladas
+
+            FROM reservas_clase r
+
+            INNER JOIN clases c
+                ON r.id_clase = c.id_clase
+
+            INNER JOIN taller_profesor tp
+                ON c.id_taller = tp.id_taller
+
+            WHERE tp.id_profesor = %s
+        """, (id_profesor,))
+
+        reservas = cursor.fetchone()
+
+
+        # ==================================================
+        # 6. ESTADÍSTICAS POR TALLER
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+
+                t.id_taller,
+
+                t.nombre AS taller,
+
+                COUNT(DISTINCT c.id_clase)
+                    AS total_clases,
+
+                COALESCE(
+                    SUM(c.cupo_maximo),
+                    0
+                ) AS cupos_totales,
+
+                COUNT(
+                    CASE
+                        WHEN r.estado = 'reservada'
+                        THEN r.id_reserva
+                    END
+                ) AS reservas_activas,
+
+                COUNT(
+                    CASE
+                        WHEN r.estado = 'cancelada'
+                        THEN r.id_reserva
+                    END
+                ) AS reservas_canceladas
+
+            FROM talleres t
+
+            INNER JOIN taller_profesor tp
+                ON t.id_taller = tp.id_taller
+
+            LEFT JOIN clases c
+                ON t.id_taller = c.id_taller
+
+            LEFT JOIN reservas_clase r
+                ON c.id_clase = r.id_clase
+
+            WHERE tp.id_profesor = %s
+
+            GROUP BY
+                t.id_taller,
+                t.nombre
+
+            ORDER BY
+                reservas_activas DESC,
+                t.nombre
+        """, (id_profesor,))
+
+        talleres = cursor.fetchall()
+
+
+        # ==================================================
+        # 7. CALCULAR OCUPACIÓN
+        # ==================================================
+
+        for taller in talleres:
+
+            cupos = int(
+                taller["cupos_totales"] or 0
+            )
+
+            activas = int(
+                taller["reservas_activas"] or 0
+            )
+
+            canceladas = int(
+                taller["reservas_canceladas"] or 0
+            )
+
+            total_clases = int(
+                taller["total_clases"] or 0
+            )
+
+
+            if cupos > 0:
+
+                porcentaje = (
+                    activas / cupos
+                ) * 100
+
+            else:
+
+                porcentaje = 0
+
+
+            taller["cupos_totales"] = cupos
+            taller["reservas_activas"] = activas
+            taller["reservas_canceladas"] = canceladas
+            taller["total_clases"] = total_clases
+
+            taller["porcentaje_ocupacion"] = round(
+                porcentaje,
+                2
+            )
+
+
+        # ==================================================
+        # 8. OCUPACIÓN PROMEDIO
+        # ==================================================
+
+        if talleres:
+
+            ocupacion_promedio = sum(
+                taller["porcentaje_ocupacion"]
+                for taller in talleres
+            ) / len(talleres)
+
+        else:
+
+            ocupacion_promedio = 0
+
+
+        # ==================================================
+        # 9. RESPUESTA
+        # ==================================================
+
+        return {
+
+            "profesor": {
+                "nombre": profesor["nombre"],
+                "apellido": profesor["apellido"]
+            },
+
+            "estadisticas": {
+
+                "talleres_asignados":
+                    talleres_asignados,
+
+                "alumnos_activos":
+                    alumnos_activos,
+
+                "proximas_clases":
+                    proximas_clases,
+
+                "reservas_activas":
+                    int(
+                        reservas["reservas_activas"]
+                        or 0
+                    ),
+
+                "reservas_canceladas":
+                    int(
+                        reservas["reservas_canceladas"]
+                        or 0
+                    ),
+
+                "ocupacion_promedio":
+                    round(
+                        ocupacion_promedio,
+                        2
+                    )
+            },
+
+            "talleres": talleres
+        }
+
+
+    finally:
+
+        cursor.close()
+        conexion.close()
+
+
+
 def obtener_profesor_por_usuario(id_usuario):
 
     conexion = conectar_db()
@@ -1981,152 +2097,6 @@ def cancelar_reserva_alumno(id_reserva):
         conexion.close()
 
 
-def obtener_clases_inscripcion_alumno(
-    id_inscripcion,
-    id_usuario
-):
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # ==================================================
-        # 1. VALIDAR INSCRIPCIÓN DEL ALUMNO
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-                i.id_inscripcion,
-                i.id_taller,
-                i.estado,
-                i.clases_contratadas,
-                t.nombre AS taller
-
-            FROM inscripciones i
-
-            INNER JOIN alumnos a
-                ON i.id_alumno = a.id_alumno
-
-            INNER JOIN talleres t
-                ON i.id_taller = t.id_taller
-
-            WHERE i.id_inscripcion = %s
-            AND a.id_usuario = %s
-            AND i.estado = 'activa'
-        """, (
-            id_inscripcion,
-            id_usuario
-        ))
-
-        inscripcion = cursor.fetchone()
-
-        if not inscripcion:
-            return None
-
-
-        id_taller = inscripcion["id_taller"]
-
-
-        # ==================================================
-        # 2. CONTAR CLASES UTILIZADAS
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-                COUNT(*) AS usadas
-            FROM reservas_clase
-            WHERE id_inscripcion = %s
-            AND consume_clase = 1
-        """, (
-            id_inscripcion,
-        ))
-
-        resultado = cursor.fetchone()
-
-        clases_usadas = int(
-            resultado["usadas"] or 0
-        )
-
-
-        # ==================================================
-        # 3. CALCULAR CLASES DISPONIBLES
-        # ==================================================
-
-        clases_contratadas = int(
-            inscripcion["clases_contratadas"] or 0
-        )
-
-        clases_disponibles = (
-            clases_contratadas - clases_usadas
-        )
-
-
-        # ==================================================
-        # 4. OBTENER CLASES FUTURAS DEL TALLER
-        # ==================================================
-
-        cursor.execute("""
-            SELECT
-                c.id_clase,
-                c.fecha,
-                c.hora_inicio,
-                c.hora_fin,
-                c.cupo_maximo,
-                c.estado,
-
-                (
-                    SELECT COUNT(*)
-                    FROM reservas_clase r
-                    WHERE r.id_clase = c.id_clase
-                    AND r.estado = 'reservada'
-                ) AS reservados,
-
-                (
-                    SELECT r2.id_reserva
-                    FROM reservas_clase r2
-                    WHERE r2.id_clase = c.id_clase
-                    AND r2.id_inscripcion = %s
-                    AND r2.estado = 'reservada'
-                    LIMIT 1
-                ) AS mi_reserva
-
-            FROM clases c
-
-            WHERE c.id_taller = %s
-            AND c.estado = 'programada'
-            AND TIMESTAMP(
-                c.fecha,
-                c.hora_inicio
-            ) > NOW()
-
-            ORDER BY
-                c.fecha,
-                c.hora_inicio
-        """, (
-            id_inscripcion,
-            id_taller
-        ))
-
-        clases = cursor.fetchall()
-
-
-        # ==================================================
-        # 5. DEVOLVER RESULTADO
-        # ==================================================
-
-        return {
-            "inscripcion": inscripcion,
-            "clases": clases,
-            "clases_usadas": clases_usadas,
-            "clases_disponibles": clases_disponibles
-        }
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
 # ============================================================
 # ASISTENCIAS
 # ============================================================

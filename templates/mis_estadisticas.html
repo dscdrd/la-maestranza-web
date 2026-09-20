@@ -12,12 +12,15 @@
 
     <title>Mis estadísticas | La Maestranza</title>
 
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/mis_estadisticas.css') }}"
     >
-
 
     <script
         src="{{ url_for('static', filename='js/mis_estadisticas.js') }}"
@@ -29,42 +32,12 @@
 
 <body>
 
+    <!-- =========================
+             BANNER SUPERIOR
+         ========================= -->
 
-    <!-- =====================================================
-         BARRA SUPERIOR
-    ====================================================== -->
+    {% include "banner.html" %}
 
-    <header class="barra">
-
-        <div class="marca">
-
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo La Maestranza"
-                class="logo"
-            >
-
-            <span>
-                MAESTRANZA - ESCUELA DEL MOVIMIENTO
-            </span>
-
-        </div>
-
-
-        <a
-            href="{{ url_for('panel_alumno') }}"
-            class="enlace-panel"
-        >
-            Mi panel
-        </a>
-
-    </header>
-
-
-
-    <!-- =====================================================
-         CONTENIDO
-    ====================================================== -->
 
     <main
         class="contenedor"
@@ -72,8 +45,9 @@
         data-api-url="{{ url_for('api.api_alumno_estadisticas') }}"
     >
 
-
-        <!-- VOLVER -->
+        <!-- =========================
+                 VOLVER
+             ========================= -->
 
         <a
             class="volver"
@@ -83,10 +57,9 @@
         </a>
 
 
-
-        <!-- =================================================
-             ENCABEZADO
-        ================================================== -->
+        <!-- ================================================
+                 ENCABEZADO
+             ================================================ -->
 
         <section class="encabezado">
 
@@ -108,10 +81,9 @@
         </section>
 
 
-
-        <!-- =================================================
-             CARGA
-        ================================================== -->
+        <!-- ================================================
+                 CARGA
+             ================================================ -->
 
         <p
             id="estado"
@@ -133,10 +105,9 @@
         </button>
 
 
-
-        <!-- =================================================
-             CONTENIDO API
-        ================================================== -->
+        <!-- ================================================
+                 CONTENIDO API
+             ================================================ -->
 
         <div
             id="contenido"
@@ -144,15 +115,14 @@
         >
 
 
-            <!-- =============================================
-                 4 MÉTRICAS PRINCIPALES
-            ============================================== -->
+            <!-- ============================================
+                     4 MÉTRICAS PRINCIPALES
+                 ============================================ -->
 
             <section
                 class="metricas"
                 aria-label="Resumen general"
             >
-
 
                 <div class="metrica">
 
@@ -165,7 +135,6 @@
                     </span>
 
                 </div>
-
 
 
                 <div class="metrica">
@@ -181,7 +150,6 @@
                 </div>
 
 
-
                 <div class="metrica">
 
                     <strong id="reservas_proximas">
@@ -193,7 +161,6 @@
                     </span>
 
                 </div>
-
 
 
                 <div class="metrica">
@@ -208,14 +175,12 @@
 
                 </div>
 
-
             </section>
 
 
-
-            <!-- =============================================
-                 ASISTENCIA
-            ============================================== -->
+            <!-- ============================================
+                     ASISTENCIA
+                 ============================================ -->
 
             <section class="seccion-asistencia">
 
@@ -282,7 +247,6 @@
                     </div>
 
 
-
                     <!-- INASISTENCIA -->
 
                     <div class="dato-asistencia">
@@ -320,7 +284,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -337,10 +300,9 @@
             </section>
 
 
-
-            <!-- =============================================
-                 TALLERES MÁS RESERVADOS
-            ============================================== -->
+            <!-- ============================================
+                     TALLERES MÁS RESERVADOS
+                 ============================================ -->
 
             <section class="seccion-talleres">
 
@@ -366,13 +328,11 @@
                 </div>
 
 
-
                 <div
                     id="ranking-talleres"
                     class="talleres-estadisticas"
                 >
                 </div>
-
 
 
                 <p
@@ -385,11 +345,9 @@
 
             </section>
 
-
         </div>
 
     </main>
-
 
 </body>
 

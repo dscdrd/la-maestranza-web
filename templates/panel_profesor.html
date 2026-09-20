@@ -2,53 +2,44 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Panel Profesor | Maestranza</title>
 
-    <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/panel_profesor.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/panel_profesor.css') }}"
+    >
+
 </head>
+
 
 <body>
 
-    <header>
+    <!-- =========================
+         BARRA SUPERIOR
+    ========================== -->
 
-        <nav class="navbar">
-
-            <div class="marca">
-
-                <img
-                    src="{{ url_for('static', filename='img/logo.png') }}"
-                    alt="Logo Maestranza"
-                    class="logo"
-                >
-
-                <span>MAESTRANZA - ESCUELA DEL MOVIMIENTO</span>
-
-            </div>
-            <div class="nav-acciones">
-
-                <a href="{{ url_for('inicio') }}">
-                    Inicio
-                </a>
-
-                
-
-                <a href="{{ url_for('cerrar_sesion') }}"
-                class="btn-cerrar">
-                    Cerrar sesión
-                </a>
-
-            </div>
-
-        </nav>
-
-    </header>
+    {% include "banner.html" %}
 
 
     <main class="panel">
+
+
+        <!-- =========================
+             BIENVENIDA
+        ========================== -->
 
         <section class="bienvenida">
 
@@ -67,50 +58,59 @@
         </section>
 
 
-        <section class="datos-profesor tarjeta" id="mi-perfil">
+        <!-- =========================
+             PERFIL
+        ========================== -->
+
+        <section
+            class="datos-profesor tarjeta"
+            id="mi-perfil"
+        >
 
             <div class="titulo-tarjeta">
 
                 <div class="perfil-resumen">
+
+
                     {% if profesor.foto_perfil %}
 
-    <img
-        src="{{ url_for(
-            'static',
-            filename='img/perfiles/' + profesor.foto_perfil
-        ) }}"
-        alt="Foto de perfil"
-        class="avatar-perfil"
-    >
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename='img/perfiles/' + profesor.foto_perfil
+                            ) }}"
+                            alt="Foto de perfil"
+                            class="avatar-perfil"
+                        >
 
-{% else %}
+                    {% else %}
 
-    <img
-        src="{{ url_for(
-            'static',
-            filename='img/logo-maestranza.png'
-        ) }}"
-        alt="Avatar predeterminado de La Maestranza"
-        class="avatar-perfil avatar-predeterminado"
-    >
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename='img/logo-maestranza.png'
+                            ) }}"
+                            alt="Avatar predeterminado de La Maestranza"
+                            class="avatar-perfil avatar-predeterminado"
+                        >
 
-{% endif %}
+                    {% endif %}
 
 
-                    <h2>Mi perfil</h2>
+                    <h2>
+                        Mi perfil
+                    </h2>
 
-                    <form>
-                        <a
-                            href="{{ url_for('editar_perfil_profesor') }}"
-                            class="btn-editar-perfil"
->
-    Editar mis datos
-</a>
-                    </form>
-    
 
+                    <a
+                        href="{{ url_for('editar_perfil_profesor') }}"
+                        class="btn-editar-perfil"
+                    >
+                        Editar mis datos
+                    </a>
 
                 </div>
+
 
                 <span class="estado">
                     Profesor
@@ -119,14 +119,22 @@
             </div>
 
 
+            <!-- =========================
+                 DATOS PROFESOR
+            ========================== -->
+
             <div class="datos-grid">
+
 
                 <div class="dato">
 
-                    <span>Nombre</span>
+                    <span>
+                        Nombre
+                    </span>
 
                     <strong>
-                        {{ profesor.nombre }} {{ profesor.apellido }}
+                        {{ profesor.nombre }}
+                        {{ profesor.apellido }}
                     </strong>
 
                 </div>
@@ -134,7 +142,9 @@
 
                 <div class="dato">
 
-                    <span>RUT</span>
+                    <span>
+                        RUT
+                    </span>
 
                     <strong>
                         {{ profesor.rut or 'Sin registrar' }}
@@ -145,7 +155,9 @@
 
                 <div class="dato">
 
-                    <span>Teléfono</span>
+                    <span>
+                        Teléfono
+                    </span>
 
                     <strong>
                         {{ profesor.telefono or 'Sin registrar' }}
@@ -156,7 +168,9 @@
 
                 <div class="dato">
 
-                    <span>Especialidad</span>
+                    <span>
+                        Especialidad
+                    </span>
 
                     <strong>
                         {{ profesor.especialidad or 'Sin registrar' }}
@@ -164,77 +178,176 @@
 
                 </div>
 
+
             </div>
 
         </section>
 
 
-        <section class="opciones" aria-label="Opciones del profesor">
+        <!-- =========================
+             OPCIONES PROFESOR
+        ========================== -->
+
+        <section
+            class="opciones"
+            aria-label="Opciones del profesor"
+        >
+
+
+            <!-- MIS TALLERES -->
 
             <article class="tarjeta opcion">
 
-    <div class="icono">◇</div>
+                <div
+                    class="icono"
+                    aria-hidden="true"
+                >
+                    ◇
+                </div>
 
-    <h2>Mis talleres y asistencia</h2>
+                <h2>
+                    Mis talleres y asistencia
+                </h2>
 
-    <p>
-        Consulta tus talleres, administra sus clases,
-        revisa alumnos y registra asistencia.
-    </p>
+                <p>
+                    Consulta tus talleres, administra sus clases,
+                    revisa alumnos y registra asistencia.
+                </p>
 
-    <a class="enlace-tarjeta" href="{{ url_for('mis_clases') }}">
-    Ver →
-</a>
-    
-    </a>
+                <a
+                    class="enlace-tarjeta"
+                    href="{{ url_for('mis_clases') }}"
+                >
+                    Ver →
+                </a>
 
-</article>
-
-
-            <article class="tarjeta opcion">
-                <div class="icono" aria-hidden="true">▥</div>
-                <h3>Mis estadísticas</h3>
-                <p>Revisa un resumen de tus talleres, alumnos, reservas y ocupación.</p>
-                <a class="enlace-tarjeta" href="{{ url_for('mis_estadisticas_profesor') }}">
-    Ver  →</a>
             </article>
 
 
+            <!-- ESTADÍSTICAS -->
+
             <article class="tarjeta opcion">
 
-    <div class="icono">⚙</div>
+                <div
+                    class="icono"
+                    aria-hidden="true"
+                >
+                    ▥
+                </div>
 
-    <h2>Gestión de talleres</h2>
+                <h2>
+                    Mis estadísticas
+                </h2>
 
-    <p>
-        Crea, modifica y administra los talleres de La Maestranza.
-    </p>
+                <p>
+                    Revisa un resumen de tus talleres,
+                    alumnos, reservas y ocupación.
+                </p>
 
-    <a class="enlace-tarjeta" href="{{ url_for('gestion_talleres') }}">
-        Gestionar  →
-    </a>
+                <a
+                    class="enlace-tarjeta"
+                    href="{{ url_for('mis_estadisticas_profesor') }}"
+                >
+                    Ver →
+                </a>
 
-</article>
+            </article>
+
+
+            <!-- GESTIÓN DE TALLERES -->
+
+            <article class="tarjeta opcion">
+
+                <div
+                    class="icono"
+                    aria-hidden="true"
+                >
+                    ⚙
+                </div>
+
+                <h2>
+                    Gestión de talleres
+                </h2>
+
+                <p>
+                    Crea, modifica y administra los talleres de La Maestranza.
+                </p>
+
+                <a
+                    class="enlace-tarjeta"
+                    href="{{ url_for('gestion_talleres') }}"
+                >
+                    Gestionar →
+                </a>
+
+            </article>
 
         </section>
+
+
+        <!-- =========================
+             CLASES DE HOY
+        ========================== -->
+
         <section class="tarjeta clases-hoy">
-            <h2>Clases de hoy</h2>
-            
+
+            <h2>
+                Clases de hoy
+            </h2>
+
+
             {% for clase in clases_hoy %}
-            <article class="fila-clase">
-                <div>
-                    <h3>{{ clase.taller }}</h3>
-                    <p>{{ clase.hora_inicio }} – {{ clase.hora_fin }}</p>
-                    <p>{{ clase.reservados }} / {{ clase.cupo_maximo }} reservas · {{ clase.estado }}</p>
-                </div>
-                {% if clase.estado != 'cancelada' %}
-                <a class="boton" href="{{ url_for('alumnos_clase', id_clase=clase.id_clase) }}">Ver alumnos</a>
-                {% endif %}
-            </article>
+
+                <article class="fila-clase">
+
+                    <div>
+
+                        <h3>
+                            {{ clase.taller }}
+                        </h3>
+
+                        <p>
+                            {{ clase.hora_inicio }}
+                            –
+                            {{ clase.hora_fin }}
+                        </p>
+
+                        <p>
+                            {{ clase.reservados }}
+                            /
+                            {{ clase.cupo_maximo }}
+                            reservas ·
+                            {{ clase.estado }}
+                        </p>
+
+                    </div>
+
+
+                    {% if clase.estado != 'cancelada' %}
+
+                        <a
+                            class="boton"
+                            href="{{ url_for(
+                                'alumnos_clase',
+                                id_clase=clase.id_clase
+                            ) }}"
+                        >
+                            Ver alumnos
+                        </a>
+
+                    {% endif %}
+
+                </article>
+
+
             {% else %}
-            <p>No tienes clases asignadas para hoy.</p>
+
+                <p>
+                    No tienes clases asignadas para hoy.
+                </p>
+
             {% endfor %}
-            
+
         </section>
 
     </main>

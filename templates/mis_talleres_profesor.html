@@ -5,43 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script
-    src="{{ url_for('static', filename='js/mis_talleres_profesor.js') }}"
-    defer>
-</script>
+
 
     <title>Mis talleres | Profesor</title>
 
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/mis_talleres_profesor.css') }}">
+        href="{{ url_for('static', filename='css/banner.css') }}">
+
+    <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/mis_talleres_profesor.css') }}">
+
+
+    <script
+        src="{{ url_for('static', filename='js/mis_talleres_profesor.js') }}"
+        defer>
+    </script>
+
 </head>
 
 <body>
 
-    <header class="barra">
-
-        <div class="marca">
-
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo La Maestranza"
-                class="logo"
-            >
-
-            <span>
-                MAESTRANZA - ESCUELA DEL MOVIMIENTO
-            </span>
-
-        </div>
-
-        <a
-            href="{{ url_for('panel_profesor') }}"
-            class="enlace-panel"
-        >
-            Mi panel
-        </a>
-
-    </header>
+    {% include "banner.html" %}
 
 
 <main class="panel">

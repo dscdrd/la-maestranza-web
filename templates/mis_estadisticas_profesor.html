@@ -4,68 +4,46 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Mis estadísticas | La Maestranza</title>
+
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/mis_estadisticas_profesor.css') }}"
     >
 
+
     <script
         src="{{ url_for('static', filename='js/mis_estadisticas_profesor.js') }}"
-        defer>
-    </script>
+        defer
+    ></script>
 
 </head>
 
 
 <body>
 
-    <!-- =====================================================
-            BARRA SUPERIOR
-    ====================================================== -->
+    {% include "banner.html" %}
 
-    <header class="barra">
-
-        <div class="marca">
-
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo La Maestranza"
-                class="logo"
-            >
-
-            <span>
-                MAESTRANZA - ESCUELA DEL MOVIMIENTO
-            </span>
-
-        </div>
-
-
-        <a
-            href="{{ url_for('panel_profesor') }}"
-            class="enlace-panel"
-        >
-            Mi panel
-        </a>
-
-    </header>
-
-
-    <!-- =====================================================
-         DASHBOARD
-    ====================================================== -->
 
     <main
         class="contenedor"
         id="estadisticas-profesor"
-        data-api-url="{{ url_for('api.estadisticas_profesor') }}"
+        data-api-url="{{ url_for('api.api_profesor_estadisticas') }}"
     >
 
-
-        <!-- VOLVER -->
 
         <a
             class="volver"
@@ -74,10 +52,6 @@
             ← Volver a mi panel
         </a>
 
-
-        <!-- =================================================
-             ENCABEZADO
-        ================================================== -->
 
         <section class="encabezado">
 
@@ -95,10 +69,6 @@
 
         </section>
 
-
-        <!-- =================================================
-             ESTADO DE CARGA / ERROR
-        ================================================== -->
 
         <p
             id="estado"
@@ -120,19 +90,11 @@
         </button>
 
 
-        <!-- =================================================
-             CONTENIDO GENERADO DESDE LA API
-        ================================================== -->
-
         <div
             id="contenido"
             hidden
         >
 
-
-            <!-- =============================================
-                 INDICADORES GENERALES
-            ============================================== -->
 
             <section
                 class="metricas"
@@ -171,8 +133,8 @@
                         0
                     </strong>
 
-                    <span>Clases reservadas
-                        
+                    <span>
+                        Clases reservadas
                     </span>
 
                 </div>
@@ -185,17 +147,13 @@
                     </strong>
 
                     <span>
-                        Clases Canceladas
+                        Clases canceladas
                     </span>
 
                 </div>
 
             </section>
 
-
-            <!-- =============================================
-                 ESTADÍSTICAS POR TALLER
-            ============================================== -->
 
             <section class="seccion-talleres">
 
@@ -215,13 +173,11 @@
 
 
                     <p>
-                        Ocupación y asistencia de tus talleres.
+                        Ocupación de tus talleres.
                     </p>
 
                 </div>
 
-
-                <!-- JavaScript genera los talleres aquí -->
 
                 <div
                     id="ranking-talleres"

@@ -1,254 +1,349 @@
+/* =========================================
+   CONFIGURACIÓN GENERAL
+========================================= */
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
+
     font-family: Arial, sans-serif;
+
     background-color: #f4f4f2;
-    color: #181818;
+    color: #222222;
+
+    line-height: 1.6;
 }
 
 
-/* CONTENEDOR */
+/* =========================================
+   CONTENEDOR PRINCIPAL
+========================================= */
 
 .contenedor {
-    width: 84%;
-    max-width: 900px;
+    width: min(1100px, 90%);
+
     margin: 0 auto;
-    padding: 55px 0 80px;
+
+    padding: 40px 0 70px;
 }
 
 
-/* VOLVER */
+/* =========================================
+   VOLVER
+========================================= */
 
-.volver {
+.contenedor .volver {
     display: inline-block;
-    margin-bottom: 25px;
+
+    margin-bottom: 26px;
 
     color: #8f0d0d;
-    font-size: 15px;
+
+    font-size: 14px;
+    font-weight: 600;
+
     text-decoration: none;
 }
 
-.volver:hover {
+
+.contenedor .volver:hover {
     text-decoration: underline;
 }
 
 
-/* ENCABEZADO */
+/* =========================================
+   ENCABEZADO
+========================================= */
 
-.encabezado {
+.contenedor .encabezado {
     margin-bottom: 30px;
 }
 
-.subtitulo {
+
+.contenedor .subtitulo {
     margin: 0 0 8px;
 
-    color: #a50b0b;
+    color: #8f0d0d;
 
     font-size: 12px;
     font-weight: bold;
 
-    letter-spacing: 4px;
+    letter-spacing: 3px;
 }
 
-.encabezado h1 {
+
+.contenedor .encabezado h1 {
     margin: 0 0 10px;
 
-    font-size: 38px;
+    font-size: clamp(30px, 5vw, 42px);
+
+    line-height: 1.2;
 }
 
-.descripcion {
+
+.contenedor .descripcion {
     margin: 0;
 
-    color: #555;
+    color: #666666;
 
-    line-height: 1.5;
+    font-size: 15px;
 }
 
 
-/* TARJETA */
+/* =========================================
+   TARJETA PRINCIPAL
+========================================= */
 
-.tarjeta-formulario {
-    padding: 35px;
+.contenedor .tarjeta {
+    max-width: 900px;
 
-    background-color: white;
+    padding: 32px;
 
-    border-radius: 12px;
+    background-color: #ffffff;
+
+    border-radius: 14px;
 
     box-shadow:
-        0 5px 18px rgba(0, 0, 0, 0.06);
+        0 6px 24px rgba(0, 0, 0, 0.06);
 }
 
 
-/* CAMPOS */
+/* =========================================
+   FORMULARIO
+========================================= */
 
-.campo {
+.contenedor .form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px;
+}
+
+
+.contenedor .campo {
     display: flex;
+
     flex-direction: column;
 
-    margin-bottom: 24px;
+    gap: 8px;
 }
 
-.campo label {
-    margin-bottom: 8px;
+
+.contenedor .campo-completo {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================
+   LABELS
+========================================= */
+
+.contenedor .campo label {
+    color: #222222;
 
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-.campo input,
-.campo textarea {
+
+/* =========================================
+   INPUTS / TEXTAREA / SELECT
+========================================= */
+
+.contenedor .campo input,
+.contenedor .campo textarea,
+.contenedor .campo select {
     width: 100%;
 
     padding: 12px 14px;
 
-    border: 1px solid #d6d6d6;
-    border-radius: 6px;
+    border: 1px solid #d3d3d3;
+    border-radius: 7px;
 
-    background-color: #fafafa;
+    background-color: #ffffff;
+
+    color: #222222;
 
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
 
     outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.campo textarea {
+
+.contenedor .campo textarea {
+    min-height: 120px;
+
     resize: vertical;
 }
 
-.campo input:focus,
-.campo textarea:focus {
-    border-color: #a50b0b;
-    background-color: white;
-}
 
-.campo small {
-    margin-top: 7px;
+.contenedor .campo input:focus,
+.contenedor .campo textarea:focus,
+.contenedor .campo select:focus {
+    border-color: #8f0d0d;
 
-    color: #777;
-    font-size: 12px;
+    box-shadow:
+        0 0 0 3px rgba(143, 13, 13, 0.08);
 }
 
 
-/* HORARIO + CUPO */
+/* =========================================
+   ARCHIVO / IMAGEN
+========================================= */
 
-.fila {
-    display: grid;
+.contenedor input[type="file"] {
+    padding: 10px;
 
-    grid-template-columns: 2fr 1fr;
-
-    gap: 20px;
+    background-color: #fafafa;
 }
 
 
-/* BOTONES */
+/* =========================================
+   ACCIONES
+========================================= */
 
-.acciones {
+.contenedor .acciones-formulario {
     display: flex;
+
     justify-content: flex-end;
     align-items: center;
 
     gap: 12px;
 
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
-.btn-cancelar,
-.btn-guardar {
-    padding: 11px 20px;
 
-    border-radius: 6px;
+/* =========================================
+   BOTÓN CANCELAR
+========================================= */
+
+.contenedor .btn-cancelar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 130px;
+
+    padding: 11px 18px;
+
+    border: 1px solid #bdbdbd;
+    border-radius: 7px;
+
+    background-color: transparent;
+
+    color: #333333;
 
     font-size: 14px;
-    font-weight: bold;
-}
-
-.btn-cancelar {
-    border: 1px solid #ccc;
-
-    background-color: white;
-    color: #333;
+    font-weight: 600;
 
     text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.btn-cancelar:hover {
-    background-color: #f1f1f1;
+
+.contenedor .btn-cancelar:hover {
+    background-color: #eeeeee;
+
+    transform: translateY(-1px);
 }
 
-.btn-guardar {
-    border: none;
 
-    background-color: #a50b0b;
-    color: white;
+/* =========================================
+   BOTÓN GUARDAR
+========================================= */
+
+.contenedor .btn-guardar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 150px;
+
+    padding: 11px 18px;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    background-color: #8f0d0d;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
 
     cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.btn-guardar:hover {
-    background-color: #7f0808;
+
+.contenedor .btn-guardar:hover {
+    background-color: #6e0909;
+
+    border-color: #6e0909;
+
+    transform: translateY(-1px);
 }
 
 
-/* RESPONSIVE */
+/* =========================================
+   RESPONSIVE
+========================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 750px) {
 
     .contenedor {
-        width: 90%;
-        padding-top: 35px;
+        width: 92%;
+
+        padding: 28px 0 50px;
     }
 
-    .encabezado h1 {
-        font-size: 31px;
+
+    .contenedor .tarjeta {
+        padding: 22px;
     }
 
-    .tarjeta-formulario {
-        padding: 25px;
-    }
 
-    .fila {
+    .contenedor .form-grid {
         grid-template-columns: 1fr;
-        gap: 0;
     }
 
-    .acciones {
+
+    .contenedor .campo-completo {
+        grid-column: auto;
+    }
+
+
+    .contenedor .acciones-formulario {
         flex-direction: column-reverse;
+
+        align-items: stretch;
     }
 
-    .btn-cancelar,
-    .btn-guardar {
+
+    .contenedor .btn-cancelar,
+    .contenedor .btn-guardar {
         width: 100%;
-        text-align: center;
+
+        min-width: 0;
     }
-}
-
-/* ESTADO DEL TALLER */
-
-.estado-actual {
-    margin-top: 2px;
-}
-
-.estado {
-    display: inline-block;
-
-    padding: 7px 13px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.estado.activo {
-    background-color: #e8f5e9;
-    color: #246b2a;
-}
-
-.estado.inactivo {
-    background-color: #eeeeee;
-    color: #666;
 }

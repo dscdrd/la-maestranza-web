@@ -7,52 +7,17 @@
 
     <title>Comunidad · Maestranza</title>
 
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
     <link rel="stylesheet"
         href="{{ url_for('static', filename='css/comunidad.css') }}">
 </head>
 
 <body>
-
-    <header class="cabecera">
-
-    <div class="barra-superior">
-
-        <div class="marca">
-
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo Maestranza"
-                class="logo-cabecera"
-            >
-
-            <span>
-                MAESTRANZA · ESCUELA DEL MOVIMIENTO
-            </span>
-
-        </div>
-
-
-        <nav class="navegacion">
-
-            <a href="{{ url_for('inicio') }}">
-                Inicio
-            </a>
-
-            <a href="{{ url_for('talleres') }}">
-                Talleres
-            </a>
-
-            <a href="#">
-                Servicios terapéuticos
-            </a>
-
-        </nav>
-
-    </div>
-
-
-    </header>
-
+    {% include "banner.html" %}
 
     <main class="comunidad">
 

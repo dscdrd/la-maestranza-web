@@ -1,10 +1,35 @@
 from flask import Blueprint, jsonify, session, request, current_app
-import mysql.connector
 from werkzeug.security import generate_password_hash
-from db import conectar_db
 import os
 import uuid
-from services import obtener_taller_por_id, obtener_talleres, crear_taller, actualizar_taller, eliminar_taller, obtener_clases_profesor, obtener_profesor_por_usuario, obtener_talleres_profesor, profesor_tiene_taller,  crear_clase, actualizar_clase, cancelar_clase, eliminar_clase, correo_usuario_existe, rut_alumno_existe, crear_alumno, obtener_alumno_por_usuario,actualizar_perfil_alumno, actualizar_foto_alumno, actualizar_perfil_profesor, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, eliminar_cuenta_alumno, obtener_estadisticas_alumno, obtener_clases_taller_api
+
+from services import (
+    obtener_taller_por_id,
+    obtener_talleres,
+    crear_taller,
+    actualizar_taller,
+    eliminar_taller,
+    obtener_clases_profesor,
+    obtener_profesor_por_usuario,
+    obtener_talleres_profesor,
+    profesor_tiene_taller,
+    crear_clase,
+    actualizar_clase,
+    cancelar_clase,
+    eliminar_clase,
+    correo_usuario_existe,
+    rut_alumno_existe,
+    crear_alumno,
+    obtener_alumno_por_usuario,
+    actualizar_perfil_alumno,
+    actualizar_foto_alumno,
+    actualizar_perfil_profesor,
+    actualizar_foto_profesor,
+    eliminar_cuenta_alumno,
+    obtener_estadisticas_alumno,
+    obtener_clases_taller_api,
+    obtener_estadisticas_profesor,
+)
 
 # ============================================================
 # BLUEPRINT API RESt
@@ -115,9 +140,12 @@ def api_crear_taller():
             "taller": taller
         }), 201
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al crear taller:", error)
+        current_app.logger.exception(
+            "Error al crear taller: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo crear el taller."
@@ -241,9 +269,12 @@ def api_actualizar_taller(id_taller):
             "taller": taller
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al actualizar taller:", error)
+        current_app.logger.exception(
+            "Error al actualizar taller: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo actualizar el taller."
@@ -293,17 +324,19 @@ def api_eliminar_taller(id_taller):
             "id_taller": id_taller
         }), 200
 
-    except mysql.connector.IntegrityError:
+    except Exception as error:
 
-        return jsonify({
-            "error":
-                "No se puede eliminar este taller porque tiene "
-                "registros relacionados."
-        }), 409
+        if error.__class__.__name__ == "IntegrityError":
+            return jsonify({
+                "error":
+                    "No se puede eliminar este taller porque tiene "
+                    "registros relacionados."
+            }), 409
 
-    except mysql.connector.Error as error:
-
-        print("Error al eliminar taller:", error)
+        current_app.logger.exception(
+            "Error al eliminar taller: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo eliminar el taller."
@@ -352,10 +385,11 @@ def api_clases_taller(id_taller):
         ), 200
 
 
-    except mysql.connector.Error:
+    except Exception as error:
 
-        print(
-            "Error al consultar las clases del taller"
+        current_app.logger.exception(
+            "Error al consultar las clases del taller: %s",
+            error
         )
 
         return jsonify({
@@ -481,9 +515,12 @@ def api_crear_clase(id_taller):
             "clase": clase
         }), 201
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al crear clase:", error)
+        current_app.logger.exception(
+            "Error al crear clase: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo crear la clase."
@@ -660,9 +697,17 @@ def api_actualizar_clase(id_clase):
     # VERIFICAR CLASE Y PERMISOS
     # --------------------------------------------------
 
-    clase = obtener_clases_profesor(
-        id_clase,
+    clases = obtener_clases_profesor(
         profesor["id_profesor"]
+    )
+
+    clase = next(
+        (
+            clase
+            for clase in clases
+            if clase["id_clase"] == id_clase
+        ),
+        None
     )
 
     if not clase:
@@ -693,9 +738,12 @@ def api_actualizar_clase(id_clase):
             "clase": clase_actualizada
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al actualizar clase:", error)
+        current_app.logger.exception(
+            "Error al actualizar clase: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo actualizar la clase."
@@ -793,9 +841,12 @@ def api_cancelar_clase(id_clase):
                 resultado["reservas_canceladas"]
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al cancelar clase:", error)
+        current_app.logger.exception(
+            "Error al cancelar clase: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo cancelar la clase."
@@ -880,18 +931,20 @@ def api_eliminar_clase(id_clase):
             "id_clase": id_clase
         }), 200
 
-    except mysql.connector.IntegrityError:
+    except Exception as error:
 
-        return jsonify({
-            "error":
-                "No se puede eliminar esta clase porque tiene "
-                "reservas o registros relacionados. Puedes cancelarla "
-                "para conservar su historial."
-        }), 409
+        if error.__class__.__name__ == "IntegrityError":
+            return jsonify({
+                "error":
+                    "No se puede eliminar esta clase porque tiene "
+                    "reservas o registros relacionados. Puedes cancelarla "
+                    "para conservar su historial."
+            }), 409
 
-    except mysql.connector.Error as error:
-
-        print("Error al eliminar clase:", error)
+        current_app.logger.exception(
+            "Error al eliminar clase: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo eliminar la clase."
@@ -1022,9 +1075,12 @@ def api_crear_alumno():
             "alumno": alumno
         }), 201
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al registrar alumno:", error)
+        current_app.logger.exception(
+            "Error al registrar alumno: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudo registrar el alumno."
@@ -1176,9 +1232,12 @@ def api_actualizar_perfil_alumno():
             "alumno": datos_actualizados
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print("Error al actualizar perfil:", error)
+        current_app.logger.exception(
+            "Error al actualizar perfil del alumno: %s",
+            error
+        )
 
         return jsonify({
             "error": "No se pudieron actualizar los datos."
@@ -1237,10 +1296,10 @@ def api_eliminar_cuenta_alumno():
             "mensaje": "Cuenta eliminada correctamente."
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print(
-            "Error al eliminar cuenta:",
+        current_app.logger.exception(
+            "Error al eliminar cuenta del alumno: %s",
             error
         )
 
@@ -1380,8 +1439,8 @@ def api_actualizar_foto_alumno():
 
     except Exception as error:
 
-        print(
-            "Error al actualizar foto:",
+        current_app.logger.exception(
+            "Error al actualizar foto del alumno: %s",
             error
         )
 
@@ -1540,10 +1599,10 @@ def api_actualizar_perfil_profesor():
             "profesor": datos_actualizados
         }), 200
 
-    except mysql.connector.Error as error:
+    except Exception as error:
 
-        print(
-            "Error al actualizar perfil del profesor:",
+        current_app.logger.exception(
+            "Error al actualizar perfil del profesor: %s",
             error
         )
 
@@ -1684,8 +1743,8 @@ def api_actualizar_foto_profesor():
 
     except Exception as error:
 
-        print(
-            "Error al actualizar foto del profesor:",
+        current_app.logger.exception(
+            "Error al actualizar foto del profesor: %s",
             error
         )
 
@@ -1742,10 +1801,11 @@ def api_alumno_estadisticas():
 
         return respuesta, 200
 
-    except mysql.connector.Error:
+    except Exception as error:
 
-        print(
-            "Error al consultar estadísticas del alumno"
+        current_app.logger.exception(
+            "Error al consultar estadísticas del alumno: %s",
+            error
         )
 
         return jsonify({
@@ -1761,298 +1821,90 @@ def api_alumno_estadisticas():
 # API - ESTADÍSTICAS DEL PROFESOR
 # ============================================================
 
-@api.route("/api/profesor/estadisticas", methods=["GET"])
-def estadisticas_profesor():
 
-    # Verificar que exista una sesión
+
+@api.route(
+    "/api/profesor/estadisticas",
+    methods=["GET"]
+)
+def api_profesor_estadisticas():
+
+    # =====================================================
+    # 1. VERIFICAR SESIÓN
+    # =====================================================
+
     if "id_usuario" not in session:
+
         return jsonify({
-            "error": "No has iniciado sesión"
+            "error": {
+                "mensaje":
+                    "Inicia sesión para consultar tus estadísticas."
+            }
         }), 401
 
-    # Verificar que el usuario sea profesor
+
+    # =====================================================
+    # 2. VERIFICAR ROL
+    # =====================================================
+
     if session.get("rol") != "profesor":
+
         return jsonify({
-            "error": "Acceso no autorizado"
+            "error": {
+                "mensaje":
+                    "Acceso exclusivo para profesores."
+            }
         }), 403
 
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
+
+    # =====================================================
+    # 3. OBTENER ESTADÍSTICAS
+    # =====================================================
 
     try:
 
-        # ====================================================
-        # OBTENER PROFESOR CONECTADO
-        # ====================================================
+        resultado = obtener_estadisticas_profesor(
+            session["id_usuario"]
+        )
 
-        cursor.execute("""
-            SELECT id_profesor
-            FROM profesores
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
 
-        profesor = cursor.fetchone()
+        if not resultado:
 
-        if not profesor:
             return jsonify({
-                "error": "Profesor no encontrado"
+                "error": {
+                    "mensaje":
+                        "No se encontró tu perfil de profesor."
+                }
             }), 404
 
-        id_profesor = profesor["id_profesor"]
 
+        respuesta = jsonify(
+            resultado
+        )
 
-        # ====================================================
-        # 1. TALLERES ASIGNADOS
-        # ====================================================
+        respuesta.headers["Cache-Control"] = "no-store"
 
-        cursor.execute("""
-            SELECT COUNT(DISTINCT id_taller) AS total
-            FROM taller_profesor
-            WHERE id_profesor = %s
-        """, (id_profesor,))
+        return respuesta, 200
 
-        talleres_asignados = cursor.fetchone()["total"]
 
+    # =====================================================
+    # 4. ERROR
+    # =====================================================
 
-        # ====================================================
-        # 2. ALUMNOS ACTIVOS
-        # ====================================================
+    except Exception as error:
 
-        cursor.execute("""
-            SELECT COUNT(DISTINCT i.id_alumno) AS total
-
-            FROM inscripciones i
-
-            INNER JOIN taller_profesor tp
-                ON i.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-            AND i.estado = 'activa'
-        """, (id_profesor,))
-
-        alumnos_activos = cursor.fetchone()["total"]
-
-
-        # ====================================================
-        # 3. RESERVAS ACTIVAS
-        # ====================================================
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-
-            FROM reservas_clase r
-
-            INNER JOIN clases c
-                ON r.id_clase = c.id_clase
-
-            INNER JOIN taller_profesor tp
-                ON c.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-            AND r.estado = 'reservada'
-        """, (id_profesor,))
-
-        reservas_activas = cursor.fetchone()["total"]
-
-
-        # ====================================================
-        # 4. RESERVAS CANCELADAS
-        # ====================================================
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-
-            FROM reservas_clase r
-
-            INNER JOIN clases c
-                ON r.id_clase = c.id_clase
-
-            INNER JOIN taller_profesor tp
-                ON c.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-            AND r.estado = 'cancelada'
-        """, (id_profesor,))
-
-        reservas_canceladas = cursor.fetchone()["total"]
-
-
-        # ====================================================
-        # 5. ESTADÍSTICAS POR TALLER
-        # ====================================================
-
-        cursor.execute("""
-            SELECT
-                t.id_taller,
-                t.nombre,
-
-                COUNT(DISTINCT CASE
-                    WHEN i.estado = 'activa'
-                    THEN i.id_alumno
-                END) AS alumnos_activos,
-
-                COUNT(DISTINCT CASE
-                    WHEN r.estado = 'reservada'
-                    THEN r.id_reserva
-                END) AS reservas_activas,
-
-                COUNT(DISTINCT CASE
-                    WHEN r.estado = 'cancelada'
-                    THEN r.id_reserva
-                END) AS reservas_canceladas
-
-            FROM talleres t
-
-            INNER JOIN taller_profesor tp
-                ON t.id_taller = tp.id_taller
-
-            LEFT JOIN inscripciones i
-                ON t.id_taller = i.id_taller
-
-            LEFT JOIN clases c
-                ON t.id_taller = c.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON c.id_clase = r.id_clase
-
-            WHERE tp.id_profesor = %s
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY t.nombre
-        """, (id_profesor,))
-
-        talleres = cursor.fetchall()
-
-
-        # ====================================================
-        # 6. CALCULAR OCUPACIÓN POR TALLER
-        # ====================================================
-
-        
-
-        for taller in talleres:
-
-            cursor.execute("""
-                SELECT
-
-                    (
-                        SELECT COALESCE(SUM(c.cupo_maximo), 0)
-                        FROM clases c
-                        WHERE c.id_taller = %s
-                        AND c.estado = 'programada'
-                        AND c.fecha >= CURDATE()
-                    ) AS cupos_totales,
-
-                    (
-                        SELECT COUNT(*)
-                        FROM reservas_clase r
-                        INNER JOIN clases c
-                            ON r.id_clase = c.id_clase
-                        WHERE c.id_taller = %s
-                        AND c.estado = 'programada'
-                        AND c.fecha >= CURDATE()
-                        AND r.estado = 'reservada'
-                    ) AS reservas
-
-            """, (
-                taller["id_taller"],
-                taller["id_taller"]
-            ))
-
-            ocupacion = cursor.fetchone()
-
-            cupos_totales = ocupacion["cupos_totales"] or 0
-            reservas = ocupacion["reservas"] or 0
-
-            if cupos_totales > 0:
-                porcentaje_ocupacion = round(
-                    (reservas / cupos_totales) * 100,
-                    1
-                )
-            else:
-                porcentaje_ocupacion = 0
-
-            taller["ocupacion"] = porcentaje_ocupacion
-
-            # Calcular asistencia del taller
-            cursor.execute("""
-                SELECT
-                    COUNT(CASE
-                        WHEN a.estado = 'presente'
-                        THEN 1
-                    END) AS presentes,
-
-                    COUNT(CASE
-                        WHEN a.estado = 'ausente'
-                        THEN 1
-                    END) AS ausentes
-
-                FROM asistencias a
-
-                INNER JOIN reservas_clase r
-                    ON a.id_reserva = r.id_reserva
-
-                INNER JOIN clases c
-                    ON r.id_clase = c.id_clase
-
-                WHERE c.id_taller = %s
-            """, (taller["id_taller"],))
-
-            datos_asistencia = cursor.fetchone()
-
-            presentes = datos_asistencia["presentes"] or 0
-            ausentes = datos_asistencia["ausentes"] or 0
-
-            total_asistencias = presentes + ausentes
-
-            if total_asistencias > 0:
-
-                porcentaje_asistencia = round(
-                    (presentes / total_asistencias) * 100,
-                    1
-                )
-
-            else:
-
-                porcentaje_asistencia = 0
-
-            taller["asistencia"] = porcentaje_asistencia
-            taller["presentes"] = presentes
-            taller["ausentes"] = ausentes
-        # ====================================================
-        # RESPUESTA JSON
-        # ====================================================
+        current_app.logger.exception(
+            "Error al consultar estadísticas del profesor: %s",
+            error
+        )
 
         return jsonify({
-
-            "talleres_asignados": talleres_asignados,
-
-            "alumnos_activos": alumnos_activos,
-
-            "reservas_activas": reservas_activas,
-
-            "reservas_canceladas": reservas_canceladas,
-
-            "talleres": talleres
-
-        })
-
-
-    except mysql.connector.Error as error:
-
-        print("Error API estadísticas:", error)
-
-        return jsonify({
-            "error": "Error al obtener las estadísticas"
+            "error": {
+                "mensaje": (
+                    "No se pudieron cargar tus estadísticas. "
+                    "Intenta nuevamente."
+                )
+            }
         }), 500
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
 
 

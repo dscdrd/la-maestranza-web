@@ -2,23 +2,37 @@
 <html lang="es">
 
 <head>
-    
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script
-        src="{{ url_for('static', filename='js/gestion_talleres.js') }}"
-        defer>
-    </script>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Gestión de talleres | La Maestranza</title>
 
     <link
         rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
         href="{{ url_for('static', filename='css/gestion_talleres.css') }}"
     >
+
+    <script
+        src="{{ url_for('static', filename='js/gestion_talleres.js') }}"
+        defer
+    ></script>
+
 </head>
 
+
 <body>
+
+    {% include "banner.html" %}
+
 
     <main
         class="contenedor"
@@ -26,7 +40,10 @@
         data-api-base="/api/talleres"
     >
 
-        <!-- VOLVER -->
+
+        <!-- =========================
+             VOLVER
+        ========================== -->
 
         <a
             class="volver"
@@ -36,7 +53,9 @@
         </a>
 
 
-        <!-- ENCABEZADO -->
+        <!-- =========================
+             ENCABEZADO
+        ========================== -->
 
         <header class="encabezado">
 
@@ -67,7 +86,9 @@
         </header>
 
 
-        <!-- LISTADO -->
+        <!-- =========================
+             LISTADO DE TALLERES
+        ========================== -->
 
         {% if talleres %}
 
@@ -76,11 +97,16 @@
                 {% for taller in talleres %}
 
                     <article
-                        class="tarjeta-taller
-                        {% if taller.estado == 'inactivo' %}
-                            taller-inactivo
-                        {% endif %}"
+                        class="
+                            tarjeta-taller
+                            {% if taller.estado == 'inactivo' %}
+                                taller-inactivo
+                            {% endif %}
+                        "
                     >
+
+
+                        <!-- CABECERA -->
 
                         <div class="cabecera-tarjeta">
 
@@ -106,32 +132,51 @@
                         </div>
 
 
+                        <!-- DESCRIPCIÓN -->
+
                         <p class="descripcion-taller">
                             {{ taller.descripcion or 'Sin descripción' }}
                         </p>
 
 
+                        <!-- DATOS -->
+
                         <div class="datos">
 
                             <p>
-                                <strong>Horario</strong>
+
+                                <strong>
+                                    Horario
+                                </strong>
+
                                 <span>
                                     {{ taller.horario or 'Sin horario' }}
                                 </span>
+
                             </p>
 
 
                             <p>
-                                <strong>Cupo máximo</strong>
+
+                                <strong>
+                                    Cupo máximo
+                                </strong>
+
                                 <span>
                                     {{ taller.cupo_maximo or 'Sin definir' }}
                                 </span>
+
                             </p>
 
                         </div>
 
 
-                        <div class="acciones">
+                        <!-- =========================
+                             ACCIONES
+                        ========================== -->
+
+                        <div class="acciones-taller">
+
 
                             <a
                                 class="btn-editar"
@@ -152,6 +197,7 @@
                             >
                                 Eliminar
                             </button>
+
 
                         </div>
 

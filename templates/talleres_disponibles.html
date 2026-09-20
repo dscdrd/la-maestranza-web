@@ -9,53 +9,17 @@
 
     <link
         rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
         href="{{ url_for('static', filename='css/talleres_disponibles.css') }}"
     >
 </head>
 
 <body>
-
-    <!-- BARRA SUPERIOR -->
-    <header>
-
-        <nav class="navbar">
-
-            <div class="marca">
-
-                <img
-                    src="{{ url_for('static', filename='img/logo.png') }}"
-                    alt="Logo Maestranza"
-                    class="logo"
-                >
-
-                <span>
-                    MAESTRANZA - ESCUELA DEL MOVIMIENTO
-                </span>
-
-            </div>
-
-            <div class="nav-acciones">
-
-                <a href="{{ url_for('inicio') }}">
-                    Inicio
-                </a>
-
-                <a href="{{ url_for('panel_alumno') }}">
-                    Mi perfil
-                </a>
-
-                <a
-                    href="{{ url_for('cerrar_sesion') }}"
-                    class="btn-cerrar"
-                >
-                    Cerrar sesión
-                </a>
-
-            </div>
-
-        </nav>
-
-    </header>
+    {% include "banner.html" %}
 
 
     <main class="pagina-talleres">

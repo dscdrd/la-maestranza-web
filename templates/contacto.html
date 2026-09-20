@@ -7,20 +7,17 @@
 
     <title>Contacto | La Maestranza</title>
 
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
     <link rel="stylesheet"
         href="{{ url_for('static', filename='css/contacto.css') }}">
 </head>
 
 <body>
-
-    <header class="barra">
-        <a class="marca" href="{{ url_for('inicio') }}">
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="">
-            <span>LA MAESTRANZA</span>
-        </a>
-    </header>
+    {% include "banner.html" %}
 
     <main class="contacto">
 

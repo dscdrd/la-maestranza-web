@@ -2,14 +2,14 @@ import os
 from db import conectar_db
 from api import api 
 
-from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, obtener_clases_inscripcion_alumno
+from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, eliminar_cuenta_profesor
 
 
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
-import mysql.connector 
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import  check_password_hash
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -45,7 +45,7 @@ def extension_permitida(nombre_archivo):
 
 
 
-#* Prueba de conexion a la base de datos
+""" #* Prueba de conexion a la base de datos
 @app.route("/prueba_db")
 def prueba_db():
 
@@ -58,7 +58,7 @@ def prueba_db():
 
     conexion.close()
 
-    return mensaje
+    return mensaje """
 
 @app.route("/subir_foto_perfil", methods=["POST"])
 def subir_foto_perfil():
@@ -234,30 +234,13 @@ def inicio():
     )
 
 
-
-@app.route("/talleres")
-def talleres():
-    return render_template("talleres.html")
-
-
-@app.route("/registro")
-def registro():
-    return render_template("registro.html")
-
-
 @app.route("/seleccionar_perfil")
 def seleccionar_perfil():
     return render_template("seleccionar_perfil.html")
 
-
 @app.route("/nosotros")
 def nosotros():
     return render_template("nosotros.html")
-
-
-@app.route("/Terapias")
-def terapias():
-    return render_template("terapias.html")
 
 
 @app.route("/comunidad")
@@ -524,6 +507,70 @@ def editar_perfil_profesor():
     )
 
 
+@app.route("/eliminar_cuenta_profesor", methods=["POST"])
+def eliminar_cuenta_profesor_ruta():
+
+    if "id_usuario" not in session:
+        return redirect(url_for("login_profesor"))
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje="No tienes permisos para realizar esta acción.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+
+    id_usuario = session["id_usuario"]
+
+
+    try:
+
+        eliminado = eliminar_cuenta_profesor(id_usuario)
+
+        if not eliminado:
+
+            return render_template(
+                "mensaje.html",
+                tipo="error",
+                titulo="Cuenta no encontrada",
+                mensaje="No fue posible encontrar la cuenta del profesor.",
+                texto_boton="Volver al panel",
+                destino=url_for("panel_profesor")
+            )
+
+
+        session.clear()
+
+
+        return render_template(
+            "mensaje.html",
+            tipo="exito",
+            titulo="Cuenta eliminada",
+            mensaje="Tu cuenta de profesor fue eliminada correctamente.",
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+
+    except Exception:
+
+        app.logger.exception(
+            "Error al eliminar cuenta de profesor"
+        )
+
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="No se pudo eliminar la cuenta",
+            mensaje="Ocurrió un problema al intentar eliminar tu cuenta.",
+            texto_boton="Volver al panel",
+            destino=url_for("panel_profesor")
+        )
+
 @app.route("/mis_clases")
 def mis_clases():
 
@@ -721,11 +768,10 @@ def registrar_asistencia(id_reserva):
                 id_clase=reserva["id_clase"]
             )
         )
+    except Exception as error:
 
-    except mysql.connector.Error as error:
-
-        print(
-            "Error al registrar asistencia:",
+        app.logger.exception(
+            "Error al registrar asistencia: %s",
             error
         )
 
@@ -1535,314 +1581,7 @@ def reservar_clase_taller(id_taller, id_clase):
             )
         )
 
-@app.route("/inscripcion/<int:id_inscripcion>/clases")
-def clases_disponibles_alumno(id_inscripcion):
 
-    if "id_usuario" not in session:
-
-        return redirect(
-            url_for("login_alumno")
-        )
-
-
-    if session.get("rol") != "alumno":
-
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para acceder a esta sección.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-
-    resultado = obtener_clases_inscripcion_alumno(
-        id_inscripcion,
-        session["id_usuario"]
-    )
-
-
-    if not resultado:
-
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Inscripción no encontrada",
-            mensaje=(
-                "La inscripción no existe, "
-                "no está activa o no te pertenece."
-            ),
-            texto_boton="Ir a mis talleres",
-            destino=url_for("mis_talleres")
-        )
-
-
-    return render_template(
-        "clases_disponibles_alumno.html",
-        inscripcion=resultado["inscripcion"],
-        clases=resultado["clases"],
-        clases_usadas=resultado["clases_usadas"],
-        clases_disponibles=resultado["clases_disponibles"]
-    )
-
-
-@app.route(
-    "/inscripcion/<int:id_inscripcion>/clase/<int:id_clase>/reservar",
-    methods=["POST"]
-)
-def reservar_clase(id_inscripcion, id_clase):
-
-    if "id_usuario" not in session:
-        return redirect(url_for("login_alumno"))
-
-    if session.get("rol") != "alumno":
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="Acceso no autorizado",
-            mensaje="No tienes permisos para realizar esta acción.",
-            texto_boton="Volver al inicio",
-            destino=url_for("inicio")
-        )
-
-    id_usuario = session["id_usuario"]
-
-    conexion = conectar_db()
-    cursor = conexion.cursor(dictionary=True)
-
-    try:
-
-        # 1. Comprobar que la inscripción pertenece al alumno
-        cursor.execute("""
-            SELECT
-                i.id_inscripcion,
-                i.id_taller,
-                i.estado,
-                i.clases_contratadas
-
-            FROM inscripciones i
-
-            INNER JOIN alumnos a
-                ON i.id_alumno = a.id_alumno
-
-            WHERE i.id_inscripcion = %s
-            AND a.id_usuario = %s
-            AND i.estado = 'activa'
-        """, (id_inscripcion, id_usuario))
-
-        inscripcion = cursor.fetchone()
-
-        if not inscripcion:
-            return render_template(
-                "mensaje.html",
-                tipo="error",
-                titulo="Inscripción no válida",
-                mensaje="La inscripción no existe o no pertenece a tu cuenta.",
-                texto_boton="Volver a mis talleres",
-                destino=url_for("mis_talleres")
-            )
-
-
-        # 2. Comprobar cuántas clases del plan ya fueron utilizadas
-        cursor.execute("""
-            SELECT COUNT(*) AS usadas
-
-            FROM reservas_clase
-
-            WHERE id_inscripcion = %s
-            AND consume_clase = 1
-        """, (id_inscripcion,))
-
-        resultado = cursor.fetchone()
-
-        clases_usadas = resultado["usadas"]
-
-        if clases_usadas >= inscripcion["clases_contratadas"]:
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Sin clases disponibles",
-                mensaje="Ya utilizaste todas las clases disponibles de tu plan.",
-                texto_boton="Volver a mis clases",
-                destino=url_for(
-                    "clases_disponibles_alumno",
-                    id_inscripcion=id_inscripcion
-                )
-            )
-
-
-        # 3. Comprobar que la clase pertenece al mismo taller
-        #    y que todavía no haya comenzado
-        cursor.execute("""
-            SELECT
-                id_clase,
-                id_taller,
-                fecha,
-                hora_inicio,
-                hora_fin,
-                cupo_maximo,
-                estado
-
-            FROM clases
-
-            WHERE id_clase = %s
-            AND id_taller = %s
-            AND estado = 'programada'
-            AND TIMESTAMP(fecha, hora_inicio) > NOW()
-        """, (
-            id_clase,
-            inscripcion["id_taller"]
-        ))
-
-        clase = cursor.fetchone()
-
-        if not clase:
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Clase no disponible",
-                mensaje="La clase ya comenzó, pasó de fecha o dejó de estar disponible.",
-                texto_boton="Volver a las clases",
-                destino=url_for(
-                    "clases_disponibles_alumno",
-                    id_inscripcion=id_inscripcion
-                )
-            )
-
-
-        # 4. Comprobar si ya existe una reserva activa
-        cursor.execute("""
-            SELECT id_reserva
-
-            FROM reservas_clase
-
-            WHERE id_inscripcion = %s
-            AND id_clase = %s
-            AND estado = 'reservada'
-        """, (
-            id_inscripcion,
-            id_clase
-        ))
-
-        reserva_existente = cursor.fetchone()
-
-        if reserva_existente:
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Clase ya reservada",
-                mensaje="Ya tienes una reserva activa para esta clase.",
-                texto_boton="Volver a las clases",
-                destino=url_for(
-                    "clases_disponibles_alumno",
-                    id_inscripcion=id_inscripcion
-                )
-            )
-
-
-        # 5. Comprobar los cupos ocupados
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-
-            FROM reservas_clase
-
-            WHERE id_clase = %s
-            AND estado = 'reservada'
-        """, (id_clase,))
-
-        resultado = cursor.fetchone()
-
-        reservados = resultado["total"]
-
-        if reservados >= clase["cupo_maximo"]:
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Clase completa",
-                mensaje="Esta clase ya alcanzó su cupo máximo.",
-                texto_boton="Volver a las clases",
-                destino=url_for(
-                    "clases_disponibles_alumno",
-                    id_inscripcion=id_inscripcion
-                )
-            )
-
-
-        # 6. Guardar la reserva
-        #    Se vuelve a comprobar que la clase siga siendo futura
-        cursor.execute("""
-            INSERT INTO reservas_clase (
-                id_inscripcion,
-                id_clase,
-                estado,
-                consume_clase
-            )
-
-            SELECT
-                %s,
-                id_clase,
-                'reservada',
-                1
-
-            FROM clases
-
-            WHERE id_clase = %s
-            AND estado = 'programada'
-            AND TIMESTAMP(fecha, hora_inicio) > NOW()
-        """, (
-            id_inscripcion,
-            id_clase
-        ))
-
-
-        # 7. Verificar que realmente se haya insertado
-        if cursor.rowcount != 1:
-
-            conexion.rollback()
-
-            return render_template(
-                "mensaje.html",
-                tipo="aviso",
-                titulo="Clase no disponible",
-                mensaje="La clase dejó de estar disponible antes de completar la reserva.",
-                texto_boton="Volver a las clases",
-                destino=url_for(
-                    "clases_disponibles_alumno",
-                    id_inscripcion=id_inscripcion
-                )
-            )
-
-
-        conexion.commit()
-
-        return redirect(url_for(
-            "clases_disponibles_alumno",
-            id_inscripcion=id_inscripcion
-        ))
-
-
-    except Exception as error:
-
-        conexion.rollback()
-
-        print("Error al reservar clase:", error)
-
-        return render_template(
-            "mensaje.html",
-            tipo="error",
-            titulo="No pudimos realizar la reserva",
-            mensaje="Ocurrió un error al intentar reservar la clase.",
-            texto_boton="Volver a mis talleres",
-            destino=url_for("mis_talleres")
-        )
-
-
-    finally:
-
-        cursor.close()
-        conexion.close()
-#* ------------------------------------------------------------- #
 @app.route(
     "/reserva/<int:id_reserva>/cancelar",
     methods=["POST"]
@@ -1976,181 +1715,7 @@ def cancelar_reserva(id_reserva):
 
 
 
-@app.route("/api/estadisticas/ocupacion-talleres", methods=["GET"])
-def api_ocupacion_talleres():
 
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                t.id_taller,
-                t.nombre AS taller,
-
-                COUNT(c.id_clase) AS total_clases,
-
-                COALESCE(SUM(c.cupo_maximo), 0) AS cupos_totales,
-
-                COALESCE(SUM(c.reservas_activas), 0) AS reservas_activas
-
-            FROM talleres t
-
-            LEFT JOIN (
-                SELECT
-                    cl.id_clase,
-                    cl.id_taller,
-                    cl.cupo_maximo,
-
-                    COUNT(
-                        CASE
-                            WHEN r.estado = 'reservada'
-                            THEN r.id_reserva
-                        END
-                    ) AS reservas_activas
-
-                FROM clases cl
-
-                LEFT JOIN reservas_clase r
-                    ON cl.id_clase = r.id_clase
-
-                GROUP BY
-                    cl.id_clase,
-                    cl.id_taller,
-                    cl.cupo_maximo
-            ) c
-                ON t.id_taller = c.id_taller
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY
-                t.nombre
-        """)
-
-        talleres = cursor.fetchall()
-
-        for taller in talleres:
-
-            cupos_totales = taller["cupos_totales"]
-            reservas_activas = taller["reservas_activas"]
-
-            if cupos_totales > 0:
-                ocupacion = (
-                    reservas_activas / cupos_totales
-                ) * 100
-            else:
-                ocupacion = 0
-
-            taller["porcentaje_ocupacion"] = round(ocupacion, 2)
-
-        return jsonify({
-            "total_talleres": len(talleres),
-            "talleres": talleres
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar ocupación de talleres"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudo obtener la ocupación de los talleres."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-@app.route("/api/estadisticas/demanda-talleres", methods=["GET"])
-def api_demanda_talleres():
-
-    conexion = None
-    cursor = None
-
-    try:
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                t.id_taller,
-                t.nombre AS taller,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'reservada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_activas,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'cancelada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_canceladas,
-
-                COUNT(r.id_reserva) AS total_reservas
-
-            FROM talleres t
-
-            LEFT JOIN clases c
-                ON t.id_taller = c.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON c.id_clase = r.id_clase
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY
-                reservas_activas DESC,
-                total_reservas DESC
-        """)
-
-        talleres = cursor.fetchall()
-
-        return jsonify({
-            "total_talleres": len(talleres),
-            "ranking_demanda": talleres
-        }), 200
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar demanda de talleres"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudo obtener la demanda de los talleres."
-            }
-        }), 500
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
 
 
 # =========================
@@ -2162,294 +1727,6 @@ def api_demanda_talleres():
 # =========================
 # ANALISIS DE DATOS  
 # =========================
-
-
-
-@app.route("/analisis")
-def analisis():
-
-    conexion = None
-    cursor = None
-
-    try:
-
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-        # -------------------------------------------------
-        # TOTAL DE ALUMNOS
-        # -------------------------------------------------
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM alumnos
-        """)
-
-        total_alumnos = cursor.fetchone()["total"]
-
-
-        # -------------------------------------------------
-        # TOTAL DE TALLERES
-        # -------------------------------------------------
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM talleres
-        """)
-
-        total_talleres = cursor.fetchone()["total"]
-
-
-        # -------------------------------------------------
-        # RESERVAS ACTIVAS
-        # -------------------------------------------------
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM reservas_clase
-            WHERE estado = 'reservada'
-        """)
-
-        reservas_activas = cursor.fetchone()["total"]
-
-
-        # -------------------------------------------------
-        # RESERVAS CANCELADAS
-        # -------------------------------------------------
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM reservas_clase
-            WHERE estado = 'cancelada'
-        """)
-
-        reservas_canceladas = cursor.fetchone()["total"]
-
-
-        # -------------------------------------------------
-        # TASA DE CANCELACIÓN
-        # -------------------------------------------------
-
-        total_reservas = (
-            reservas_activas +
-            reservas_canceladas
-        )
-
-        if total_reservas > 0:
-
-            tasa_cancelacion = round(
-                (reservas_canceladas / total_reservas) * 100,
-                1
-            )
-
-        else:
-
-            tasa_cancelacion = 0
-
-
-        # -------------------------------------------------
-        # DEMANDA POR TALLER
-        # -------------------------------------------------
-
-        cursor.execute("""
-            SELECT
-                t.id_taller,
-                t.nombre AS taller,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'reservada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas
-
-            FROM talleres t
-
-            LEFT JOIN clases c
-                ON t.id_taller = c.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON c.id_clase = r.id_clase
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY
-                reservas DESC,
-                t.nombre
-        """)
-
-        talleres = cursor.fetchall()
-
-
-        # -------------------------------------------------
-        # TALLER MÁS DEMANDADO
-        # -------------------------------------------------
-
-        if talleres and talleres[0]["reservas"] > 0:
-
-            taller_mas_demandado = talleres[0]["taller"]
-            reservas_taller_mas_demandado = talleres[0]["reservas"]
-
-        else:
-
-            taller_mas_demandado = "Sin reservas"
-            reservas_taller_mas_demandado = 0
-
-
-        # -------------------------------------------------
-        # ENVIAR DATOS A HTML
-        # -------------------------------------------------
-
-        return render_template(
-            "analisis.html",
-
-            total_alumnos=total_alumnos,
-
-            total_talleres=total_talleres,
-
-            reservas_activas=reservas_activas,
-
-            reservas_canceladas=reservas_canceladas,
-
-            tasa_cancelacion=tasa_cancelacion,
-
-            taller_mas_demandado=taller_mas_demandado,
-
-            reservas_taller_mas_demandado=
-                reservas_taller_mas_demandado,
-
-            talleres=talleres
-        )
-
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al cargar el panel de análisis"
-        )
-
-        return "No se pudo cargar el panel de análisis"
-
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-@app.route("/api/estadisticas/reservas-historicas", methods=["GET"])
-def api_reservas_historicas():
-
-    conexion = None
-    cursor = None
-
-    try:
-
-        periodo = request.args.get("periodo", "mes")
-
-        if periodo == "dia":
-            formato_fecha = "%Y-%m-%d"
-
-        elif periodo == "mes":
-            formato_fecha = "%Y-%m"
-
-        elif periodo == "anio":
-            formato_fecha = "%Y"
-
-        else:
-
-            return jsonify({
-                "error": {
-                    "codigo": "periodo_invalido",
-                    "mensaje": "El periodo debe ser dia, mes o anio."
-                }
-            }), 400
-
-
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-
-        consulta = f"""
-            SELECT
-
-                DATE_FORMAT(
-                    fecha_reserva,
-                    '{formato_fecha}'
-                ) AS periodo,
-
-                COUNT(*) AS total_reservas,
-
-                SUM(
-                    CASE
-                        WHEN estado = 'reservada'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS reservas_activas,
-
-                SUM(
-                    CASE
-                        WHEN estado = 'cancelada'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS reservas_canceladas
-
-            FROM reservas_clase
-
-            GROUP BY
-                DATE_FORMAT(
-                    fecha_reserva,
-                    '{formato_fecha}'
-                )
-
-            ORDER BY periodo
-        """
-
-        cursor.execute(consulta)
-
-        historial = cursor.fetchall()
-
-
-        return jsonify({
-            "periodo": periodo,
-            "total_periodos": len(historial),
-            "historial": historial
-        }), 200
-
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar historial de reservas"
-        )
-
-        return jsonify({
-            "error": {
-                "codigo": "error_base_datos",
-                "mensaje": "No se pudo consultar el historial de reservas."
-            }
-        }), 500
-
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-
-
 
 # FUNCIONES NUEVAS PARA ESTADISTICAS DEL ALUMNO
 @app.route("/mis_estadisticas")
@@ -2490,343 +1767,19 @@ def mis_estadisticas_profesor():
 
 
 
-@app.route("/api/profesor/estadisticas", methods=["GET"])
-def api_profesor_estadisticas():
-
-    if "id_usuario" not in session:
-
-        return jsonify({
-            "error": {
-                "mensaje": "Inicia sesión para consultar tus estadísticas."
-            }
-        }), 401
-
-
-    if session.get("rol") != "profesor":
-
-        return jsonify({
-            "error": {
-                "mensaje": "Acceso exclusivo para profesores."
-            }
-        }), 403
-
-
-    conexion = None
-    cursor = None
-
-
-    try:
-
-        conexion = conectar_db()
-        cursor = conexion.cursor(dictionary=True)
-
-
-        # ==========================================
-        # 1. OBTENER PROFESOR CONECTADO
-        # ==========================================
-
-        cursor.execute("""
-            SELECT
-                id_profesor,
-                nombre,
-                apellido
-
-            FROM profesores
-
-            WHERE id_usuario = %s
-        """, (session["id_usuario"],))
-
-        profesor = cursor.fetchone()
-
-
-        if not profesor:
-
-            return jsonify({
-                "error": {
-                    "mensaje": "No se encontró tu perfil de profesor."
-                }
-            }), 404
-
-
-        id_profesor = profesor["id_profesor"]
-
-
-        # ==========================================
-        # 2. TALLERES ASIGNADOS
-        # ==========================================
-
-        cursor.execute("""
-            SELECT COUNT(DISTINCT id_taller) AS total
-
-            FROM taller_profesor
-
-            WHERE id_profesor = %s
-        """, (id_profesor,))
-
-        talleres_asignados = cursor.fetchone()["total"]
-
-
-        # ==========================================
-        # 3. ALUMNOS ACTIVOS
-        # ==========================================
-
-        cursor.execute("""
-            SELECT COUNT(DISTINCT i.id_alumno) AS total
-
-            FROM inscripciones i
-
-            INNER JOIN taller_profesor tp
-                ON i.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-            AND i.estado = 'activa'
-        """, (id_profesor,))
-
-        alumnos_activos = cursor.fetchone()["total"]
-
-
-        # ==========================================
-        # 4. PRÓXIMAS CLASES
-        # ==========================================
-
-        cursor.execute("""
-            SELECT COUNT(DISTINCT c.id_clase) AS total
-
-            FROM clases c
-
-            INNER JOIN taller_profesor tp
-                ON c.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-            AND c.estado = 'programada'
-            AND TIMESTAMP(c.fecha, c.hora_inicio) > NOW()
-        """, (id_profesor,))
-
-        proximas_clases = cursor.fetchone()["total"]
-
-
-        # ==========================================
-        # 5. RESERVAS ACTIVAS Y CANCELADAS
-        # ==========================================
-
-        cursor.execute("""
-            SELECT
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'reservada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_activas,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'cancelada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_canceladas
-
-            FROM reservas_clase r
-
-            INNER JOIN clases c
-                ON r.id_clase = c.id_clase
-
-            INNER JOIN taller_profesor tp
-                ON c.id_taller = tp.id_taller
-
-            WHERE tp.id_profesor = %s
-        """, (id_profesor,))
-
-        reservas = cursor.fetchone()
-
-
-        # ==========================================
-        # 6. ESTADÍSTICAS POR TALLER
-        # ==========================================
-
-        cursor.execute("""
-            SELECT
-
-                t.id_taller,
-
-                t.nombre AS taller,
-
-                COUNT(DISTINCT c.id_clase) AS total_clases,
-
-                COALESCE(
-                    SUM(c.cupo_maximo),
-                    0
-                ) AS cupos_totales,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'reservada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_activas,
-
-                COUNT(
-                    CASE
-                        WHEN r.estado = 'cancelada'
-                        THEN r.id_reserva
-                    END
-                ) AS reservas_canceladas
-
-            FROM talleres t
-
-            INNER JOIN taller_profesor tp
-                ON t.id_taller = tp.id_taller
-
-            LEFT JOIN clases c
-                ON t.id_taller = c.id_taller
-
-            LEFT JOIN reservas_clase r
-                ON c.id_clase = r.id_clase
-
-            WHERE tp.id_profesor = %s
-
-            GROUP BY
-                t.id_taller,
-                t.nombre
-
-            ORDER BY
-                reservas_activas DESC,
-                t.nombre
-        """, (id_profesor,))
-
-        talleres = cursor.fetchall()
-
-
-        # ==========================================
-        # 7. CALCULAR OCUPACIÓN
-        # ==========================================
-
-        for taller in talleres:
-
-            cupos = int(
-                taller["cupos_totales"] or 0
-            )
-
-            activas = int(
-                taller["reservas_activas"] or 0
-            )
-
-
-            if cupos > 0:
-
-                porcentaje = (
-                    activas / cupos
-                ) * 100
-
-            else:
-
-                porcentaje = 0
-
-
-            taller["cupos_totales"] = cupos
-
-            taller["reservas_activas"] = activas
-
-            taller["reservas_canceladas"] = int(
-                taller["reservas_canceladas"] or 0
-            )
-
-            taller["total_clases"] = int(
-                taller["total_clases"] or 0
-            )
-
-            taller["porcentaje_ocupacion"] = round(
-                porcentaje,
-                2
-            )
-
-
-        # ==========================================
-        # 8. OCUPACIÓN PROMEDIO
-        # ==========================================
-
-        if talleres:
-
-            ocupacion_promedio = sum(
-                taller["porcentaje_ocupacion"]
-                for taller in talleres
-            ) / len(talleres)
-
-        else:
-
-            ocupacion_promedio = 0
-
-
-        # ==========================================
-        # 9. RESPUESTA JSON
-        # ==========================================
-
-        respuesta = jsonify({
-
-            "profesor": {
-                "nombre": profesor["nombre"],
-                "apellido": profesor["apellido"]
-            },
-
-            "estadisticas": {
-
-                "talleres_asignados":
-                    int(talleres_asignados),
-
-                "alumnos_activos":
-                    int(alumnos_activos),
-
-                "proximas_clases":
-                    int(proximas_clases),
-
-                "reservas_activas":
-                    int(reservas["reservas_activas"] or 0),
-
-                "reservas_canceladas":
-                    int(reservas["reservas_canceladas"] or 0),
-
-                "ocupacion_promedio":
-                    round(ocupacion_promedio, 2)
-            },
-
-            "talleres": talleres
-
-        })
-
-
-        respuesta.headers["Cache-Control"] = "no-store"
-
-        return respuesta, 200
-
-
-    except mysql.connector.Error:
-
-        app.logger.exception(
-            "Error al consultar estadísticas del profesor"
-        )
-
-        return jsonify({
-            "error": {
-                "mensaje":
-                    "No se pudieron cargar tus estadísticas. "
-                    "Intenta nuevamente."
-            }
-        }), 500
-
-
-    finally:
-
-        if cursor is not None:
-            cursor.close()
-
-        if conexion is not None:
-            conexion.close()
-
-
-
-"""if __name__ == "__main__":
-    app.run(debug=True) """
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(debug=True) 
+
+
+"""if __name__ == "__main__": 
+
+    port = int(
+        os.environ.get("PORT", 5000)
+    )
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    ) """

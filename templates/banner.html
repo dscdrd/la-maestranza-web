@@ -1,0 +1,52 @@
+<header class="barra">
+
+    <div class="marca">
+
+        <img
+            src="{{ url_for('static', filename='img/logo.png') }}"
+            alt="Logo La Maestranza"
+            class="logo-banner"
+        >
+
+        <span class="nombre-marca">
+            MAESTRANZA - ESCUELA DEL MOVIMIENTO
+        </span>
+
+    </div>
+
+
+    <nav class="acciones-banner">
+
+        <a href="{{ url_for('inicio') }}">
+            Inicio
+        </a>
+
+        {% if session.get("rol") == "alumno" %}
+
+            <a href="{{ url_for('panel_alumno') }}">
+                Mi perfil
+            </a>
+
+        {% elif session.get("rol") == "profesor" %}
+
+            <a href="{{ url_for('panel_profesor') }}">
+                Mi perfil
+            </a>
+
+        {% endif %}
+
+
+        {% if session.get("id_usuario") %}
+
+            <a
+                href="{{ url_for('cerrar_sesion') }}"
+                class="cerrar-sesion"
+            >
+                Cerrar sesión
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+</header>

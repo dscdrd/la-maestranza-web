@@ -9,78 +9,21 @@
 :root {
     --rojo: #8f0d0d;
     --rojo-claro: #a80d12;
-    --negro: #111;
-    --gris: #666;
-    --blanco: #fff;
+    --negro: #111111;
+    --gris: #666666;
+    --gris-boton: #f2f2f2;
+    --gris-borde: #d0d0d0;
+    --blanco: #ffffff;
     --fondo: #f4f4f2;
 }
 
 body {
     margin: 0;
+
     font-family: Arial, sans-serif;
+
     background-color: var(--fondo);
-    color: #222;
-}
-
-
-/* =========================
-   NAV
-========================= */
-
-.navbar {
-    height: 80px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 0 6%;
-
-    background-color: var(--negro);
-    color: var(--blanco);
-}
-
-.marca {
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.logo {
-    width: 38px;
-    height: 50px;
-
-    object-fit: contain;
-}
-
-.nav-acciones {
-    display: flex;
-    align-items: center;
-
-    gap: 25px;
-}
-
-.nav-acciones a {
-    color: var(--blanco);
-
-    text-decoration: none;
-
-    font-size: 14px;
-}
-
-.nav-acciones a:hover {
-    opacity: 0.7;
-}
-
-.btn-cerrar {
-    padding: 10px 16px;
-
-    border: 1px solid var(--blanco);
-    border-radius: 5px;
+    color: #222222;
 }
 
 
@@ -112,6 +55,7 @@ body {
 
     font-size: 12px;
     font-weight: bold;
+
     letter-spacing: 3px;
 }
 
@@ -139,7 +83,8 @@ body {
 
     border-radius: 12px;
 
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.06);
 }
 
 .datos-personales {
@@ -153,6 +98,7 @@ body {
 
 .titulo-tarjeta {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
@@ -165,12 +111,18 @@ body {
 
 .perfil-resumen {
     display: flex;
+
     align-items: center;
 
     gap: 12px;
 
     flex-wrap: wrap;
 }
+
+
+/* =========================
+   AVATAR
+========================= */
 
 .avatar-perfil {
     width: 72px;
@@ -179,7 +131,7 @@ body {
     object-fit: cover;
     object-position: center;
 
-    border: 1px solid #ddd;
+    border: 1px solid #dddddd;
     border-radius: 50%;
 
     background-color: var(--blanco);
@@ -187,8 +139,14 @@ body {
 
 .avatar-predeterminado {
     object-fit: contain;
+
     padding: 5px;
 }
+
+
+/* =========================
+   ETIQUETA ALUMNO
+========================= */
 
 .estado {
     padding: 7px 14px;
@@ -199,6 +157,7 @@ body {
     border-radius: 20px;
 
     font-size: 12px;
+    font-weight: 600;
 }
 
 
@@ -208,6 +167,7 @@ body {
 
 .form-foto-perfil {
     display: flex;
+
     align-items: center;
 
     gap: 10px;
@@ -230,29 +190,22 @@ body {
    BOTONES DEL PERFIL
 ========================= */
 
-/*
-   Esta clase controla el tamaño de los
-   cuatro botones del perfil:
-
-   - Seleccionar imagen
-   - Guardar foto
-   - Editar mis datos
-   - Eliminar mi cuenta
-*/
-
 .btn-perfil {
     height: 38px;
+
+    min-width: 116px;
 
     padding: 0 16px;
 
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    border: none;
     border-radius: 7px;
 
     font-family: Arial, sans-serif;
+
     font-size: 13px;
     font-weight: 600;
 
@@ -262,31 +215,57 @@ body {
 
     cursor: pointer;
 
-    transition: 0.2s;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
 }
 
 
-/* BOTONES NEGROS */
+/* =========================
+   BOTÓN GRIS
+   Editar mis datos
+========================= */
 
 .btn-negro {
-    background-color: var(--negro);
-    color: var(--blanco);
+    background-color: var(--gris-boton);
+
+    color: #222222;
+
+    border: 1px solid var(--gris-borde);
+}
+
+.btn-negro {
+    background-color: #111111;
+
+    color: #ffffff;
+
+    border: 1px solid #111111;
 }
 
 .btn-negro:hover {
-    background-color: #333;
+    background-color: #333333;
+
+    border-color: #333333;
 }
 
 
-/* BOTONES ROJOS */
+/* =========================
+   BOTONES ROJOS
+========================= */
 
 .btn-rojo {
     background-color: var(--rojo-claro);
+
     color: var(--blanco);
+
+    border: 1px solid var(--rojo-claro);
 }
 
 .btn-rojo:hover {
     background-color: #860a0e;
+
+    border-color: #860a0e;
 }
 
 
@@ -297,20 +276,22 @@ body {
 .datos-grid {
     display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns:
+        repeat(3, 1fr);
 
     gap: 25px;
 }
 
 .dato {
     display: flex;
+
     flex-direction: column;
 
     gap: 7px;
 }
 
 .dato span {
-    color: #888;
+    color: #888888;
 
     font-size: 13px;
 }
@@ -337,7 +318,7 @@ body {
     padding: 6px 12px;
 
     background-color: #f1f1f1;
-    color: #555;
+    color: #555555;
 
     border-radius: 16px;
 }
@@ -354,13 +335,15 @@ body {
 .opciones {
     display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns:
+        repeat(3, 1fr);
 
     gap: 20px;
 }
 
 .opcion {
-    transition: transform 0.2s;
+    transition:
+        transform 0.2s ease;
 }
 
 .opcion:hover {
@@ -409,7 +392,8 @@ body {
 @media (max-width: 800px) {
 
     .datos-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 
     .opciones {
@@ -419,7 +403,6 @@ body {
     .perfil-resumen {
         gap: 10px;
     }
-
 }
 
 
@@ -428,18 +411,6 @@ body {
 ========================= */
 
 @media (max-width: 550px) {
-
-    .navbar {
-        padding: 0 20px;
-    }
-
-    .marca span {
-        display: none;
-    }
-
-    .nav-acciones {
-        gap: 12px;
-    }
 
     .panel {
         padding: 40px 20px;
@@ -470,5 +441,4 @@ body {
     .btn-perfil {
         min-width: 130px;
     }
-
 }

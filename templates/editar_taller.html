@@ -4,137 +4,206 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Editar taller | La Maestranza</title>
+
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/editar_taller.css') }}"
     >
 
-    <script
-        src="{{ url_for('static', filename='js/editar_taller.js') }}"
-        defer>
-    </script>
-
 </head>
 
 
 <body>
 
-    <main
-        id="editar-taller"
-        data-api-url="{{ url_for(
-            'api.api_actualizar_taller',
-            id_taller=taller.id_taller
-        ) }}"
-        data-gestion-url="{{ url_for('gestion_talleres') }}"
-    >
-
-        <h1>Editar taller</h1>
+    {% include "banner.html" %}
 
 
-        <a href="{{ url_for('gestion_talleres') }}">
+    <main class="contenedor">
+
+
+        <!-- =========================
+             VOLVER
+        ========================== -->
+
+        <a
+            href="{{ url_for('gestion_talleres') }}"
+            class="volver"
+        >
             ← Volver a gestión de talleres
         </a>
 
 
-        <hr>
+        <!-- =========================
+             ENCABEZADO
+        ========================== -->
+
+        <section class="encabezado">
+
+            <p class="subtitulo">
+                PANEL DE PROFESOR
+            </p>
+
+            <h1>
+                Editar taller
+            </h1>
+
+            <p class="descripcion">
+                Modifica la información del taller seleccionado.
+            </p>
+
+        </section>
 
 
-        <form id="form-editar-taller">
+        <!-- =========================
+             FORMULARIO
+        ========================== -->
 
-            <label for="nombre">
-                Nombre:
-            </label>
+        <section class="tarjeta">
 
-            <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value="{{ taller.nombre }}"
-                required
-            >
+            <form method="POST">
 
 
-            <br><br>
+                <div class="form-grid">
 
 
-            <label for="descripcion">
-                Descripción:
-            </label>
+                    <!-- NOMBRE -->
 
-            <textarea
-                id="descripcion"
-                name="descripcion"
-            >{{ taller.descripcion or '' }}</textarea>
+                    <div class="campo campo-completo">
 
+                        <label for="nombre">
+                            Nombre del taller
+                        </label>
 
-            <br><br>
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            value="{{ taller.nombre }}"
+                            required
+                        >
 
-
-            <label for="horario">
-                Horario:
-            </label>
-
-            <input
-                type="text"
-                id="horario"
-                name="horario"
-                value="{{ taller.horario or '' }}"
-            >
+                    </div>
 
 
-            <br><br>
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="campo campo-completo">
+
+                        <label for="descripcion">
+                            Descripción
+                        </label>
+
+                        <textarea
+                            id="descripcion"
+                            name="descripcion"
+                            required
+                        >{{ taller.descripcion or '' }}</textarea>
+
+                    </div>
 
 
-            <label for="cupo_maximo">
-                Cupo máximo:
-            </label>
+                    <!-- HORARIO -->
 
-            <input
-                type="number"
-                id="cupo_maximo"
-                name="cupo_maximo"
-                value="{{ taller.cupo_maximo or '' }}"
-                min="1"
-                required
-            >
+                    <div class="campo">
 
+                        <label for="horario">
+                            Horario
+                        </label>
 
-            <br><br>
+                        <input
+                            type="text"
+                            id="horario"
+                            name="horario"
+                            value="{{ taller.horario or '' }}"
+                            required
+                        >
 
-
-            <label for="imagen">
-                Imagen:
-            </label>
-
-            <input
-                type="text"
-                id="imagen"
-                name="imagen"
-                value="{{ taller.imagen or '' }}"
-            >
+                    </div>
 
 
-            <br><br>
+                    <!-- CUPO -->
+
+                    <div class="campo">
+
+                        <label for="cupo_maximo">
+                            Cupo máximo
+                        </label>
+
+                        <input
+                            type="number"
+                            id="cupo_maximo"
+                            name="cupo_maximo"
+                            value="{{ taller.cupo_maximo }}"
+                            min="1"
+                            required
+                        >
+
+                    </div>
 
 
-            <button
-                type="submit"
-                id="btn-guardar"
-            >
-                Guardar cambios
-            </button>
+                    <!-- IMAGEN -->
 
-        </form>
+                    <div class="campo campo-completo">
+
+                        <label for="imagen">
+                            Imagen
+                        </label>
+
+                        <input
+                            type="text"
+                            id="imagen"
+                            name="imagen"
+                            value="{{ taller.imagen or '' }}"
+                            placeholder="ejemplo.jpg"
+                        >
+
+                    </div>
 
 
-        <p
-            id="mensaje-formulario"
-            hidden
-        ></p>
+                </div>
+
+
+                <!-- =========================
+                     ACCIONES
+                ========================== -->
+
+                <div class="acciones-formulario">
+
+                    <a
+                        href="{{ url_for('gestion_talleres') }}"
+                        class="btn-cancelar"
+                    >
+                        Cancelar
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn-guardar"
+                    >
+                        Guardar cambios
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </section>
 
     </main>
 

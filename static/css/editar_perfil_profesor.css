@@ -419,3 +419,129 @@ body {
     }
 
 }
+
+/* =========================
+   ZONA DE PELIGRO
+========================= */
+
+.zona-peligro {
+    margin-top: 40px;
+
+    padding-top: 28px;
+
+    border-top: 1px solid #dddddd;
+}
+
+.zona-peligro h2 {
+    margin: 0 0 8px;
+
+    font-size: 20px;
+}
+
+.zona-peligro p {
+    margin: 0 0 18px;
+
+    color: #666666;
+
+    font-size: 14px;
+}
+
+.btn-eliminar-cuenta {
+    padding: 10px 16px;
+
+    background-color: transparent;
+    color: #8f0d0d;
+
+    border: 1px solid #8f0d0d;
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-eliminar-cuenta:hover {
+    background-color: #8f0d0d;
+
+    color: #ffffff;
+}
+
+
+
+
+/* =========================================================
+   ZONA ELIMINAR CUENTA
+========================================================= */
+
+.zona-desactivar {
+    margin-top: 45px;
+}
+
+.zona-desactivar hr {
+    border: none;
+
+    border-top: 1px solid #e5e5e5;
+
+    margin: 0 0 30px;
+}
+
+.zona-desactivar h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+
+    color: #8f0d0d;
+}
+
+.zona-desactivar p {
+    max-width: 600px;
+
+    margin: 0 0 18px;
+
+    color: #666666;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   BOTÓN ELIMINAR CUENTA
+========================================================= */
+
+.btn-desactivar-cuenta {
+    border: 1px solid #8f0d0d;
+
+    background-color: transparent;
+    color: #8f0d0d;
+
+    padding: 11px 18px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-desactivar-cuenta:hover {
+    background-color: #8f0d0d;
+
+    color: #ffffff;
+}
+
+.btn-desactivar-cuenta:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}

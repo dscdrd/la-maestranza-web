@@ -9,6 +9,11 @@
     <title>Crear taller | La Maestranza</title>
 
     <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/banner.css') }}"
+>
+
+    <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/crear_taller.css') }}"
     >
@@ -21,6 +26,8 @@
 </head>
 
 <body>
+
+    {% include "banner.html" %}
 
     <main
     class="contenedor"
