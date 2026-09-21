@@ -1,0 +1,549 @@
+/* ============================================================
+   ESTADÍSTICAS BI
+   LA MAESTRANZA
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background-color: #f4f4f2;
+
+    color: #111111;
+}
+
+
+/* ============================================================
+   CONTENEDOR
+   ============================================================ */
+
+.bi-container {
+
+    width: min(
+        1008px,
+        calc(100% - 40px)
+    );
+
+    margin: 0 auto;
+
+    padding:
+        38px
+        0
+        70px;
+}
+
+
+/* ============================================================
+   VOLVER AL PANEL
+   ============================================================ */
+
+.btn-volver {
+
+    display: inline-block;
+
+    margin-bottom: 32px;
+
+    padding:
+        9px
+        13px;
+
+    border:
+        1px solid
+        #a00000;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    color: #a00000;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-volver:hover {
+
+    background-color: #a00000;
+
+    color: #ffffff;
+}
+
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.bi-encabezado {
+
+    margin-bottom: 34px;
+}
+
+.bi-etiqueta {
+
+    margin:
+        0
+        0
+        14px;
+
+    color: #a00000;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.8px;
+}
+
+.bi-encabezado h1 {
+
+    margin:
+        0
+        0
+        14px;
+
+    font-size: 36px;
+
+    font-weight: 700;
+
+    letter-spacing: -1px;
+}
+
+.bi-descripcion {
+
+    margin: 0;
+
+    color: #666666;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   INDICADORES PRINCIPALES
+   ============================================================ */
+
+.bi-indicadores {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    border-top:
+        1px solid
+        #d5d5d5;
+
+    border-bottom:
+        1px solid
+        #d5d5d5;
+
+    margin-bottom: 58px;
+
+    padding:
+        24px
+        0;
+}
+
+.bi-indicador {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    min-height: 70px;
+
+    padding:
+        0
+        24px;
+
+    border-right:
+        1px solid
+        #d5d5d5;
+}
+
+.bi-indicador:first-child {
+
+    padding-left: 0;
+}
+
+.bi-indicador:last-child {
+
+    border-right: none;
+}
+
+.bi-numero {
+
+    margin-bottom: 12px;
+
+    font-size: 30px;
+
+    font-weight: 400;
+}
+
+.bi-nombre {
+
+    color: #666666;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.3px;
+}
+
+
+/* ============================================================
+   RESUMEN
+   ============================================================ */
+
+.bi-resumen {
+
+    margin-bottom: 58px;
+}
+
+.bi-resumen-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    border-top:
+        1px solid
+        #d5d5d5;
+
+    border-bottom:
+        1px solid
+        #d5d5d5;
+}
+
+.bi-resumen-grid div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding:
+        18px
+        20px;
+
+    border-bottom:
+        1px solid
+        #e1e1e1;
+}
+
+.bi-resumen-grid div:nth-last-child(-n + 3) {
+
+    border-bottom: none;
+}
+
+.bi-resumen-grid span {
+
+    color: #666666;
+
+    font-size: 13px;
+}
+
+.bi-resumen-grid strong {
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   TITULO SECCIÓN TALLERES
+   ============================================================ */
+
+.bi-titulo-seccion {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+    gap: 30px;
+
+    padding-bottom: 25px;
+
+    border-bottom:
+        1px solid
+        #d5d5d5;
+}
+
+.bi-titulo-seccion h2 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    font-weight: 700;
+}
+
+.bi-texto-derecha {
+
+    margin: 0;
+
+    color: #777777;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   TALLER
+   ============================================================ */
+
+.bi-taller {
+
+    padding:
+        29px
+        0;
+
+    border-bottom:
+        1px solid
+        #d5d5d5;
+}
+
+.bi-taller-superior {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+.bi-taller-superior h3 {
+
+    margin: 0;
+
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+.bi-taller-superior > span {
+
+    color: #777777;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   DATOS POR TALLER
+   ============================================================ */
+
+.bi-taller-datos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 20px;
+}
+
+.bi-taller-datos div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.bi-taller-datos span {
+
+    color: #777777;
+
+    font-size: 11px;
+}
+
+.bi-taller-datos strong {
+
+    color: #111111;
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   SIN DATOS
+   ============================================================ */
+
+.sin-datos {
+
+    color: #999999 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 400 !important;
+}
+
+.sin-resultados {
+
+    padding:
+        30px
+        0;
+
+    color: #777777;
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    .bi-indicadores {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .bi-indicador {
+
+        border-bottom:
+            1px solid
+            #d5d5d5;
+
+        padding:
+            20px;
+    }
+
+    .bi-indicador:nth-child(2) {
+
+        border-right: none;
+    }
+
+    .bi-indicador:nth-child(3),
+    .bi-indicador:nth-child(4) {
+
+        border-bottom: none;
+    }
+
+    .bi-resumen-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .bi-taller-datos {
+
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .bi-container {
+
+        width:
+            calc(100% - 28px);
+
+        padding-top: 25px;
+    }
+
+    .bi-encabezado h1 {
+
+        font-size: 30px;
+    }
+
+    .bi-indicadores {
+
+        grid-template-columns: 1fr;
+    }
+
+    .bi-indicador {
+
+        border-right: none;
+
+        border-bottom:
+            1px solid
+            #d5d5d5;
+
+        padding:
+            18px
+            0;
+    }
+
+    .bi-indicador:last-child {
+
+        border-bottom: none;
+    }
+
+    .bi-resumen-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .bi-resumen-grid div {
+
+        border-bottom:
+            1px solid
+            #e1e1e1 !important;
+    }
+
+    .bi-resumen-grid div:last-child {
+
+        border-bottom: none !important;
+    }
+
+    .bi-titulo-seccion {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .bi-taller-superior {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .bi-taller-datos {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}

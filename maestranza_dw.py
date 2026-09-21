@@ -48,27 +48,36 @@ def comprobar_conexion():
             SELECT
                 'alumnos' AS entidad,
                 (SELECT COUNT(*)
-                 FROM la_maestranza.alumnos) AS origen,
+                FROM la_maestranza.alumnos) AS origen,
                 (SELECT COUNT(*)
-                 FROM la_maestranza_dw.dim_alumno) AS dw
+                FROM la_maestranza_dw.dim_alumno) AS dw
 
             UNION ALL
 
             SELECT
                 'talleres',
                 (SELECT COUNT(*)
-                 FROM la_maestranza.talleres),
+                FROM la_maestranza.talleres),
                 (SELECT COUNT(*)
-                 FROM la_maestranza_dw.dim_taller)
+                FROM la_maestranza_dw.dim_taller)
 
             UNION ALL
 
             SELECT
                 'reservas',
                 (SELECT COUNT(*)
-                 FROM la_maestranza.reservas_clase),
+                FROM la_maestranza.reservas_clase),
                 (SELECT COUNT(*)
-                 FROM la_maestranza_dw.fact_reservas)
+                FROM la_maestranza_dw.fact_reservas)
+
+            UNION ALL
+
+            SELECT
+                'asistencias',
+                (SELECT COUNT(*)
+                FROM la_maestranza.asistencias),
+                (SELECT COUNT(*)
+                FROM la_maestranza_dw.fact_asistencias)
         """)
 
         print("\nCantidades actuales:")
@@ -218,6 +227,12 @@ def sincronizar_calendario(id_ejecucion):
                 SELECT DATE(fecha_cancelacion)
                 FROM la_maestranza.reservas_clase
                 WHERE fecha_cancelacion IS NOT NULL
+
+                UNION ALL
+
+                SELECT DATE(fecha_registro)
+                FROM la_maestranza.asistencias
+
             ) AS fechas_origen
         """)
 
@@ -605,6 +620,306 @@ def sincronizar_reservas(id_ejecucion):
         if conexion is not None and conexion.is_connected():
             conexion.close()
 
+
+def sincronizar_asistencias(id_ejecucion):
+    conexion = None
+    cursor = None
+
+    try:
+        conexion = conectar_db()
+
+        conexion.start_transaction(
+            isolation_level="REPEATABLE READ",
+            consistent_snapshot=True,
+        )
+
+        cursor = conexion.cursor(dictionary=True)
+
+        # -----------------------------------------------------
+        # EXTRAER ASISTENCIAS DEL SISTEMA OPERACIONAL
+        # -----------------------------------------------------
+
+        cursor.execute("""
+            SELECT
+                a.id_asistencia AS id_asistencia_origen,
+                a.id_reserva AS id_reserva_origen,
+
+                da.alumno_key,
+                dt.taller_key,
+
+                CAST(
+                    DATE_FORMAT(c.fecha, '%Y%m%d')
+                    AS UNSIGNED
+                ) AS fecha_clase_key,
+
+                CAST(
+                    DATE_FORMAT(a.fecha_registro, '%Y%m%d')
+                    AS UNSIGNED
+                ) AS fecha_registro_key,
+
+                r.id_clase AS id_clase_origen,
+                a.id_profesor AS id_profesor_origen,
+                a.estado AS estado_asistencia,
+
+                1 AS cantidad_asistencias,
+
+                i.id_taller AS taller_inscripcion,
+                c.id_taller AS taller_clase
+
+            FROM la_maestranza.asistencias AS a
+
+            LEFT JOIN la_maestranza.reservas_clase AS r
+                ON r.id_reserva = a.id_reserva
+
+            LEFT JOIN la_maestranza.inscripciones AS i
+                ON i.id_inscripcion = r.id_inscripcion
+
+            LEFT JOIN la_maestranza.clases AS c
+                ON c.id_clase = r.id_clase
+
+            LEFT JOIN la_maestranza_dw.dim_alumno AS da
+                ON da.id_alumno_origen = i.id_alumno
+
+            LEFT JOIN la_maestranza_dw.dim_taller AS dt
+                ON dt.id_taller_origen = c.id_taller
+        """)
+
+        asistencias = cursor.fetchall()
+
+        campos = (
+            "id_reserva_origen",
+            "alumno_key",
+            "taller_key",
+            "fecha_clase_key",
+            "fecha_registro_key",
+            "id_clase_origen",
+            "id_profesor_origen",
+            "estado_asistencia",
+            "cantidad_asistencias",
+        )
+
+        columnas = ", ".join(campos)
+
+        # -----------------------------------------------------
+        # LEER ASISTENCIAS YA EXISTENTES EN EL DW
+        # -----------------------------------------------------
+
+        cursor.execute(f"""
+            SELECT
+                id_asistencia_origen,
+                {columnas}
+            FROM la_maestranza_dw.fact_asistencias
+        """)
+
+        existentes = {
+            fila["id_asistencia_origen"]: fila
+            for fila in cursor.fetchall()
+        }
+
+        marcadores = ", ".join(
+            ["%s"] * (len(campos) + 1)
+        )
+
+        asignaciones = ", ".join(
+            f"{campo} = %s"
+            for campo in campos
+        )
+
+        sql_insertar = f"""
+            INSERT INTO la_maestranza_dw.fact_asistencias (
+                id_asistencia_origen,
+                {columnas},
+                fecha_actualizacion_dw
+            )
+            VALUES (
+                {marcadores},
+                CURRENT_TIMESTAMP
+            )
+        """
+
+        sql_actualizar = f"""
+            UPDATE la_maestranza_dw.fact_asistencias
+            SET
+                {asignaciones},
+                fecha_actualizacion_dw = CURRENT_TIMESTAMP
+            WHERE id_asistencia_origen = %s
+        """
+
+        nuevas = 0
+        actualizadas = 0
+        sin_cambios = 0
+
+        # -----------------------------------------------------
+        # INSERTAR O ACTUALIZAR
+        # -----------------------------------------------------
+
+        for asistencia in asistencias:
+
+            id_asistencia = asistencia[
+                "id_asistencia_origen"
+            ]
+
+            faltantes = [
+                campo
+                for campo in campos
+                if asistencia[campo] is None
+            ]
+
+            if faltantes:
+                raise RuntimeError(
+                    f"Asistencia {id_asistencia}: "
+                    f"faltan datos en "
+                    f"{', '.join(faltantes)}."
+                )
+
+            if (
+                asistencia["taller_inscripcion"]
+                != asistencia["taller_clase"]
+            ):
+                raise RuntimeError(
+                    f"Asistencia {id_asistencia}: "
+                    "el taller de la inscripción "
+                    "no coincide con el taller "
+                    "de la clase."
+                )
+
+            valores = tuple(
+                asistencia[campo]
+                for campo in campos
+            )
+
+            anterior = existentes.get(
+                id_asistencia
+            )
+
+            if anterior is None:
+
+                cursor.execute(
+                    sql_insertar,
+                    (id_asistencia,) + valores,
+                )
+
+                nuevas += 1
+
+            elif any(
+                asistencia[campo]
+                != anterior[campo]
+                for campo in campos
+            ):
+
+                cursor.execute(
+                    sql_actualizar,
+                    valores + (id_asistencia,),
+                )
+
+                actualizadas += 1
+
+            else:
+
+                sin_cambios += 1
+
+        # -----------------------------------------------------
+        # VALIDACIÓN
+        # -----------------------------------------------------
+
+        cursor.execute(f"""
+            SELECT
+                id_asistencia_origen,
+                {columnas}
+            FROM la_maestranza_dw.fact_asistencias
+        """)
+
+        resultado_dw = {
+            fila["id_asistencia_origen"]: fila
+            for fila in cursor.fetchall()
+        }
+
+        for asistencia in asistencias:
+
+            id_asistencia = asistencia[
+                "id_asistencia_origen"
+            ]
+
+            cargada = resultado_dw.get(
+                id_asistencia
+            )
+
+            if cargada is None or any(
+                cargada[campo]
+                != asistencia[campo]
+                for campo in campos
+            ):
+                raise RuntimeError(
+                    f"No se pudo validar "
+                    f"la asistencia {id_asistencia}."
+                )
+
+        ids_origen = {
+            asistencia["id_asistencia_origen"]
+            for asistencia in asistencias
+        }
+
+        solo_en_dw = (
+            set(resultado_dw) - ids_origen
+        )
+
+        # -----------------------------------------------------
+        # MÉTRICAS
+        # -----------------------------------------------------
+
+        guardar_metricas(
+            cursor,
+            id_ejecucion,
+            asistencias_nuevas=nuevas,
+            asistencias_actualizadas=actualizadas,
+            asistencias_sin_cambios=sin_cambios,
+            asistencias_verificadas=len(asistencias),
+            asistencias_solo_dw=len(solo_en_dw),
+        )
+
+        conexion.commit()
+
+        print("\nAsistencias sincronizadas:")
+        print(f"  Nuevas: {nuevas}")
+        print(f"  Actualizadas: {actualizadas}")
+        print(f"  Sin cambios: {sin_cambios}")
+
+        print(
+            "  Asistencias del origen verificadas: "
+            f"{len(asistencias)}"
+        )
+
+        print(
+            "  Conservadas sin registro en origen: "
+            f"{len(solo_en_dw)}"
+        )
+
+    except Exception:
+
+        if (
+            conexion is not None
+            and conexion.is_connected()
+        ):
+            conexion.rollback()
+
+        print(
+            "\nFalló la carga de asistencias; "
+            "se revirtieron sus cambios."
+        )
+
+        raise
+
+    finally:
+
+        if cursor is not None:
+            cursor.close()
+
+        if (
+            conexion is not None
+            and conexion.is_connected()
+        ):
+            conexion.close()
+
 def registrar_ejecucion(
     id_ejecucion=None,
     estado="en_proceso",
@@ -678,6 +993,12 @@ def guardar_metricas(cursor, id_ejecucion, **metricas):
         "reservas_solo_dw",
         "observaciones_iniciales",
         "cambios_estado",
+
+        "asistencias_nuevas",
+        "asistencias_actualizadas",
+        "asistencias_sin_cambios",
+        "asistencias_verificadas",
+        "asistencias_solo_dw",
     }
 
     if not metricas or not set(metricas).issubset(permitidas):
@@ -730,6 +1051,9 @@ if __name__ == "__main__":
 
         etapa = "reservas e historial"
         sincronizar_reservas(id_ejecucion)
+
+        etapa = "asistencias"
+        sincronizar_asistencias(id_ejecucion)       
 
         etapa = "cierre de bitácora"
         registrar_ejecucion(

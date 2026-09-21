@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Estadísticas BI | La Maestranza</title>
+
+    <!-- Banner general de La Maestranza -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/banner.css') }}"
+    >
+
+    <!-- Estilos propios del dashboard BI -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/dashboard_bi.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- Banner común del sitio -->
+    {% include "banner.html" %}
+
+    <main class="bi-container">
+
+        <!-- VOLVER -->
+        <a
+            href="{{ url_for('panel_profesor') }}"
+            class="btn-volver"
+        >
+            ← Volver a mi panel
+        </a>
+
+
+        <!-- ENCABEZADO -->
+        <section class="bi-encabezado">
+
+            <p class="bi-etiqueta">
+                BUSINESS INTELLIGENCE
+            </p>
+
+            <h1>
+                Estadísticas BI
+            </h1>
+
+            <p class="bi-descripcion">
+                Análisis histórico de reservas,
+                cancelaciones y asistencia de La Maestranza.
+            </p>
+
+        </section>
+
+
+        <!-- INDICADORES PRINCIPALES -->
+        <section class="bi-indicadores">
+
+            <article class="bi-indicador">
+                <span class="bi-numero">
+                    {{ indicadores.reservas_totales }}
+                </span>
+
+                <span class="bi-nombre">
+                    RESERVAS TOTALES
+                </span>
+            </article>
+
+
+            <article class="bi-indicador">
+                <span class="bi-numero">
+                    {{ indicadores.cancelaciones }}
+                </span>
+
+                <span class="bi-nombre">
+                    CANCELACIONES
+                </span>
+            </article>
+
+
+            <article class="bi-indicador">
+                <span class="bi-numero">
+                    {{ indicadores.cancelaciones_tardias }}
+                </span>
+
+                <span class="bi-nombre">
+                    CANCELACIONES TARDÍAS
+                </span>
+            </article>
+
+
+            <article class="bi-indicador">
+
+                <span class="bi-numero">
+
+                    {% if indicadores.tasa_asistencia is not none %}
+                        {{ indicadores.tasa_asistencia }}%
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </span>
+
+                <span class="bi-nombre">
+                    TASA DE ASISTENCIA
+                </span>
+
+            </article>
+
+        </section>
+
+
+        <!-- RESUMEN SECUNDARIO -->
+        <section class="bi-resumen">
+
+            <p class="bi-etiqueta">
+                RESUMEN
+            </p>
+
+            <div class="bi-resumen-grid">
+
+                <div>
+                    <span>Reservas activas</span>
+                    <strong>{{ indicadores.reservas_activas }}</strong>
+                </div>
+
+                <div>
+                    <span>Cancelaciones anticipadas</span>
+                    <strong>{{ indicadores.cancelaciones_anticipadas }}</strong>
+                </div>
+
+                <div>
+                    <span>Clases descontadas</span>
+                    <strong>{{ indicadores.clases_descontadas }}</strong>
+                </div>
+
+                <div>
+                    <span>Asistencias registradas</span>
+                    <strong>{{ indicadores.asistencias_registradas }}</strong>
+                </div>
+
+                <div>
+                    <span>Presentes</span>
+                    <strong>{{ indicadores.presentes }}</strong>
+                </div>
+
+                <div>
+                    <span>Ausentes</span>
+                    <strong>{{ indicadores.ausentes }}</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ESTADÍSTICAS POR TALLER -->
+        <section class="bi-talleres">
+
+            <div class="bi-titulo-seccion">
+
+                <div>
+                    <p class="bi-etiqueta">
+                        ANÁLISIS
+                    </p>
+
+                    <h2>
+                        Estadísticas por taller
+                    </h2>
+                </div>
+
+                <p class="bi-texto-derecha">
+                    Información obtenida desde el Data Warehouse.
+                </p>
+
+            </div>
+
+
+            {% for taller in talleres %}
+
+            <article class="bi-taller">
+
+                <div class="bi-taller-superior">
+
+                    <h3>
+                        {{ taller.taller }}
+                    </h3>
+
+                    <span>
+                        {{ taller.reservas }} reservas
+                    </span>
+
+                </div>
+
+
+                <div class="bi-taller-datos">
+
+                    <div>
+                        <span>Activas</span>
+                        <strong>{{ taller.activas }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Canceladas</span>
+                        <strong>{{ taller.canceladas }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Anticipadas</span>
+                        <strong>{{ taller.cancelaciones_anticipadas }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Tardías</span>
+                        <strong>{{ taller.cancelaciones_tardias }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Clases descontadas</span>
+                        <strong>{{ taller.clases_descontadas }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Asistencia</span>
+
+                        <strong>
+
+                            {% if taller.tasa_asistencia is not none %}
+
+                                {{ taller.tasa_asistencia }}%
+
+                            {% else %}
+
+                                <span class="sin-datos">
+                                    Sin datos
+                                </span>
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% else %}
+
+            <p class="sin-resultados">
+                No existen datos disponibles.
+            </p>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

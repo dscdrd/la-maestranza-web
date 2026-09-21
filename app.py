@@ -2,7 +2,7 @@ import os
 from db import conectar_db
 from api import api 
 
-from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, eliminar_cuenta_profesor
+from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, eliminar_cuenta_profesor, obtener_resumen_bi_talleres
 
 
 from dotenv import load_dotenv
@@ -893,6 +893,39 @@ def mi_panel():
 
     return redirect(url_for("seleccionar_perfil"))
 
+
+#----------------------------------------------------
+# IMPLEMENTACION BIG DATA
+#----------------------------------------------------
+
+@app.route("/dashboard_bi")
+def dashboard_bi():
+
+    if "id_usuario" not in session:
+        return redirect(
+            url_for("login_profesor")
+        )
+
+    if session.get("rol") != "profesor":
+        return render_template(
+            "mensaje.html",
+            tipo="error",
+            titulo="Acceso no autorizado",
+            mensaje=(
+                "No tienes permisos para acceder "
+                "al panel de Business Intelligence."
+            ),
+            texto_boton="Volver al inicio",
+            destino=url_for("inicio")
+        )
+
+    datos = obtener_resumen_bi_talleres()
+
+    return render_template(
+        "dashboard_bi.html",
+        indicadores=datos["indicadores"],
+        talleres=datos["talleres"]
+    )
 
 #----------------------------------------------------
 # TALLERES

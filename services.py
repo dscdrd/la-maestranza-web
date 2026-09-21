@@ -2910,9 +2910,443 @@ def obtener_clases_taller_api(id_taller):
         conexion.close()
 
 
-
 # ============================================================
-#   ESTADÍSTICAS
+# BUSINESS INTELLIGENCE / DATA WAREHOUSE
 # ============================================================
 
+def obtener_resumen_bi_talleres():
 
+    conexion = conectar_db()
+    cursor = conexion.cursor(dictionary=True)
+
+    try:
+
+        # ==================================================
+        # 1. INDICADORES GLOBALES DE RESERVAS
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+
+                COUNT(*) AS reservas_totales,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'reservada'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS reservas_activas,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS cancelaciones,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            AND consume_clase = 0
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS cancelaciones_anticipadas,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            AND consume_clase = 1
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS cancelaciones_tardias,
+
+                COALESCE(
+                    SUM(consume_clase),
+                    0
+                ) AS clases_descontadas
+
+            FROM la_maestranza_dw.fact_reservas
+        """)
+
+        reservas = cursor.fetchone()
+
+
+        # ==================================================
+        # 2. INDICADORES GLOBALES DE ASISTENCIA
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+
+                COUNT(*) AS asistencias_registradas,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_asistencia = 'presente'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS presentes,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN estado_asistencia = 'ausente'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS ausentes
+
+            FROM la_maestranza_dw.fact_asistencias
+        """)
+
+        asistencia = cursor.fetchone()
+
+
+        asistencias_registradas = int(
+            asistencia["asistencias_registradas"] or 0
+        )
+
+        presentes = int(
+            asistencia["presentes"] or 0
+        )
+
+        ausentes = int(
+            asistencia["ausentes"] or 0
+        )
+
+
+        if asistencias_registradas > 0:
+
+            tasa_asistencia = round(
+                (
+                    presentes
+                    / asistencias_registradas
+                ) * 100,
+                1
+            )
+
+        else:
+
+            tasa_asistencia = None
+
+
+        # ==================================================
+        # 3. RESUMEN BI POR TALLER
+        # ==================================================
+
+        cursor.execute("""
+            WITH reservas AS (
+
+                SELECT
+                    taller_key,
+
+                    COUNT(*) AS total_reservas,
+
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'reservada'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS reservas_activas,
+
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS cancelaciones,
+
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            AND consume_clase = 0
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS cancelaciones_anticipadas,
+
+                    SUM(
+                        CASE
+                            WHEN estado_reserva = 'cancelada'
+                            AND consume_clase = 1
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS cancelaciones_tardias,
+
+                    SUM(
+                        consume_clase
+                    ) AS clases_descontadas
+
+                FROM la_maestranza_dw.fact_reservas
+
+                GROUP BY taller_key
+            ),
+
+            asistencias AS (
+
+                SELECT
+                    taller_key,
+
+                    COUNT(*) AS asistencias_registradas,
+
+                    SUM(
+                        CASE
+                            WHEN estado_asistencia = 'presente'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS presentes,
+
+                    SUM(
+                        CASE
+                            WHEN estado_asistencia = 'ausente'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS ausentes
+
+                FROM la_maestranza_dw.fact_asistencias
+
+                GROUP BY taller_key
+            )
+
+            SELECT
+
+                t.taller_key,
+                t.nombre AS taller,
+
+                COALESCE(
+                    r.total_reservas,
+                    0
+                ) AS reservas,
+
+                COALESCE(
+                    r.reservas_activas,
+                    0
+                ) AS activas,
+
+                COALESCE(
+                    r.cancelaciones,
+                    0
+                ) AS canceladas,
+
+                COALESCE(
+                    r.cancelaciones_anticipadas,
+                    0
+                ) AS cancelaciones_anticipadas,
+
+                COALESCE(
+                    r.cancelaciones_tardias,
+                    0
+                ) AS cancelaciones_tardias,
+
+                COALESCE(
+                    r.clases_descontadas,
+                    0
+                ) AS clases_descontadas,
+
+                COALESCE(
+                    a.asistencias_registradas,
+                    0
+                ) AS asistencias_registradas,
+
+                COALESCE(
+                    a.presentes,
+                    0
+                ) AS presentes,
+
+                COALESCE(
+                    a.ausentes,
+                    0
+                ) AS ausentes,
+
+                CASE
+
+                    WHEN COALESCE(
+                        a.asistencias_registradas,
+                        0
+                    ) > 0
+
+                    THEN ROUND(
+                        a.presentes
+                        * 100.0
+                        / a.asistencias_registradas,
+                        1
+                    )
+
+                    ELSE NULL
+
+                END AS tasa_asistencia
+
+            FROM la_maestranza_dw.dim_taller AS t
+
+            LEFT JOIN reservas AS r
+                ON t.taller_key = r.taller_key
+
+            LEFT JOIN asistencias AS a
+                ON t.taller_key = a.taller_key
+
+            WHERE
+                COALESCE(
+                    r.total_reservas,
+                    0
+                ) > 0
+
+                OR
+
+                COALESCE(
+                    a.asistencias_registradas,
+                    0
+                ) > 0
+
+            ORDER BY
+                COALESCE(
+                    r.total_reservas,
+                    0
+                ) DESC,
+
+                t.nombre
+        """)
+
+        talleres = cursor.fetchall()
+
+
+        # ==================================================
+        # 4. NORMALIZAR RESULTADOS
+        # ==================================================
+
+        for taller in talleres:
+
+            taller["reservas"] = int(
+                taller["reservas"] or 0
+            )
+
+            taller["activas"] = int(
+                taller["activas"] or 0
+            )
+
+            taller["canceladas"] = int(
+                taller["canceladas"] or 0
+            )
+
+            taller["cancelaciones_anticipadas"] = int(
+                taller["cancelaciones_anticipadas"] or 0
+            )
+
+            taller["cancelaciones_tardias"] = int(
+                taller["cancelaciones_tardias"] or 0
+            )
+
+            taller["clases_descontadas"] = int(
+                taller["clases_descontadas"] or 0
+            )
+
+            taller["asistencias_registradas"] = int(
+                taller["asistencias_registradas"] or 0
+            )
+
+            taller["presentes"] = int(
+                taller["presentes"] or 0
+            )
+
+            taller["ausentes"] = int(
+                taller["ausentes"] or 0
+            )
+
+            if taller["tasa_asistencia"] is not None:
+                taller["tasa_asistencia"] = float(
+                    taller["tasa_asistencia"]
+                )
+
+
+        # ==================================================
+        # 5. RESPUESTA
+        # ==================================================
+
+        return {
+
+            "indicadores": {
+
+                "reservas_totales":
+                    int(
+                        reservas["reservas_totales"]
+                        or 0
+                    ),
+
+                "reservas_activas":
+                    int(
+                        reservas["reservas_activas"]
+                        or 0
+                    ),
+
+                "cancelaciones":
+                    int(
+                        reservas["cancelaciones"]
+                        or 0
+                    ),
+
+                "cancelaciones_anticipadas":
+                    int(
+                        reservas["cancelaciones_anticipadas"]
+                        or 0
+                    ),
+
+                "cancelaciones_tardias":
+                    int(
+                        reservas["cancelaciones_tardias"]
+                        or 0
+                    ),
+
+                "clases_descontadas":
+                    int(
+                        reservas["clases_descontadas"]
+                        or 0
+                    ),
+
+                "asistencias_registradas":
+                    asistencias_registradas,
+
+                "presentes":
+                    presentes,
+
+                "ausentes":
+                    ausentes,
+
+                "tasa_asistencia":
+                    tasa_asistencia
+            },
+
+            "talleres":
+                talleres
+        }
+
+
+    finally:
+
+        cursor.close()
+        conexion.close()
