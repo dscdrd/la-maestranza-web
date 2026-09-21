@@ -1304,12 +1304,23 @@ def obtener_talleres():
         conexion.close()
 
 
-def crear_taller(nombre, descripcion, horario, cupo_maximo, imagen):
+def crear_taller(
+    nombre,
+    descripcion,
+    horario,
+    cupo_maximo,
+    imagen,
+    id_profesor
+):
 
     conexion = conectar_db()
     cursor = conexion.cursor()
 
     try:
+
+        # ==========================================
+        # 1. CREAR TALLER
+        # ==========================================
 
         cursor.execute("""
             INSERT INTO talleres (
@@ -1329,9 +1340,31 @@ def crear_taller(nombre, descripcion, horario, cupo_maximo, imagen):
             imagen
         ))
 
+        id_taller = cursor.lastrowid
+
+
+        # ==========================================
+        # 2. ASIGNAR TALLER AL PROFESOR
+        # ==========================================
+
+        cursor.execute("""
+            INSERT INTO taller_profesor (
+                id_taller,
+                id_profesor
+            )
+            VALUES (%s, %s)
+        """, (
+            id_taller,
+            id_profesor
+        ))
+
+
+        # ==========================================
+        # 3. CONFIRMAR TRANSACCIÓN
+        # ==========================================
+
         conexion.commit()
 
-        id_taller = cursor.lastrowid
 
         return {
             "id_taller": id_taller,
@@ -1343,16 +1376,17 @@ def crear_taller(nombre, descripcion, horario, cupo_maximo, imagen):
             "estado": "activo"
         }
 
-    except:
 
-        conexion.rollback() #Si MySQL falla, el servicio deshace la operación y luego vuelve a lanzar el error.
+    except Exception:
+
+        conexion.rollback()
         raise
+
 
     finally:
 
         cursor.close()
         conexion.close()
-
 
 def actualizar_taller(
     id_taller,
@@ -1411,30 +1445,148 @@ def actualizar_taller(
 def eliminar_taller(id_taller):
 
     conexion = conectar_db()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(dictionary=True)
 
     try:
 
+        # ==================================================
+        # 1. COMPROBAR SI EL TALLER TIENE REGISTROS
+        # ==================================================
+
+        cursor.execute("""
+            SELECT
+
+                (
+                    SELECT COUNT(*)
+                    FROM planes
+                    WHERE id_taller = %s
+                ) AS total_planes,
+
+                (
+                    SELECT COUNT(*)
+                    FROM clases
+                    WHERE id_taller = %s
+                ) AS total_clases,
+
+                (
+                    SELECT COUNT(*)
+                    FROM inscripciones
+                    WHERE id_taller = %s
+                ) AS total_inscripciones
+
+        """, (
+            id_taller,
+            id_taller,
+            id_taller
+        ))
+
+        registros = cursor.fetchone()
+
+        total_planes = int(
+            registros["total_planes"] or 0
+        )
+
+        total_clases = int(
+            registros["total_clases"] or 0
+        )
+
+        total_inscripciones = int(
+            registros["total_inscripciones"] or 0
+        )
+
+
+        tiene_registros = (
+            total_planes > 0
+            or total_clases > 0
+            or total_inscripciones > 0
+        )
+
+
+        # ==================================================
+        # 2. SI TIENE REGISTROS → DESACTIVAR
+        # ==================================================
+
+        if tiene_registros:
+
+            cursor.execute("""
+                UPDATE talleres
+
+                SET estado = 'inactivo'
+
+                WHERE id_taller = %s
+            """, (
+                id_taller,
+            ))
+
+            conexion.commit()
+
+            return {
+                "resultado": True,
+                "accion": "desactivado",
+                "id_taller": id_taller,
+                "registros": {
+                    "planes": total_planes,
+                    "clases": total_clases,
+                    "inscripciones": total_inscripciones
+                }
+            }
+
+
+        # ==================================================
+        # 3. SIN REGISTROS → ELIMINAR RELACIÓN PROFESOR
+        # ==================================================
+
+        cursor.execute("""
+            DELETE FROM taller_profesor
+
+            WHERE id_taller = %s
+        """, (
+            id_taller,
+        ))
+
+
+        # ==================================================
+        # 4. ELIMINAR TALLER FÍSICAMENTE
+        # ==================================================
+
         cursor.execute("""
             DELETE FROM talleres
+
             WHERE id_taller = %s
-        """, (id_taller,))
+        """, (
+            id_taller,
+        ))
+
+
+        eliminado = cursor.rowcount > 0
 
         conexion.commit()
 
-        return True
 
-    except:
+        return {
+            "resultado": eliminado,
+            "accion": "eliminado",
+            "id_taller": id_taller,
+            "registros": {
+                "planes": 0,
+                "clases": 0,
+                "inscripciones": 0
+            }
+        }
+
+
+    except Exception:
 
         conexion.rollback()
         raise
+
 
     finally:
 
         cursor.close()
         conexion.close()
 
-
+        
 def obtener_talleres_profesor(id_profesor):
 
     conexion = conectar_db()
@@ -1457,6 +1609,7 @@ def obtener_talleres_profesor(id_profesor):
                 ON t.id_taller = tp.id_taller
 
             WHERE tp.id_profesor = %s
+            AND t.estado = 'activo'
 
             ORDER BY t.nombre
         """, (id_profesor,))
@@ -1595,14 +1748,24 @@ def obtener_clases_profesor(id_profesor):
                 c.hora_fin,
                 c.cupo_maximo,
                 c.estado,
+
                 t.id_taller,
                 t.nombre AS taller,
 
+                CASE
+                    WHEN c.fecha = CURDATE()
+                    THEN 1
+                    ELSE 0
+                END AS es_hoy,
+
                 (
                     SELECT COUNT(*)
+
                     FROM reservas_clase r
+
                     WHERE r.id_clase = c.id_clase
                     AND r.estado = 'reservada'
+
                 ) AS reservados
 
             FROM clases c
@@ -1610,14 +1773,14 @@ def obtener_clases_profesor(id_profesor):
             INNER JOIN talleres t
                 ON c.id_taller = t.id_taller
 
-            WHERE EXISTS (
-                SELECT 1
-                FROM taller_profesor tp
-                WHERE tp.id_taller = t.id_taller
+            INNER JOIN taller_profesor tp
+                ON tp.id_taller = t.id_taller
                 AND tp.id_profesor = %s
-            )
+
+            WHERE t.estado = 'activo'
 
             ORDER BY
+
                 CASE
                     WHEN c.fecha = CURDATE() THEN 0
                     WHEN c.fecha > CURDATE() THEN 1
@@ -1636,33 +1799,45 @@ def obtener_clases_profesor(id_profesor):
 
                 c.hora_inicio ASC
 
-        """, (id_profesor,))
+        """, (
+            id_profesor,
+        ))
 
         clases = cursor.fetchall()
 
+
         # --------------------------------------------------
-        # CONVERTIR DATOS MYSQL PARA JSON
+        # CONVERTIR VALORES DE MYSQL
         # --------------------------------------------------
 
         for clase in clases:
 
-            # Fecha
             if clase["fecha"] is not None:
-                clase["fecha"] = str(clase["fecha"])
+                clase["fecha"] = str(
+                    clase["fecha"]
+                )
 
-            # Hora de inicio
             if clase["hora_inicio"] is not None:
                 clase["hora_inicio"] = str(
                     clase["hora_inicio"]
                 )
 
-            # Hora de término
             if clase["hora_fin"] is not None:
                 clase["hora_fin"] = str(
                     clase["hora_fin"]
                 )
 
+            clase["reservados"] = int(
+                clase["reservados"] or 0
+            )
+
+            clase["es_hoy"] = bool(
+                clase["es_hoy"]
+            )
+
+
         return clases
+
 
     finally:
 

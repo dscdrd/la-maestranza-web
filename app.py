@@ -1,6 +1,7 @@
 import os
 from db import conectar_db
 from api import api 
+from datetime import date
 
 from services import actualizar_foto_alumno, actualizar_foto_profesor, obtener_alumno_por_usuario, obtener_profesor_por_usuario, obtener_usuario_login, obtener_clases_profesor, obtener_talleres_profesor, obtener_reserva_profesor, registrar_asistencia_reserva, obtener_alumnos_clase, obtener_talleres, obtener_taller_por_id, obtener_talleres_activos, obtener_taller_activo_por_id, obtener_planes_taller, obtener_talleres_activos_alumno, obtener_resumen_taller_alumno, contar_reservas_activas_clase, obtener_clases_disponibles_taller_alumno, obtener_inscripcion_con_saldo, obtener_clase_disponible_taller, obtener_reserva_previa_clase, crear_reserva_clase, obtener_reserva_alumno, cancelar_reserva_alumno, obtener_plan_taller, procesar_inscripcion_taller, eliminar_cuenta_profesor, obtener_resumen_bi_talleres
 
@@ -435,17 +436,27 @@ def login_profesor():
 @app.route("/panel_profesor")
 def panel_profesor():
 
-    # Verificar sesión
+    # --------------------------------------------------
+    # VERIFICAR SESIÓN
+    # --------------------------------------------------
+
     if "id_usuario" not in session:
         return redirect(
             url_for("login_profesor")
         )
 
-    # Verificar rol
+    # --------------------------------------------------
+    # VERIFICAR ROL
+    # --------------------------------------------------
+
     if session.get("rol") != "profesor":
         return "Acceso no autorizado", 403
 
-    # Obtener profesor mediante services.py
+
+    # --------------------------------------------------
+    # OBTENER PROFESOR
+    # --------------------------------------------------
+
     profesor = obtener_profesor_por_usuario(
         session["id_usuario"]
     )
@@ -453,15 +464,58 @@ def panel_profesor():
     if not profesor:
         return "No se encontraron los datos del profesor", 404
 
-    # Obtener clases mediante services.py
+
+    # --------------------------------------------------
+    # OBTENER TODAS LAS CLASES DEL PROFESOR
+    # --------------------------------------------------
+
     clases = obtener_clases_profesor(
         profesor["id_profesor"]
     )
 
+
+    # --------------------------------------------------
+    # FILTRAR CLASES DE HOY
+    # --------------------------------------------------
+
+    from datetime import date
+
+    hoy = date.today().isoformat()
+
+    clases_hoy = []
+
+    for clase in clases:
+
+        fecha_clase = str(
+            clase.get("fecha", "")
+        )
+
+        estado_clase = clase.get(
+            "estado"
+        )
+
+        if (
+            fecha_clase == hoy
+            and estado_clase == "programada"
+        ):
+
+            clases_hoy.append(
+                clase
+            )
+
+    # --------------------------------------------------
+    # MOSTRAR PANEL
+    # --------------------------------------------------
+
     return render_template(
         "panel_profesor.html",
+
         profesor=profesor,
-        clases=clases
+
+        # Enviamos ambas variables para evitar problemas
+        # con el nombre utilizado actualmente en el HTML.
+        clases=clases_hoy,
+        clases_hoy=clases_hoy
     )
 # =========================
 # EDITAR PROFESOR

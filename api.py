@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 import os
 import uuid
 
+
 from services import (
     obtener_taller_por_id,
     obtener_talleres,
@@ -66,21 +67,27 @@ def api_listar_talleres():
 # ==========================================================
 # API REST - CREAR TALLER
 # ==========================================================
-
 @api.route("/api/talleres", methods=["POST"])
 def api_crear_taller():
 
-    # Verificar sesión
+    # --------------------------------------------------
+    # VERIFICAR SESIÓN
+    # --------------------------------------------------
+
     if "id_usuario" not in session:
         return jsonify({
             "error": "Debes iniciar sesión."
         }), 401
 
-    # Verificar rol
+    # --------------------------------------------------
+    # VERIFICAR ROL
+    # --------------------------------------------------
+
     if session.get("rol") != "profesor":
         return jsonify({
             "error": "No tienes permisos para crear talleres."
         }), 403
+
 
     # --------------------------------------------------
     # RECIBIR JSON
@@ -93,12 +100,27 @@ def api_crear_taller():
             "error": "Debes enviar los datos del taller."
         }), 400
 
-    nombre = str(datos.get("nombre", "")).strip()
-    descripcion = str(datos.get("descripcion", "")).strip()
-    horario = str(datos.get("horario", "")).strip()
-    imagen = str(datos.get("imagen", "")).strip()
 
-    cupo_maximo = datos.get("cupo_maximo")
+    nombre = str(
+        datos.get("nombre", "")
+    ).strip()
+
+    descripcion = str(
+        datos.get("descripcion", "")
+    ).strip()
+
+    horario = str(
+        datos.get("horario", "")
+    ).strip()
+
+    imagen = str(
+        datos.get("imagen", "")
+    ).strip()
+
+    cupo_maximo = datos.get(
+        "cupo_maximo"
+    )
+
 
     # --------------------------------------------------
     # VALIDACIONES
@@ -109,20 +131,47 @@ def api_crear_taller():
             "error": "El nombre del taller es obligatorio."
         }), 400
 
+
     try:
-        cupo_maximo = int(cupo_maximo)
+
+        cupo_maximo = int(
+            cupo_maximo
+        )
 
         if cupo_maximo < 1:
             raise ValueError
 
+
     except (TypeError, ValueError):
 
         return jsonify({
-            "error": "El cupo máximo debe ser un número mayor a 0."
+            "error":
+                "El cupo máximo debe ser un número mayor a 0."
         }), 400
 
+
     # --------------------------------------------------
-    # SERVICIO
+    # OBTENER PROFESOR CONECTADO
+    # --------------------------------------------------
+
+    profesor = obtener_profesor_por_usuario(
+        session["id_usuario"]
+    )
+
+    if not profesor:
+        return jsonify({
+            "error":
+                "No se encontró el perfil del profesor."
+        }), 404
+
+
+    id_profesor = profesor[
+        "id_profesor"
+    ]
+
+
+    # --------------------------------------------------
+    # CREAR TALLER
     # --------------------------------------------------
 
     try:
@@ -132,13 +181,18 @@ def api_crear_taller():
             descripcion,
             horario,
             cupo_maximo,
-            imagen
+            imagen,
+            id_profesor
         )
 
+
         return jsonify({
-            "mensaje": "Taller creado correctamente.",
-            "taller": taller
+            "mensaje":
+                "Taller creado correctamente.",
+            "taller":
+                taller
         }), 201
+
 
     except Exception as error:
 
@@ -147,10 +201,11 @@ def api_crear_taller():
             error
         )
 
-        return jsonify({
-            "error": "No se pudo crear el taller."
-        }), 500
 
+        return jsonify({
+            "error":
+                "No se pudo crear el taller."
+        }), 500
 
 # ==========================================================
 # API REST - OBTENER UN TALLER
@@ -285,53 +340,108 @@ def api_actualizar_taller(id_taller):
 # API REST - ELIMINAR TALLER
 # ==========================================================
 
-@api.route("/api/talleres/<int:id_taller>", methods=["DELETE"])
+@api.route(
+    "/api/talleres/<int:id_taller>",
+    methods=["DELETE"]
+)
 def api_eliminar_taller(id_taller):
 
-    # Verificar sesión
+    # --------------------------------------------------
+    # VERIFICAR SESIÓN
+    # --------------------------------------------------
+
     if "id_usuario" not in session:
         return jsonify({
             "error": "Debes iniciar sesión."
         }), 401
 
-    # Verificar rol
+
+    # --------------------------------------------------
+    # VERIFICAR ROL
+    # --------------------------------------------------
+
     if session.get("rol") != "profesor":
         return jsonify({
-            "error": "No tienes permisos para eliminar talleres."
+            "error":
+                "No tienes permisos para eliminar talleres."
         }), 403
+
 
     # --------------------------------------------------
     # COMPROBAR QUE EL TALLER EXISTE
     # --------------------------------------------------
 
-    taller = obtener_taller_por_id(id_taller)
+    taller = obtener_taller_por_id(
+        id_taller
+    )
 
     if not taller:
+
         return jsonify({
-            "error": "El taller no existe."
+            "error":
+                "El taller no existe."
         }), 404
 
+
     # --------------------------------------------------
-    # ELIMINAR MEDIANTE SERVICES
+    # ELIMINAR O DESACTIVAR
     # --------------------------------------------------
 
     try:
 
-        eliminar_taller(id_taller)
+        resultado = eliminar_taller(
+            id_taller
+        )
 
-        return jsonify({
-            "mensaje": "Taller eliminado permanentemente.",
-            "id_taller": id_taller
-        }), 200
 
-    except Exception as error:
+        if not resultado["resultado"]:
 
-        if error.__class__.__name__ == "IntegrityError":
             return jsonify({
                 "error":
-                    "No se puede eliminar este taller porque tiene "
-                    "registros relacionados."
-            }), 409
+                    "No se pudo eliminar el taller."
+            }), 400
+
+
+        # ==============================================
+        # CASO 1: ELIMINACIÓN FÍSICA
+        # ==============================================
+
+        if resultado["accion"] == "eliminado":
+
+            return jsonify({
+                "mensaje":
+                    "Taller eliminado permanentemente.",
+                "accion":
+                    "eliminado",
+                "id_taller":
+                    id_taller
+            }), 200
+
+
+        # ==============================================
+        # CASO 2: DESACTIVACIÓN
+        # ==============================================
+
+        return jsonify({
+
+            "mensaje":
+                "El taller posee registros históricos, "
+                "por lo que fue desactivado en lugar "
+                "de eliminarse.",
+
+            "accion":
+                "desactivado",
+
+            "id_taller":
+                id_taller,
+
+            "registros":
+                resultado["registros"]
+
+        }), 200
+
+
+    except Exception as error:
 
         current_app.logger.exception(
             "Error al eliminar taller: %s",
@@ -339,9 +449,9 @@ def api_eliminar_taller(id_taller):
         )
 
         return jsonify({
-            "error": "No se pudo eliminar el taller."
+            "error":
+                "No se pudo eliminar el taller."
         }), 500
-
 
 @api.route(
     "/api/talleres/<int:id_taller>/clases",
