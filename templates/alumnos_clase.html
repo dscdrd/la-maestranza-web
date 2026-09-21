@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -22,6 +23,12 @@
         href="{{ url_for('static', filename='css/alumnos_clase.css') }}"
     >
 
+    <style>
+        .acciones-asistencia { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .acciones-asistencia button { padding: 8px 12px; border: 1px solid #777; border-radius: 6px; background: white; color: #222; cursor: pointer; }
+        .acciones-asistencia button[aria-pressed="true"] { background: #222; color: white; }
+        .acciones-asistencia button:focus-visible { outline: 3px solid #a40000; outline-offset: 2px; }
+    </style>
 </head>
 
 
@@ -109,9 +116,9 @@
                 </span>
 
                 <strong>
-                    {{ clase.presentes or 0 }}
+                    {{ total_presentes }}
                     /
-                    {{ clase.total_asistencias or 0 }}
+                    {{ total_inscritos }}
                 </strong>
 
             </div>
@@ -214,9 +221,9 @@
 
                                     <td>
 
-                                        {% if alumno.estado_asistencia %}
+                                        {% if alumno.asistencia %}
 
-                                            {{ alumno.estado_asistencia|capitalize }}
+                                            {{ alumno.asistencia|capitalize }}
 
                                         {% else %}
 
@@ -224,6 +231,16 @@
                                                 —
                                             </span>
 
+                                        {% endif %}
+
+                                        {% if alumno.estado_reserva == 'reservada' %}
+                                            <form class="acciones-asistencia" method="post"
+                                                  action="{{ url_for('registrar_asistencia', id_reserva=alumno.id_reserva) }}">
+                                                <button type="submit" name="estado" value="presente"
+                                                        aria-pressed="{{ 'true' if alumno.asistencia == 'presente' else 'false' }}">Presente</button>
+                                                <button type="submit" name="estado" value="ausente"
+                                                        aria-pressed="{{ 'true' if alumno.asistencia == 'ausente' else 'false' }}">Ausente</button>
+                                            </form>
                                         {% endif %}
 
                                     </td>
